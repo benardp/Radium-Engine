@@ -1,0 +1,9 @@
+<map id="Ra::Core::Geometry::PolyLine::project" name="Ra::Core::Geometry::PolyLine::project">
+<area shape="rect" id="node2" href="$namespaceRa_1_1Core_1_1Geometry.html#a749ee9e81862ef200b0b7540cc1f16bc" title="Project point Q on segment AB defined by point A and vector AB = (B &#45;A). " alt="" coords="228,23,379,65"/>
+<area shape="rect" id="node5" href="$namespaceRa_1_1Core_1_1Geometry.html#aa04e6052d8911b1df1bd881474debb45" title="Ra::Core::Geometry::t" alt="" coords="223,89,383,116"/>
+<area shape="rect" id="node6" href="$namespaceRa_1_1Core_1_1Math.html#a8667e211f2182821346ba4bcfe07b053" title="Get the cotangent of the angle between two vectors. " alt="" coords="223,140,383,167"/>
+<area shape="rect" id="node7" href="$classRa_1_1Core_1_1Geometry_1_1PolyLine.html#a0a39e8afbbe12da750ec49276a3f9269" title="Given a point on one of the segments identified by parameter tSegment in [0,1] and segment number..." alt="" coords="201,191,405,233"/>
+<area shape="rect" id="node3" href="$namespaceRa_1_1Core_1_1Math.html#acc9f6f3b880b60bf0ee7723afabaf180" title="Component&#45;wise clamp() function on a floating&#45;point vector. " alt="" coords="453,5,616,32"/>
+<area shape="rect" id="node4" href="$namespaceOpenMesh.html#a575b338f0fc9ecb5393d23e977e6ac38" title="OpenMesh::dot" alt="" coords="475,56,594,83"/>
+<area shape="rect" id="node8" href="$classRa_1_1Core_1_1Geometry_1_1PolyLine.html#a2902446ee56d44c7ac8003e7b9335652" title="Get the total length of the line . " alt="" coords="461,191,609,233"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="CameraManipPlugin::CameraManipPluginC::saveCamera" name="CameraManipPlugin::CameraManipPluginC::saveCamera">
+<area shape="rect" id="node2" href="$classRa_1_1Gui_1_1Viewer.html#abd94acd8d3999771e1b7536c5e210f80" title="Access to camera interface. " alt="" coords="222,5,419,47"/>
+<area shape="rect" id="node3" href="$classRa_1_1Gui_1_1CameraManipulator.html#a1166d807b9d04c05aecf3b1de8c89150" title="Pointer access to the camera. " alt="" coords="220,71,421,112"/>
+<area shape="rect" id="node4" href="$classRa_1_1Engine_1_1Camera.html#ab7995c83701d0186160eb02b176ecbac" title="Return the projection type. " alt="" coords="247,136,395,177"/>
+</map>

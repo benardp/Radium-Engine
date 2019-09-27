@@ -1,0 +1,7 @@
+<map id="MeshFeatureTrackingPlugin::MeshFeatureTrackingComponent::setTriangleIdx" name="MeshFeatureTrackingPlugin::MeshFeatureTrackingComponent::setTriangleIdx">
+<area shape="rect" id="node2" href="$classRa_1_1Engine_1_1Component.html#a10b0bc182b76165744ebea603ae32dfe" title="Shortcut to access the render object manager. " alt="" coords="327,5,499,47"/>
+<area shape="rect" id="node3" href="$classRa_1_1Engine_1_1Mesh.html#a7dd9018e643becd20e714a54cf6664db" title="Ra::Engine::Mesh::getRenderMode" alt="" coords="294,71,533,98"/>
+<area shape="rect" id="node5" href="$namespaceRa_1_1Core_1_1Geometry.html#aa04e6052d8911b1df1bd881474debb45" title="Ra::Core::Geometry::t" alt="" coords="784,93,944,119"/>
+<area shape="rect" id="node6" href="$classRa_1_1Engine_1_1Mesh.html#aeb1eb176c4ac5a045a80b97a5e09e07e" title="Returns the underlying TriangleMesh. " alt="" coords="292,173,535,199"/>
+<area shape="rect" id="node4" href="$namespaceRa_1_1Core_1_1Containers.html#a83257c42de08d550fe2081a5d8a13331" title="Stores a 3&#45;dimensional hierarchy of meshes of arbitrary type. " alt="" coords="583,56,736,97"/>
+</map>

@@ -1,0 +1,13 @@
+<map id="Ra::Engine::DrawPrimitives::Capsule" name="Ra::Engine::DrawPrimitives::Capsule">
+<area shape="rect" id="node2" href="$namespaceOpenMesh.html#a8205f789ce08919bc11c58383574596c" title="OpenMesh::norm" alt="" coords="947,107,1079,133"/>
+<area shape="rect" id="node3" href="$namespaceRa_1_1Core_1_1Geometry.html#ab8891eb859ec20df78a252a89870c04a" title="Create a capsule with given cylinder length and radius. " alt="" coords="244,138,392,179"/>
+<area shape="rect" id="node4" href="$classRa_1_1Core_1_1Geometry_1_1TriangleMesh.html#a6ef9dbd18c0501f2ffd1316be6be56ce" title="Access the vertices positions. " alt="" coords="725,95,896,137"/>
+<area shape="rect" id="node10" href="$namespaceRa_1_1Core_1_1Geometry.html#aa04e6052d8911b1df1bd881474debb45" title="Ra::Core::Geometry::t" alt="" coords="731,357,891,384"/>
+<area shape="rect" id="node5" href="$classRa_1_1Core_1_1Geometry_1_1TriangleMesh.html#ad7d3f6272b902171740e50232ba56114" title="Access the vertices normals. " alt="" coords="725,226,897,267"/>
+<area shape="rect" id="node6" href="$namespaceRa_1_1Core_1_1Math.html#a4f441ac6a56092d52849a4f48e274aa8" title="Get the cosine of the angle between two vectors. " alt="" coords="484,65,631,92"/>
+<area shape="rect" id="node7" href="$classRa_1_1Core_1_1Geometry_1_1TriangleMesh.html#a51b5e7d49d82ffa036306e28a42cd92b" title="Utility function colorzing the mesh with a given color. Add the color attribute if needed..." alt="" coords="473,167,642,209"/>
+<area shape="rect" id="node9" href="$classRa_1_1Core_1_1Geometry_1_1TriangleMesh.html#a0b294c697e094dcc62b3adb3c0ac16af" title="Check that the mesh is well built, asserting when it is not. " alt="" coords="440,285,675,326"/>
+<area shape="rect" id="node8" href="$classRa_1_1Core_1_1Geometry_1_1TriangleMesh.html#a209037ce5a11ec8539a9ada7ba763e8c" title="Get attribute by handle. " alt="" coords="723,161,899,202"/>
+<area shape="rect" id="node11" href="$namespaceRa_1_1Core_1_1Geometry.html#a178f2b7309fe2ea5bc31a3abcb25368e" title="Ra::Core::Geometry\l::triangleArea" alt="" coords="737,291,885,333"/>
+<area shape="rect" id="node12" href="$namespaceOpenMesh.html#a71e7f1dd3eac016d2b8245ac408a291c" title="OpenMesh::cross" alt="" coords="947,299,1079,325"/>
+</map>

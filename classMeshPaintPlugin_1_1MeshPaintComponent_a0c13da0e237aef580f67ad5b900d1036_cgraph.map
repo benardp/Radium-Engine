@@ -1,0 +1,14 @@
+<map id="MeshPaintPlugin::MeshPaintComponent::startPaint" name="MeshPaintPlugin::MeshPaintComponent::startPaint">
+<area shape="rect" id="node2" href="$classRa_1_1Engine_1_1Component.html#a10b0bc182b76165744ebea603ae32dfe" title="Shortcut to access the render object manager. " alt="" coords="287,5,459,47"/>
+<area shape="rect" id="node3" href="$classRa_1_1Engine_1_1Mesh.html#aeb1eb176c4ac5a045a80b97a5e09e07e" title="Returns the underlying TriangleMesh. " alt="" coords="252,71,495,98"/>
+<area shape="rect" id="node4" href="$classRa_1_1Core_1_1Geometry_1_1TriangleMesh.html#a316e86eab4e624183f1bfe5c25f8592c" title="Return the Handle to the attribute with the given name if it exists, an invalid handle otherwise..." alt="" coords="263,123,484,164"/>
+<area shape="rect" id="node5" href="$classRa_1_1Core_1_1Utils_1_1AttribHandle.html#a4a424e15cc78e180173f5bf2c9c79612" title="Ra::Core::Utils::AttribHandle::idx" alt="" coords="260,189,487,215"/>
+<area shape="rect" id="node6" href="$classRa_1_1Core_1_1Utils_1_1Index.html#ac7d6c68387fe147f7a13668ac30a4533" title="INVALID. " alt="" coords="296,240,451,281"/>
+<area shape="rect" id="node7" href="$classRa_1_1Core_1_1Geometry_1_1TriangleMesh.html#a51b5e7d49d82ffa036306e28a42cd92b" title="Utility function colorzing the mesh with a given color. Add the color attribute if needed..." alt="" coords="289,357,458,399"/>
+<area shape="rect" id="node8" href="$classRa_1_1Core_1_1Geometry_1_1TriangleMesh.html#a209037ce5a11ec8539a9ada7ba763e8c" title="Get attribute by handle. " alt="" coords="543,299,719,340"/>
+<area shape="rect" id="node10" href="$classRa_1_1Core_1_1Utils_1_1ColorBase.html#a06951f0641b03be8d47e2762f75d1f6e" title="Ra::Core::Utils::ColorBase\l\&lt; Scalar \&gt;::Skin" alt="" coords="281,423,466,464"/>
+<area shape="rect" id="node11" href="$classRa_1_1Engine_1_1Mesh.html#a9a1dcadf7fb4ff851b18c87b3a98ac6b" title="Mark one of the data types as dirty, forcing an update of the openGL buffer. " alt="" coords="279,489,468,515"/>
+<area shape="rect" id="node12" href="$classRa_1_1Core_1_1Geometry_1_1TriangleMesh.html#a500ec734182d60422cfea1fb57f39462" title="Remove attribute by handle. " alt="" coords="271,540,475,581"/>
+<area shape="rect" id="node13" href="$classRa_1_1Core_1_1Geometry_1_1TriangleMesh.html#adfb86f61e519e83e15d6f3bb32d76eb9" title="Return true if h refers to an existing attribute in *this. " alt="" coords="293,605,453,647"/>
+<area shape="rect" id="node9" href="$classRa_1_1Core_1_1Geometry_1_1TriangleMesh.html#a6ef9dbd18c0501f2ffd1316be6be56ce" title="Access the vertices positions. " alt="" coords="545,364,716,405"/>
+</map>

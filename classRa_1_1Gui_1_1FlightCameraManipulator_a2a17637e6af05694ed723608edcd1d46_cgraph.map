@@ -1,0 +1,8 @@
+<map id="Ra::Gui::FlightCameraManipulator::setCameraTarget" name="Ra::Gui::FlightCameraManipulator::setCameraTarget">
+<area shape="rect" id="node2" href="$classRa_1_1Engine_1_1Camera.html#a724a052e94817af7e602129467c8696f" title="Return the position. " alt="" coords="697,5,845,47"/>
+<area shape="rect" id="node3" href="$classRa_1_1Engine_1_1Camera.html#a2fd3ed37be68acb358df23c3f04b3d81" title="Set the direction of the camera to &#39;direction&#39;. " alt="" coords="288,89,436,131"/>
+<area shape="rect" id="node4" href="$classRa_1_1Engine_1_1Camera.html#a23be7aa714c0e9c2a9429dfc9ef2c53a" title="Return the direction the camera is looking at. " alt="" coords="484,35,632,76"/>
+<area shape="rect" id="node7" href="$classRa_1_1Engine_1_1Light.html#a24e11b300dfe4e2a785d87b6de74b036" title="set the direction of lighting " alt="" coords="294,155,430,196"/>
+<area shape="rect" id="node5" href="$classRa_1_1Engine_1_1Camera.html#a7a2c1c84e3063c6c3f09d490477abb0f" title="Apply the local transformation &#39;T&#39; to the camera. " alt="" coords="484,100,632,141"/>
+<area shape="rect" id="node6" href="$classRa_1_1Engine_1_1RenderObject.html#a2d6a1bc2b7646fe0912035a2ece24864" title="Ra::Engine::RenderObject\l::setLocalTransform" alt="" coords="680,100,863,141"/>
+</map>

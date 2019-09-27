@@ -1,0 +1,42 @@
+<map id="Ra::Gui::Viewer::mouseMoveEvent" name="Ra::Gui::Viewer::mouseMoveEvent">
+<area shape="rect" id="node2" href="$classRa_1_1Engine_1_1Renderer.html#acba3d1160a0d77f8aff98feade1efb7e" title="Ra::Engine::Renderer\l::setMousePosition" alt="" coords="293,5,448,47"/>
+<area shape="rect" id="node3" href="$classRa_1_1Gui_1_1WindowQt.html#a78476baacd2df24a260f604d02c8ddc4" title="Make the OpenGL context associated with the viewer the current context. " alt="" coords="298,71,443,112"/>
+<area shape="rect" id="node4" href="$classRa_1_1Engine_1_1Renderer.html#ad305540d63cd086f9e99ef6990978244" title="Ra::Engine::Renderer\l::doPickingNow" alt="" coords="293,136,448,177"/>
+<area shape="rect" id="node5" href="$classRa_1_1Gui_1_1WindowQt.html#acd31b9e580f049491d13c16ef954d964" title="Reset the current OpenGL context that is no more the one associated with the viewer. " alt="" coords="298,201,443,243"/>
+<area shape="rect" id="node6" href="$namespaceRa_1_1Gui.html#a6a6b6c1b2092c0718698a298a8c4cf8b" title="return the last, still pressed, key code, &#45;1 if no key currently pressed " alt="" coords="303,267,438,294"/>
+<area shape="rect" id="node7" href="$classRa_1_1Gui_1_1KeyMappingManageable.html#a22954323f435085f355701781f846cda" title="Ra::Gui::KeyMappingManageable\l\&lt; GizmoManager \&gt;::getContext" alt="" coords="256,319,485,360"/>
+<area shape="rect" id="node8" href="$classRa_1_1Gui_1_1GizmoManager.html#aeb11c8ca78b0a6b957c3551aa99b29c5" title="Ra::Gui::GizmoManager\l::handleMouseMoveEvent" alt="" coords="278,384,463,425"/>
+<area shape="rect" id="node37" href="$classRa_1_1Gui_1_1Viewer.html#ab4b12ff8c0b88d00e22da2a5add68db9" title="Ra::Gui::Viewer::getPickingMode" alt="" coords="258,450,483,477"/>
+<area shape="rect" id="node38" href="$classRa_1_1Engine_1_1Renderer.html#a4c25a5364a90acf6e55b122770a654a2" title="Add a new picking query for the next rendering. " alt="" coords="293,501,448,543"/>
+<area shape="rect" id="node39" href="$classRa_1_1Gui_1_1Viewer.html#a40bbbeeea10361efef8ab41917832a44" title="Access to gizmo manager. " alt="" coords="277,567,464,608"/>
+<area shape="rect" id="node40" href="$classRa_1_1Gui_1_1GizmoManager.html#ab63207c7a3d7afb2dfd735ecf5bd3005" title="Callback when a drawable is picked. " alt="" coords="285,632,457,673"/>
+<area shape="rect" id="node9" href="$classRa_1_1GuiBase_1_1TransformEditor.html#ad21b8c46ad2d5c62e309eb16b104ee2f" title="Ra::GuiBase::TransformEditor\l::canEdit" alt="" coords="1089,384,1296,425"/>
+<area shape="rect" id="node25" href="$classRa_1_1Gui_1_1CameraManipulator.html#a7ded184bdfa9e586bf7357a40852dace" title="Static method to get the Camera from the given viewer. " alt="" coords="547,533,748,575"/>
+<area shape="rect" id="node26" href="$classRa_1_1Gui_1_1Gizmo.html#ae17f5ca99626c9777b91c9f50f062872" title="Called when the mouse movement is recorder with the camera parameters and the current pixel coordinat..." alt="" coords="546,290,749,317"/>
+<area shape="rect" id="node27" href="$classRa_1_1GuiBase_1_1TransformEditor.html#a28fe7af7f62396a35765ce909f76485b" title="Helper to set the transform to the editable. " alt="" coords="822,325,1029,367"/>
+<area shape="rect" id="node30" href="$classRa_1_1Gui_1_1GizmoManager.html#a2733d1f2a992c50e41b93790b5323fe1" title="Retrieve the transform from the editable and update the gizmos. " alt="" coords="561,468,733,509"/>
+<area shape="rect" id="node10" href="$structRa_1_1Engine_1_1ItemEntry.html#aceafc81a73631955b64999dd39a639da" title="Returns true if the item represents any valid object. " alt="" coords="1351,487,1509,528"/>
+<area shape="rect" id="node20" href="$structRa_1_1Engine_1_1ItemEntry.html#a09e294208d0896596a42a7a6c7e78f75" title="Returns true if the item can be selected. " alt="" coords="1351,304,1509,345"/>
+<area shape="rect" id="node23" href="$structRa_1_1Engine_1_1ItemEntry.html#a4823dfa3c113db71733979f1719f3b28" title="Returns true if the item represents an entity. " alt="" coords="1351,552,1509,593"/>
+<area shape="rect" id="node24" href="$classRa_1_1Engine_1_1Component.html#a2c33ddf042a2c56f81f39477d9b616d0" title="Returns true if a transform can be edited with the render object index given as a key..." alt="" coords="1344,369,1516,411"/>
+<area shape="rect" id="node11" href="$structRa_1_1Engine_1_1ItemEntry.html#a1fb9fdd74413a1fa5878f53c1cfcf8fd" title="Debug checks. " alt="" coords="1816,727,1975,768"/>
+<area shape="rect" id="node13" href="$classRa_1_1Engine_1_1RadiumEngine.html#a79f6626ce468268791bc5bdfe17b5586" title="Get the entity manager attached to the engine. " alt="" coords="1566,552,1754,593"/>
+<area shape="rect" id="node14" href="$classRa_1_1Engine_1_1EntityManager.html#a5115cccae6aaef614ad4bd08e64d8185" title="Check wether an entity with a given name exists or not. " alt="" coords="1565,617,1755,659"/>
+<area shape="rect" id="node15" href="$classRa_1_1Engine_1_1Entity.html#aaf256bea44bbc5bff6aa504aca05ca35" title="Ra::Engine::Entity\l::getName" alt="" coords="1593,487,1727,528"/>
+<area shape="rect" id="node16" href="$structRa_1_1Engine_1_1ItemEntry.html#a898047549069e5b64d3a9a65c058af56" title="Returns true if the item represents a render object. " alt="" coords="1581,304,1739,345"/>
+<area shape="rect" id="node18" href="$classRa_1_1Engine_1_1RadiumEngine.html#a58b27bc600ea769f68b0e2938abc7862" title="Manager getters. " alt="" coords="1564,369,1756,411"/>
+<area shape="rect" id="node19" href="$classRa_1_1Engine_1_1RenderObjectManager.html#a088feae4339349a81b7b6635b38aead1" title="Returns true if the index points to a valid render object. " alt="" coords="1804,363,1987,404"/>
+<area shape="rect" id="node12" href="$classRa_1_1Core_1_1Utils_1_1Index.html#ac7d6c68387fe147f7a13668ac30a4533" title="INVALID. " alt="" coords="2035,756,2189,797"/>
+<area shape="rect" id="node17" href="$classRa_1_1Core_1_1Utils_1_1Index.html#ac7a1b710e6b95834a562c27e2f6c0f4b" title="DESTRUCTOR: Must not be defined, we need it trivial to be constexpr. " alt="" coords="2035,333,2189,375"/>
+<area shape="rect" id="node21" href="$classRa_1_1Core_1_1Utils_1_1IndexedObject.html#accf1e1447b2ed890b10080fb44a91e6c" title="Ra::Core::Utils::Indexed\lObject::getIndex" alt="" coords="1575,173,1745,215"/>
+<area shape="rect" id="node22" href="$classRa_1_1Engine_1_1RenderObjectManager.html#a13fc919e9fa01bfb36e67bc9011d325f" title="Returns the render object corresponding to the given index. " alt="" coords="1564,239,1756,280"/>
+<area shape="rect" id="node28" href="$classRa_1_1Engine_1_1Entity.html#a0555082e814666f1ec051e65b727930d" title="Ra::Engine::Entity\l::setTransform" alt="" coords="1126,267,1259,308"/>
+<area shape="rect" id="node29" href="$classRa_1_1Engine_1_1Component.html#ad86983f76e15fa45a9e84b4d073b3094" title="Set the new transform associated with the RO index key. " alt="" coords="1107,201,1279,243"/>
+<area shape="rect" id="node31" href="$classRa_1_1GuiBase_1_1TransformEditor.html#aecdcc853ebf6b4ae1dab2c9ee56c96ef" title="Ra::GuiBase::TransformEditor\l::getTransform" alt="" coords="822,493,1029,535"/>
+<area shape="rect" id="node35" href="$classRa_1_1Gui_1_1Gizmo.html#a2fc380738268508ca2d46ac856c2f98a" title="Called every time the underlying transform may have changed. " alt="" coords="809,559,1041,586"/>
+<area shape="rect" id="node36" href="$classRa_1_1GuiBase_1_1TransformEditor.html#a6c8c6e18c8b92a92a53f6c035aa6c241" title="Ra::GuiBase::TransformEditor\l::getWorldTransform" alt="" coords="822,669,1029,711"/>
+<area shape="rect" id="node32" href="$classRa_1_1Engine_1_1Entity.html#adfcfb0c0eb4e1663cd66473e74d83aa3" title="Ra::Engine::Entity\l::getTransform" alt="" coords="1126,669,1259,711"/>
+<area shape="rect" id="node33" href="$structRa_1_1Engine_1_1ItemEntry.html#ac78e7430338c62ed664a16da7e3ea206" title="Returns true if the item represents a component. " alt="" coords="1581,785,1739,827"/>
+<area shape="rect" id="node34" href="$classRa_1_1Engine_1_1Component.html#ab99972b81a95e94e10b35bb2845782b2" title="Get the transform associated with the given RO index key. " alt="" coords="1107,552,1279,593"/>
+<area shape="rect" id="node41" href="$classRa_1_1Gui_1_1Gizmo.html#a6ad53eca5654b426a0b467ab716a2704" title="Called when one of the drawables of the gizmo has been selected. " alt="" coords="533,639,761,666"/>
+</map>

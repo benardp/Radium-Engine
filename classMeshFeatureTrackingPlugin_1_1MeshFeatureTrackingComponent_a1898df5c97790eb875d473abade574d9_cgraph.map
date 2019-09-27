@@ -1,0 +1,8 @@
+<map id="MeshFeatureTrackingPlugin::MeshFeatureTrackingComponent::getMaxT" name="MeshFeatureTrackingPlugin::MeshFeatureTrackingComponent::getMaxT">
+<area shape="rect" id="node2" href="$classRa_1_1Engine_1_1Component.html#a10b0bc182b76165744ebea603ae32dfe" title="Shortcut to access the render object manager. " alt="" coords="301,5,473,47"/>
+<area shape="rect" id="node3" href="$classRa_1_1Engine_1_1Mesh.html#a42d52db86eb855dda07e2349ad0dce41" title="Ra::Engine::Mesh::getNum\lFaces" alt="" coords="292,71,483,112"/>
+<area shape="rect" id="node4" href="$classRa_1_1Engine_1_1Mesh.html#a7dd9018e643becd20e714a54cf6664db" title="Ra::Engine::Mesh::getRenderMode" alt="" coords="533,53,771,79"/>
+<area shape="rect" id="node7" href="$classRa_1_1Engine_1_1Mesh.html#aeb1eb176c4ac5a045a80b97a5e09e07e" title="Returns the underlying TriangleMesh. " alt="" coords="531,103,773,130"/>
+<area shape="rect" id="node5" href="$namespaceRa_1_1Core_1_1Containers.html#a83257c42de08d550fe2081a5d8a13331" title="Stores a 3&#45;dimensional hierarchy of meshes of arbitrary type. " alt="" coords="821,45,975,87"/>
+<area shape="rect" id="node6" href="$namespaceRa_1_1Core_1_1Geometry.html#aa04e6052d8911b1df1bd881474debb45" title="Ra::Core::Geometry::t" alt="" coords="1023,53,1183,79"/>
+</map>

@@ -1,0 +1,22 @@
+<map id="/home/travis/build/STORM&#45;IRIT/Radium&#45;Engine/src/Core/Geometry/PolyLine.cpp" name="/home/travis/build/STORM&#45;IRIT/Radium&#45;Engine/src/Core/Geometry/PolyLine.cpp">
+<area shape="rect" id="node2" href="$PolyLine_8hpp.html" title="Core/Geometry/PolyLine.hpp" alt="" coords="913,109,1117,136"/>
+<area shape="rect" id="node3" href="$VectorArray_8hpp.html" title="Core/Containers/VectorArray.hpp" alt="" coords="1880,408,2111,435"/>
+<area shape="rect" id="node5" href="$RaCore_8hpp.html" title="Core/RaCore.hpp" alt="" coords="1549,572,1679,599"/>
+<area shape="rect" id="node14" href="$Types_8hpp.html" title="Core/Types.hpp" alt="" coords="1015,490,1133,517"/>
+<area shape="rect" id="node18" href="$DistanceQueries_8hpp.html" title="Core/Geometry/DistanceQueries.hpp" alt="" coords="1047,184,1304,211"/>
+<area shape="rect" id="node30" href="$PolyLine_8inl.html" title="Core/Geometry/PolyLine.inl" alt="" coords="623,184,818,211"/>
+<area shape="rect" id="node4" href="$AlignedStdVector_8hpp.html" title="Core/Containers/AlignedStd\lVector.hpp" alt="" coords="2108,483,2307,524"/>
+<area shape="rect" id="node6" href="$CoreMacros_8hpp.html" title="Core/CoreMacros.hpp" alt="" coords="1406,647,1566,673"/>
+<area shape="rect" id="node19" href="$TriangleMesh_8hpp.html" title="Core/Geometry/TriangleMesh.hpp" alt="" coords="1213,259,1447,285"/>
+<area shape="rect" id="node28" href="$DistanceQueries_8inl.html" title="Core/Geometry/DistanceQueries.inl" alt="" coords="892,259,1139,285"/>
+<area shape="rect" id="node20" href="$AbstractGeometry_8hpp.html" title="Core/Geometry/AbstractGeometry.hpp" alt="" coords="1151,408,1419,435"/>
+<area shape="rect" id="node21" href="$Attribs_8hpp.html" title="Core/Utils/Attribs.hpp" alt="" coords="1595,333,1753,360"/>
+<area shape="rect" id="node25" href="$Color_8hpp.html" title="Core/Utils/Color.hpp" alt="" coords="1157,490,1305,517"/>
+<area shape="rect" id="node27" href="$TriangleMesh_8inl.html" title="Core/Geometry/TriangleMesh.inl" alt="" coords="1295,333,1519,360"/>
+<area shape="rect" id="node22" href="$Index_8hpp.html" title="Core/Utils/Index.hpp" alt="" coords="1596,408,1747,435"/>
+<area shape="rect" id="node24" href="$Index_8inl.html" title="Core/Utils/Index.inl" alt="" coords="1563,490,1703,517"/>
+<area shape="rect" id="node31" href="$LinearAlgebra_8hpp.html" title="Core/Math/LinearAlgebra.hpp" alt="" coords="610,408,818,435"/>
+<area shape="rect" id="node34" href="$Math_8hpp.html" title="Core/Math/Math.hpp" alt="" coords="87,490,239,517"/>
+<area shape="rect" id="node37" href="$LinearAlgebra_8inl.html" title="Core/Math/LinearAlgebra.inl" alt="" coords="691,490,889,517"/>
+<area shape="rect" id="node36" href="$Math_8inl.html" title="Core/Math/Math.inl" alt="" coords="92,572,235,599"/>
+</map>

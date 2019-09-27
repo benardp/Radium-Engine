@@ -1,0 +1,4 @@
+<map id="Ra::Gui::CameraManipulator::attachLight" name="Ra::Gui::CameraManipulator::attachLight">
+<area shape="rect" id="node2" href="$classRa_1_1Engine_1_1Light.html#a24e11b300dfe4e2a785d87b6de74b036" title="set the direction of lighting " alt="" coords="261,5,397,47"/>
+<area shape="rect" id="node3" href="$classRa_1_1Engine_1_1Camera.html#a23be7aa714c0e9c2a9429dfc9ef2c53a" title="Return the direction the camera is looking at. " alt="" coords="255,71,403,112"/>
+</map>

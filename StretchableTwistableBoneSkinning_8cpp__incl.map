@@ -1,0 +1,21 @@
+<map id="/home/travis/build/STORM&#45;IRIT/Radium&#45;Engine/src/Core/Animation/StretchableTwistableBoneSkinning.cpp" name="/home/travis/build/STORM&#45;IRIT/Radium&#45;Engine/src/Core/Animation/StretchableTwistableBoneSkinning.cpp">
+<area shape="rect" id="node2" href="$StretchableTwistableBoneSkinning_8hpp.html" title="Core/Animation/Stretchable\lTwistableBoneSkinning.hpp" alt="" coords="687,124,886,165"/>
+<area shape="rect" id="node3" href="$HandleWeight_8hpp.html" title="Core/Animation/HandleWeight.hpp" alt="" coords="45,385,285,411"/>
+<area shape="rect" id="node4" href="$AlignedStdVector_8hpp.html" title="Core/Containers/AlignedStd\lVector.hpp" alt="" coords="571,467,770,508"/>
+<area shape="rect" id="node14" href="$Types_8hpp.html" title="Core/Types.hpp" alt="" coords="1317,474,1435,501"/>
+<area shape="rect" id="node19" href="$Pose_8hpp.html" title="Core/Animation/Pose.hpp" alt="" coords="579,385,763,411"/>
+<area shape="rect" id="node20" href="$Skeleton_8hpp.html" title="Core/Animation/Skeleton.hpp" alt="" coords="682,213,891,240"/>
+<area shape="rect" id="node24" href="$VectorArray_8hpp.html" title="Core/Containers/VectorArray.hpp" alt="" coords="787,385,1018,411"/>
+<area shape="rect" id="node26" href="$DualQuaternion_8hpp.html" title="Core/Math/DualQuaternion.hpp" alt="" coords="1510,213,1730,240"/>
+<area shape="rect" id="node5" href="$RaCore_8hpp.html" title="Core/RaCore.hpp" alt="" coords="1097,556,1228,583"/>
+<area shape="rect" id="node6" href="$CoreMacros_8hpp.html" title="Core/CoreMacros.hpp" alt="" coords="852,631,1012,657"/>
+<area shape="rect" id="node21" href="$Handle_8hpp.html" title="Core/Animation/Handle.hpp" alt="" coords="1071,295,1270,322"/>
+<area shape="rect" id="node23" href="$AdjacencyList_8hpp.html" title="Core/Containers/Adjacency\lList.hpp" alt="" coords="360,288,555,329"/>
+<area shape="rect" id="node22" href="$Handle_8inl.html" title="Core/Animation/Handle.inl" alt="" coords="1145,385,1333,411"/>
+<area shape="rect" id="node25" href="$AdjacencyList_8inl.html" title="Core/Containers/Adjacency\lList.inl" alt="" coords="360,377,555,419"/>
+<area shape="rect" id="node27" href="$DualQuaternion_8inl.html" title="Core/Math/DualQuaternion.inl" alt="" coords="1560,295,1771,322"/>
+<area shape="rect" id="node28" href="$LinearAlgebra_8hpp.html" title="Core/Math/LinearAlgebra.hpp" alt="" coords="1561,385,1769,411"/>
+<area shape="rect" id="node31" href="$Math_8hpp.html" title="Core/Math/Math.hpp" alt="" coords="2212,474,2364,501"/>
+<area shape="rect" id="node35" href="$LinearAlgebra_8inl.html" title="Core/Math/LinearAlgebra.inl" alt="" coords="1989,474,2187,501"/>
+<area shape="rect" id="node34" href="$Math_8inl.html" title="Core/Math/Math.inl" alt="" coords="2217,556,2359,583"/>
+</map>

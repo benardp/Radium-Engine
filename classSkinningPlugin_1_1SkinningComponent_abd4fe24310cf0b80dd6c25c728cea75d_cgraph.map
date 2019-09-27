@@ -1,0 +1,16 @@
+<map id="SkinningPlugin::SkinningComponent::initialize" name="SkinningPlugin::SkinningComponent::initialize">
+<area shape="rect" id="node2" href="$classRa_1_1Core_1_1Geometry_1_1TriangleMesh.html#a5a66222eccdfa045fb880cf0d92e9d11" title="Copy only the mesh faces and geometry. " alt="" coords="229,71,476,112"/>
+<area shape="rect" id="node6" href="$namespaceSkinningPlugin.html#a61275f4a6e62a958c49fe895b4d2c81a" title="SkinningPlugin::findDuplicates" alt="" coords="247,175,459,202"/>
+<area shape="rect" id="node10" href="$namespaceRa_1_1Core_1_1Animation.html#a03d7eb179bf339237a3e5b06d6d06100" title="Ra::Core::Animation\l::relativePose" alt="" coords="278,227,427,268"/>
+<area shape="rect" id="node12" href="$classRa_1_1Engine_1_1Mesh.html#ac6b2c0b356fedc903a39fc7b3393f7e4" title="Get the name expected for a given attrib. " alt="" coords="235,293,470,319"/>
+<area shape="rect" id="node13" href="$namespaceRa_1_1Engine_1_1EngineRenderTechniques.html#a5e831d5088144082e9bd3828323aa57a" title="Ra::Engine::EngineRender\lTechniques::getDefaultTechnique" alt="" coords="237,344,468,385"/>
+<area shape="rect" id="node14" href="$classRa_1_1Core_1_1Utils_1_1ColorBase.html#a06951f0641b03be8d47e2762f75d1f6e" title="Ra::Core::Utils::ColorBase\l\&lt; Scalar \&gt;::Skin" alt="" coords="260,409,445,451"/>
+<area shape="rect" id="node15" href="$classRa_1_1Core_1_1Utils_1_1ColorBase.html#a467dad42627c64495356c4fd21b3ac81" title="Ra::Core::Utils::ColorBase\l\&lt; Scalar \&gt;::White" alt="" coords="260,475,445,516"/>
+<area shape="rect" id="node3" href="$classRa_1_1Core_1_1Geometry_1_1TriangleMesh.html#ab0b79d1c797e6c887a0b32c90e07994e" title="Erases all data, making the mesh empty. " alt="" coords="554,5,705,47"/>
+<area shape="rect" id="node5" href="$classRa_1_1Core_1_1Utils_1_1AttribManager.html#ac6bb36601ef78ccc0997134b5a2df7f0" title="Base copy, does nothing. " alt="" coords="524,71,735,112"/>
+<area shape="rect" id="node4" href="$classRa_1_1Core_1_1Utils_1_1AttribManager.html#ae99bb77d3d29e9d99b4bcc257919ecda" title="clear all attribs, invalidate handles. " alt="" coords="783,5,993,47"/>
+<area shape="rect" id="node7" href="$classRa_1_1Core_1_1Geometry_1_1TriangleMesh.html#a6ef9dbd18c0501f2ffd1316be6be56ce" title="Access the vertices positions. " alt="" coords="544,136,715,177"/>
+<area shape="rect" id="node8" href="$classRa_1_1Core_1_1Utils_1_1Index.html#a771f93efd49538950e3cb9e57e46fbaf" title="Ra::Core::Utils::Index\l::Invalid" alt="" coords="552,201,707,243"/>
+<area shape="rect" id="node9" href="$classRa_1_1Core_1_1Utils_1_1Index.html#ab3ba134498a9c2f1f3f9ccadd984a8e8" title="CONSTRUCTOR Default constructor that allow implicit conversion from integer to Index. " alt="" coords="811,201,965,243"/>
+<area shape="rect" id="node11" href="$namespaceRa_1_1Core_1_1Animation.html#a44a3a0320649edf2829268bf80555800" title="Ra::Core::Animation\l::compatible" alt="" coords="555,267,704,308"/>
+</map>

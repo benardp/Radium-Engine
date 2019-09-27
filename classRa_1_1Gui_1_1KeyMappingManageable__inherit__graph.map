@@ -1,0 +1,10 @@
+<map id="Ra::Gui::KeyMappingManageable&lt; T &gt;" name="Ra::Gui::KeyMappingManageable&lt; T &gt;">
+<area shape="rect" id="node2" href="$classRa_1_1Gui_1_1KeyMappingManageable.html" title="{Ra::Gui::KeyMappingManageable\l\&lt; GizmoManager \&gt;\n|# m_keyMappingContext\l|+ getContext()\l+ configureKeyMapping()\l# self()\l}" alt="" coords="5,175,235,296"/>
+<area shape="rect" id="node4" href="$classRa_1_1Gui_1_1KeyMappingManageable.html" title="{Ra::Gui::KeyMappingManageable\l\&lt; FlightCameraManipulator \&gt;\n|# m_keyMappingContext\l|+ getContext()\l+ configureKeyMapping()\l# self()\l}" alt="" coords="260,175,489,296"/>
+<area shape="rect" id="node6" href="$classRa_1_1Gui_1_1KeyMappingManageable.html" title="{Ra::Gui::KeyMappingManageable\l\&lt; TrackballCameraManipulator \&gt;\n|# m_keyMappingContext\l|+ getContext()\l+ configureKeyMapping()\l# self()\l}" alt="" coords="513,175,745,296"/>
+<area shape="rect" id="node8" href="$classRa_1_1Gui_1_1KeyMappingManageable.html" title="{Ra::Gui::KeyMappingManageable\l\&lt; Viewer \&gt;\n|# m_keyMappingContext\l|+ getContext()\l+ configureKeyMapping()\l# self()\l}" alt="" coords="769,175,999,296"/>
+<area shape="rect" id="node3" href="$classRa_1_1Gui_1_1GizmoManager.html" title="This class interfaces the gizmos with the ui commands. " alt="" coords="10,609,227,848"/>
+<area shape="rect" id="node5" href="$classRa_1_1Gui_1_1FlightCameraManipulator.html" title="A Flight manipulator for Cameras. " alt="" coords="252,507,487,951"/>
+<area shape="rect" id="node7" href="$classRa_1_1Gui_1_1TrackballCameraManipulator.html" title="A Trackball manipulator for Cameras. " alt="" coords="511,448,750,1009"/>
+<area shape="rect" id="node9" href="$classRa_1_1Gui_1_1Viewer.html" title="The Viewer is the main display class. " alt="" coords="775,345,993,1112"/>
+</map>

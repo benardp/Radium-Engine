@@ -1,0 +1,34 @@
+<map id="SkinningPlugin::SkinningSystem::handleAssetLoading" name="SkinningPlugin::SkinningSystem::handleAssetLoading">
+<area shape="rect" id="node2" href="$classRa_1_1Core_1_1Asset_1_1FileData.html#a46beb82e240cf24be6f3c2127e2b4c7a" title="DATA. " alt="" coords="295,280,474,321"/>
+<area shape="rect" id="node3" href="$classRa_1_1Core_1_1Asset_1_1FileData.html#a36b5050f3bcc3f39c14e746edb8bb697" title="Ra::Core::Asset::FileData\l::getHandleData" alt="" coords="295,345,474,387"/>
+<area shape="rect" id="node4" href="$classSkinningPlugin_1_1SkinningComponent.html#a50a3d95f4b8725aa74b725ccd968e335" title="Loads the skinning weights from the given Handledata. " alt="" coords="261,411,508,452"/>
+<area shape="rect" id="node5" href="$classRa_1_1Core_1_1Asset_1_1AssetData.html#a3f4a6e18b60f2de4a23c8898a7341d21" title="Acces to the name of the asset. " alt="" coords="561,312,755,353"/>
+<area shape="rect" id="node6" href="$classRa_1_1Core_1_1Asset_1_1HandleData.html#a456d73d7b367dbf29f03d037bedaeaba" title="Return the list of HandleComponentData. " alt="" coords="556,377,760,419"/>
+<area shape="rect" id="node7" href="$namespaceRa_1_1Core_1_1Animation.html#a386a12a440bf79de7a806c397023c443" title="Ra::Core::Animation\l::checkWeightMatrix" alt="" coords="583,443,733,484"/>
+<area shape="rect" id="node32" href="$namespaceRa_1_1Core_1_1Animation.html#a6a32b4881129c88ac07339fd783ebc49" title="In&#45;place normalization of the weights, such that matrix.row( k ).sum() = 1;. " alt="" coords="583,508,733,549"/>
+<area shape="rect" id="node8" href="$namespaceRa_1_1Core_1_1Math.html#ae18c7b57c072ca801413a45e8944b15d" title="Call std::isnormal on quaternion entries. " alt="" coords="808,443,1009,484"/>
+<area shape="rect" id="node31" href="$namespaceRa_1_1Core_1_1Animation.html#a5f77b87a09e5e7bd707190d70e4f4b64" title="Ra::Core::Animation\l::checkNoWeightVertex" alt="" coords="825,377,993,419"/>
+<area shape="rect" id="node9" href="$namespaceRa_1_1Core_1_1Math.html#a5f25a31a29b0688e349dc35a353b9766" title="Get two vectors orthogonal to a given vector. " alt="" coords="1057,5,1273,47"/>
+<area shape="rect" id="node12" href="$namespaceRa_1_1Core_1_1Math.html#a5306cf8ea65c31d4bbe0560ec7bb6bb4" title="Get the angle between two vectors. " alt="" coords="1327,155,1486,182"/>
+<area shape="rect" id="node13" href="$namespaceRa_1_1Core_1_1Math.html#a5130d4a8434d4ccc82fa04bcba73d2f0" title="Get the spherical linear interpolation between two unit non&#45;colinear vectors. " alt="" coords="1088,239,1243,266"/>
+<area shape="rect" id="node15" href="$namespaceRa_1_1Core_1_1Math.html#a4f441ac6a56092d52849a4f48e274aa8" title="Get the cosine of the angle between two vectors. " alt="" coords="1333,282,1480,309"/>
+<area shape="rect" id="node16" href="$namespaceRa_1_1Core_1_1Geometry.html#aa04e6052d8911b1df1bd881474debb45" title="Ra::Core::Geometry::t" alt="" coords="1085,341,1245,367"/>
+<area shape="rect" id="node17" href="$namespaceRa_1_1Core_1_1Math.html#ab5addcd796ee2477977a4e219145ea85" title="Ra::Core::Math::projectOn\lPlane" alt="" coords="1072,173,1259,215"/>
+<area shape="rect" id="node18" href="$namespaceRa_1_1Core_1_1Math.html#a8667e211f2182821346ba4bcfe07b053" title="Get the cotangent of the angle between two vectors. " alt="" coords="1085,391,1245,418"/>
+<area shape="rect" id="node19" href="$namespaceRa_1_1Core_1_1Math.html#a19a397c8570c4f1df64d6c055d215659" title="Normalize a vector and returns its norm before normalization. " alt="" coords="1062,443,1269,484"/>
+<area shape="rect" id="node21" href="$namespaceRa_1_1Core_1_1Math.html#add677f0ab64a79b894bd36d7aa6987f1" title="Normalize a vector and returns its norm before normalization. " alt="" coords="1062,508,1269,549"/>
+<area shape="rect" id="node22" href="$namespaceRa_1_1Core_1_1Math.html#a15598e77958bb1790082f621851bddef" title="Transform a ray, direction is only transformed by linear part of the transformation, while origin is fully transformed corresponds to t*r. " alt="" coords="1060,639,1271,666"/>
+<area shape="rect" id="node23" href="$namespaceRa_1_1Core_1_1Math.html#ad79b708fb40ed130ff8031d709b78504" title="Ra::Core::Math::lookAt" alt="" coords="1083,690,1247,717"/>
+<area shape="rect" id="node24" href="$namespaceRa_1_1Core_1_1Math.html#ab5436769ec59975b2a35b83a86defd2c" title="Ra::Core::Math::perspective" alt="" coords="1066,741,1265,767"/>
+<area shape="rect" id="node25" href="$namespaceRa_1_1Core_1_1Math.html#a8b773ee57d017ddd6a3d2612dd426f71" title="Ra::Core::Math::orthographic" alt="" coords="1063,791,1268,818"/>
+<area shape="rect" id="node26" href="$namespaceRa_1_1Core_1_1Math.html#a941baf20065c77d494ca251e6e104f31" title="Returns the quaternion q multipled by a scalar factor of k. " alt="" coords="1087,842,1244,869"/>
+<area shape="rect" id="node27" href="$namespaceRa_1_1Core_1_1Math.html#a0523a53d2d94a623e194830837863c4c" title="Returns the sum of two quaternions. " alt="" coords="1091,893,1239,919"/>
+<area shape="rect" id="node28" href="$namespaceRa_1_1Core_1_1Math.html#aa5c9bddd5fdbbdbcdb661348982ff204" title="Returns the sum of two quaternions, resolving antipodality by flipping the sign of q2 if q1..." alt="" coords="1074,71,1257,98"/>
+<area shape="rect" id="node30" href="$namespaceRa_1_1Core_1_1Math.html#aa5414be6d83af5b67fb48c22e4f49679" title="Decompose a given rotation Qin into a swing rotation and a twist rotation. " alt="" coords="1074,573,1257,615"/>
+<area shape="rect" id="node10" href="$namespaceRa_1_1Core_1_1Math.html#a90f0fe9079f5bb86c721ea4b61738470" title="Returns the sign of any numeric type as { &#45;1, 0, 1}. " alt="" coords="1331,17,1482,43"/>
+<area shape="rect" id="node11" href="$namespaceRa_1_1Core_1_1Math.html#ae4e681e0738fe7e5bfd028c6270b597a" title="Ra::Core::Math::signum" alt="" coords="1540,17,1711,43"/>
+<area shape="rect" id="node14" href="$namespaceOpenMesh.html#a575b338f0fc9ecb5393d23e977e6ac38" title="OpenMesh::dot" alt="" coords="1347,223,1466,250"/>
+<area shape="rect" id="node20" href="$namespaceOpenMesh.html#a8205f789ce08919bc11c58383574596c" title="OpenMesh::norm" alt="" coords="1341,515,1473,542"/>
+<area shape="rect" id="node29" href="$namespaceRa_1_1Core_1_1Math.html#a810d6d50b61cc01cda1d54527de864d0" title="Returns the sign of any numeric type as { &#45;1, 1} Note: signNZ(0) returns 1 for any integral type but ..." alt="" coords="1321,71,1492,98"/>
+<area shape="rect" id="node33" href="$namespaceRa_1_1Core_1_1Math.html#a46540d56930b4c1ff3b115872cde4893" title="Compare two numbers such that |x&#45;y| &lt; espilon*epsilonBoostFactor. " alt="" coords="813,508,1004,549"/>
+</map>

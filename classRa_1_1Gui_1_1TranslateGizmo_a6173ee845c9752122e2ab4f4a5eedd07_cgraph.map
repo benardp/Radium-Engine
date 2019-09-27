@@ -1,0 +1,8 @@
+<map id="Ra::Gui::TranslateGizmo::selectConstraint" name="Ra::Gui::TranslateGizmo::selectConstraint">
+<area shape="rect" id="node2" href="$classRa_1_1Gui_1_1Gizmo.html#a3b27e68ee1608637f7197a35e1a916e2" title="read access to the gizmo render objects Meshes " alt="" coords="227,5,413,32"/>
+<area shape="rect" id="node3" href="$classRa_1_1Core_1_1Utils_1_1ColorBase.html#a1b7a2d694cf0fe9382aa80868253f0d1" title="Ra::Core::Utils::ColorBase\l\&lt; Scalar \&gt;::Red" alt="" coords="227,57,413,98"/>
+<area shape="rect" id="node4" href="$classRa_1_1Core_1_1Utils_1_1ColorBase.html#a54193413c10301c1edf46fc41fb09dfb" title="Ra::Core::Utils::ColorBase\l\&lt; Scalar \&gt;::Green" alt="" coords="227,122,413,163"/>
+<area shape="rect" id="node5" href="$classRa_1_1Core_1_1Utils_1_1ColorBase.html#aed9cce82f3b09c3ec32a9fdc898d3b7f" title="Ra::Core::Utils::ColorBase\l\&lt; Scalar \&gt;::Blue" alt="" coords="227,187,413,229"/>
+<area shape="rect" id="node6" href="$classRa_1_1Gui_1_1Gizmo.html#a54a7f30aa51625a9a54cf58a03d79e43" title="read access to the gizmo render objects id " alt="" coords="243,253,397,280"/>
+<area shape="rect" id="node7" href="$classRa_1_1Core_1_1Utils_1_1ColorBase.html#a983f43f3e20bc518a4c2c35fadd4cc7a" title="Ra::Core::Utils::ColorBase\l\&lt; Scalar \&gt;::Yellow" alt="" coords="227,305,413,346"/>
+</map>

@@ -1,0 +1,20 @@
+<map id="MeshPaintPlugin::MeshPaintPluginC::onCurrentChanged" name="MeshPaintPlugin::MeshPaintPluginC::onCurrentChanged">
+<area shape="rect" id="node2" href="$classRa_1_1Core_1_1Utils_1_1Index.html#a771f93efd49538950e3cb9e57e46fbaf" title="Ra::Core::Utils::Index\l::Invalid" alt="" coords="286,39,441,80"/>
+<area shape="rect" id="node4" href="$classRa_1_1GuiBase_1_1SelectionManager.html#a29cbd250208f1e18d2ab1e0f4d91105d" title="Return the current selected item, or an invalid entry if there is no current item. " alt="" coords="252,136,475,177"/>
+<area shape="rect" id="node8" href="$classMeshPaintPlugin_1_1MeshPaintSystem.html#ab738125913eddacce4f4a42150741f8e" title="MeshPaintPlugin::MeshPaint\lSystem::paintMesh" alt="" coords="264,201,463,243"/>
+<area shape="rect" id="node19" href="$classRa_1_1Gui_1_1PickingManager.html#a93bbe7807a11b0aa423ddcc777dc1168" title="Ra::Gui::PickingManager\l::getCurrent" alt="" coords="276,267,451,308"/>
+<area shape="rect" id="node3" href="$classRa_1_1Core_1_1Utils_1_1Index.html#ab3ba134498a9c2f1f3f9ccadd984a8e8" title="CONSTRUCTOR Default constructor that allow implicit conversion from integer to Index. " alt="" coords="557,5,711,47"/>
+<area shape="rect" id="node5" href="$classRa_1_1GuiBase_1_1SelectionManager.html#aec178a6b3de1c04e5e1d16ff72c6e966" title="Ra::GuiBase::SelectionManager\l::itemModel" alt="" coords="523,71,745,112"/>
+<area shape="rect" id="node6" href="$classRa_1_1GuiBase_1_1ItemModel.html#a3236433d461ad6cac5e9390b2685fa3f" title="Returns the entry corresponding to a given index or an invalid entry if the index doesn&#39;t match any e..." alt="" coords="547,136,721,177"/>
+<area shape="rect" id="node7" href="$classRa_1_1GuiBase_1_1TreeModel.html#a5aa24ace72c1c3d29e268cb34dc576f2" title="Get the tree item corresponding to the given index. " alt="" coords="829,48,1000,89"/>
+<area shape="rect" id="node9" href="$classMeshPaintPlugin_1_1MeshPaintComponent.html#ad9bb2078c1824760a5394105ad9866e8" title="MeshPaintPlugin::MeshPaint\lComponent::paintMesh" alt="" coords="535,288,733,329"/>
+<area shape="rect" id="node10" href="$classRa_1_1Engine_1_1Component.html#a10b0bc182b76165744ebea603ae32dfe" title="Shortcut to access the render object manager. " alt="" coords="829,113,1001,155"/>
+<area shape="rect" id="node11" href="$classRa_1_1Engine_1_1Displayable.html#aae62e0fc9bcee75aa66bc49f66843f94" title="Returns the picking rendermode advised by the object (default PickingRenderMode::NO_PICKING) ..." alt="" coords="829,179,1000,220"/>
+<area shape="rect" id="node12" href="$classRa_1_1Engine_1_1Mesh.html#a7dd9018e643becd20e714a54cf6664db" title="Ra::Engine::Mesh::getRenderMode" alt="" coords="795,245,1034,271"/>
+<area shape="rect" id="node14" href="$namespaceRa_1_1Core_1_1Geometry.html#aa04e6052d8911b1df1bd881474debb45" title="Ra::Core::Geometry::t" alt="" coords="1285,266,1445,293"/>
+<area shape="rect" id="node15" href="$classRa_1_1Engine_1_1Mesh.html#aeb1eb176c4ac5a045a80b97a5e09e07e" title="Returns the underlying TriangleMesh. " alt="" coords="793,346,1036,373"/>
+<area shape="rect" id="node16" href="$classRa_1_1Core_1_1Geometry_1_1TriangleMesh.html#a316e86eab4e624183f1bfe5c25f8592c" title="Return the Handle to the attribute with the given name if it exists, an invalid handle otherwise..." alt="" coords="804,397,1025,439"/>
+<area shape="rect" id="node17" href="$classRa_1_1Core_1_1Geometry_1_1TriangleMesh.html#a209037ce5a11ec8539a9ada7ba763e8c" title="Get attribute by handle. " alt="" coords="827,463,1003,504"/>
+<area shape="rect" id="node18" href="$classRa_1_1Engine_1_1Mesh.html#a9a1dcadf7fb4ff851b18c87b3a98ac6b" title="Mark one of the data types as dirty, forcing an update of the openGL buffer. " alt="" coords="820,529,1009,555"/>
+<area shape="rect" id="node13" href="$namespaceRa_1_1Core_1_1Containers.html#a83257c42de08d550fe2081a5d8a13331" title="Stores a 3&#45;dimensional hierarchy of meshes of arbitrary type. " alt="" coords="1084,229,1237,271"/>
+</map>

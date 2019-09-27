@@ -1,0 +1,4 @@
+<map id="Ra::Gui::ScaleGizmo::updateTransform" name="Ra::Gui::ScaleGizmo::updateTransform">
+<area shape="rect" id="node2" href="$namespaceRa_1_1Core_1_1Geometry.html#aa04e6052d8911b1df1bd881474debb45" title="Ra::Core::Geometry::t" alt="" coords="204,5,364,32"/>
+<area shape="rect" id="node3" href="$classRa_1_1Gui_1_1Gizmo.html#a54a7f30aa51625a9a54cf58a03d79e43" title="read access to the gizmo render objects id " alt="" coords="207,56,361,83"/>
+</map>

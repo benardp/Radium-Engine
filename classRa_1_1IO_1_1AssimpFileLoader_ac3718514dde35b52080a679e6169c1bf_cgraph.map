@@ -1,0 +1,51 @@
+<map id="Ra::IO::AssimpFileLoader::loadFile" name="Ra::IO::AssimpFileLoader::loadFile">
+<area shape="rect" id="node2" href="$namespaceRa_1_1Core_1_1Utils.html#a3255c68f2926d6f7f133d6b3c0e996a5" title="Ra::Core::Utils::getDirName" alt="" coords="238,1070,437,1097"/>
+<area shape="rect" id="node3" href="$classRa_1_1IO_1_1AssimpLightDataLoader.html#a14954991f17ce6b8bdce75ac509ecb18" title="LOADING. " alt="" coords="491,123,711,164"/>
+<area shape="rect" id="node12" href="$classRa_1_1IO_1_1AssimpGeometryDataLoader.html#aa6c1ada49b7dbf1ef90fa318c39699f7" title="Convert all the geometry data from scene into data. " alt="" coords="233,1172,442,1213"/>
+<area shape="rect" id="node33" href="$classRa_1_1IO_1_1AssimpHandleDataLoader.html#ae4cda7d5e392e3f2e98a9efcb34c6996" title="LOAD. " alt="" coords="242,1584,433,1625"/>
+<area shape="rect" id="node43" href="$classRa_1_1IO_1_1AssimpAnimationDataLoader.html#ae70539c711179086512ee305e03fcb92" title="LOADING. " alt="" coords="232,1976,443,2017"/>
+<area shape="rect" id="node4" href="$classRa_1_1IO_1_1AssimpLightDataLoader.html#a964e3a64503d5f97ff4dea2e159cecf3" title="QUERY. " alt="" coords="759,25,979,67"/>
+<area shape="rect" id="node5" href="$classRa_1_1IO_1_1AssimpLightDataLoader.html#a1e010b161ed6c5bfc3b067b669fa8a7f" title="Ra::IO::AssimpLightDataLoader\l::sceneLightSize" alt="" coords="759,91,979,132"/>
+<area shape="rect" id="node6" href="$classRa_1_1IO_1_1AssimpLightDataLoader.html#a9d0ff5042912203432e3abf6ae1bdece" title="LOADING. " alt="" coords="759,156,979,197"/>
+<area shape="rect" id="node7" href="$classRa_1_1IO_1_1AssimpLightDataLoader.html#a581a8f4d6dd9a730ce1972142f93e729" title="NAME. " alt="" coords="1031,5,1251,47"/>
+<area shape="rect" id="node8" href="$namespaceRa_1_1IO.html#aef6c50424873964fcea0008be55d4a34" title="Ra::IO::assimpToCore" alt="" coords="1304,947,1460,974"/>
+<area shape="rect" id="node9" href="$classRa_1_1IO_1_1AssimpLightDataLoader.html#a63b3721a1bfe4c6c6e47b7c3b3dddbcf" title="TYPE. " alt="" coords="1031,123,1251,164"/>
+<area shape="rect" id="node10" href="$classRa_1_1IO_1_1AssimpLightDataLoader.html#a6a6d947accba385a4d02b544affa0433" title="Ra::IO::AssimpLightDataLoader\l::loadLightFrame" alt="" coords="1031,188,1251,229"/>
+<area shape="rect" id="node11" href="$classRa_1_1IO_1_1AssimpLightDataLoader.html#ad1b8ceeba5c2acfe436f48549e75bac6" title="FRAME. " alt="" coords="1031,253,1251,295"/>
+<area shape="rect" id="node13" href="$classRa_1_1IO_1_1AssimpGeometryDataLoader.html#a34824214a7bca1f664b3cce7fdef3e0d" title="Return true if the given scene has geometry data. " alt="" coords="496,903,705,944"/>
+<area shape="rect" id="node15" href="$classRa_1_1IO_1_1AssimpGeometryDataLoader.html#ac6c762bcaad871e6771ee2ad4d6c777b" title="Fill data with all the GeometryData from scene. " alt="" coords="496,1172,705,1213"/>
+<area shape="rect" id="node14" href="$classRa_1_1IO_1_1AssimpGeometryDataLoader.html#aa36139f3ab669179345ac2fe95793348" title="Return the number of AssImp geometry data in the given scene. " alt="" coords="764,711,973,752"/>
+<area shape="rect" id="node16" href="$classRa_1_1IO_1_1AssimpGeometryDataLoader.html#af5c15d97fec98d1bbc62de339fab4928" title="Fill data with the GeometryData from mesh. " alt="" coords="764,776,973,817"/>
+<area shape="rect" id="node30" href="$classRa_1_1IO_1_1AssimpGeometryDataLoader.html#a9bd7b60295b35b11adaa3ae1238fa380" title="Fill data with the Material data from material. " alt="" coords="764,1172,973,1213"/>
+<area shape="rect" id="node32" href="$classRa_1_1IO_1_1AssimpGeometryDataLoader.html#ad45a978372614a6d443ebd32dc26d0c4" title="Fill data with the transformation data from node and parentFrame. " alt="" coords="764,1259,973,1300"/>
+<area shape="rect" id="node17" href="$classRa_1_1IO_1_1AssimpGeometryDataLoader.html#ae273721e27deb8f1461ee2c4d077ded0" title="Fill data with the name from mesh. " alt="" coords="1037,319,1246,360"/>
+<area shape="rect" id="node18" href="$classRa_1_1IO_1_1AssimpGeometryDataLoader.html#a41562a946e6a9f0fefd9cd9b311f490d" title="Fill data with the GeometryType from mesh. " alt="" coords="1037,384,1246,425"/>
+<area shape="rect" id="node19" href="$classRa_1_1IO_1_1AssimpGeometryDataLoader.html#a015c0e61580e9cf1b72ae9751844df68" title="Fill data with the vertices from mesh. " alt="" coords="1037,449,1246,491"/>
+<area shape="rect" id="node20" href="$classRa_1_1Core_1_1Asset_1_1GeometryData.html#a3a4ec38455b1ed79e0b80f90c4313c00" title="Return true if the object is a Line Mesh. " alt="" coords="1045,515,1237,556"/>
+<area shape="rect" id="node21" href="$classRa_1_1IO_1_1AssimpGeometryDataLoader.html#ad1d722a22c80e869ed4340ff34be34cb" title="Fill data with the lines from mesh. " alt="" coords="1037,580,1246,621"/>
+<area shape="rect" id="node22" href="$classRa_1_1IO_1_1AssimpGeometryDataLoader.html#a8efd5128ca84545148024394e24456f6" title="Fill data with the faces from mesh. " alt="" coords="1037,645,1246,687"/>
+<area shape="rect" id="node23" href="$classRa_1_1Core_1_1Asset_1_1GeometryData.html#a011898d87a536df9b8ff58d28db76648" title="Return true if the object is a Tetrahedron Mesh. " alt="" coords="1045,711,1237,752"/>
+<area shape="rect" id="node24" href="$classRa_1_1Core_1_1Asset_1_1GeometryData.html#a879dcba366fe25a42f1320e42d002e6d" title="Return true if the object is a Hexahedron Mesh. " alt="" coords="1045,776,1237,817"/>
+<area shape="rect" id="node25" href="$classRa_1_1IO_1_1AssimpGeometryDataLoader.html#a9dde85b325e30328e26e3a984def2e38" title="Fill data with the polyhedra from mesh. " alt="" coords="1037,841,1246,883"/>
+<area shape="rect" id="node26" href="$classRa_1_1IO_1_1AssimpGeometryDataLoader.html#a4e273972199d004dd227de544ad2f308" title="Fill data with the vertex normals from mesh. " alt="" coords="1037,907,1246,948"/>
+<area shape="rect" id="node27" href="$classRa_1_1IO_1_1AssimpGeometryDataLoader.html#a4ff00e2cca24724f418cb069f2975c3b" title="Fill data with the vertex tangent vectors from mesh. " alt="" coords="1037,972,1246,1013"/>
+<area shape="rect" id="node28" href="$classRa_1_1IO_1_1AssimpGeometryDataLoader.html#a715eb5af20d150bae43bcc8fe7d66dae" title="Fill data with the vertex bitangent vectors from mesh. " alt="" coords="1037,1037,1246,1079"/>
+<area shape="rect" id="node29" href="$classRa_1_1IO_1_1AssimpGeometryDataLoader.html#a9ce1f0b5e1e63ec0980532da6d842957" title="Fill data with the vertex texture coordinates from mesh. " alt="" coords="1027,1103,1256,1144"/>
+<area shape="rect" id="node31" href="$classRa_1_1Core_1_1Asset_1_1GeometryData.html#a4df3ae33c97163e9f31cc2f59e9a8374" title="Set the MaterialData for the object. " alt="" coords="1045,1220,1237,1261"/>
+<area shape="rect" id="node34" href="$classRa_1_1Core_1_1Asset_1_1HandleData.html#a9b6aadf86a2a5328c83fc9d17f09893c" title="Set the type of the Handle system. " alt="" coords="499,1388,703,1429"/>
+<area shape="rect" id="node35" href="$classRa_1_1Core_1_1Asset_1_1HandleData.html#afd1b588bb09b7e6ff3ed39d702d4b042" title="Set the name of the Handle system. " alt="" coords="499,1453,703,1495"/>
+<area shape="rect" id="node36" href="$classRa_1_1Core_1_1Asset_1_1HandleData.html#a583661ca8646175c80bd0964f23abf07" title="Set the transformation of the Handle system. " alt="" coords="499,1519,703,1560"/>
+<area shape="rect" id="node37" href="$classRa_1_1Core_1_1Asset_1_1HandleData.html#a1189e767e22ef4bb93527a724630cc56" title="Set the map from Handle names to Handle storage index. " alt="" coords="499,1584,703,1625"/>
+<area shape="rect" id="node38" href="$classRa_1_1Core_1_1Asset_1_1HandleData.html#acbae173d72a5e07eaec8e930c9fffecf" title="Set whether the Handle system needs end bones. " alt="" coords="499,1649,703,1691"/>
+<area shape="rect" id="node39" href="$classRa_1_1Core_1_1Asset_1_1HandleData.html#a2418d9eca693c1ce84e66837faef6091" title="Print stat info to the Debug output. " alt="" coords="499,1715,703,1756"/>
+<area shape="rect" id="node40" href="$classRa_1_1Core_1_1Asset_1_1HandleData.html#a456d73d7b367dbf29f03d037bedaeaba" title="Return the list of HandleComponentData. " alt="" coords="499,1780,703,1821"/>
+<area shape="rect" id="node41" href="$classRa_1_1Core_1_1Asset_1_1HandleData.html#ad517df66c4005d5768a68be7ccb29a1f" title="Add name to the list of bound mesh names. " alt="" coords="499,1845,703,1887"/>
+<area shape="rect" id="node42" href="$classRa_1_1Core_1_1Asset_1_1HandleData.html#a2ce8dde1d1d3848bcc76693a40e389de" title="Return the HandleSystem hierarchy, i.e. bones hierarchy. " alt="" coords="499,1911,703,1952"/>
+<area shape="rect" id="node44" href="$classRa_1_1IO_1_1AssimpAnimationDataLoader.html#a055e8ed9642a4a6131e6342e0855ef2b" title="QUERY. " alt="" coords="495,1976,706,2017"/>
+<area shape="rect" id="node46" href="$classRa_1_1IO_1_1AssimpAnimationDataLoader.html#a77e8abfd38e758c5f75c3419f0c6beb1" title="KEY FRAME. " alt="" coords="495,2041,706,2083"/>
+<area shape="rect" id="node45" href="$classRa_1_1IO_1_1AssimpAnimationDataLoader.html#ab0bc77b937a09f8e770b8826d526f980" title="Ra::IO::AssimpAnimationData\lLoader::sceneAnimationSize" alt="" coords="763,1911,974,1952"/>
+<area shape="rect" id="node47" href="$classRa_1_1IO_1_1AssimpAnimationDataLoader.html#a3fd820ed40bc590ce8eacb14906ac624" title="NAME. " alt="" coords="763,1976,974,2017"/>
+<area shape="rect" id="node48" href="$classRa_1_1IO_1_1AssimpAnimationDataLoader.html#a964ac458da2d4db7e5f33dc756bac339" title="TIME. " alt="" coords="763,2041,974,2083"/>
+<area shape="rect" id="node49" href="$classRa_1_1IO_1_1AssimpAnimationDataLoader.html#a0bace18eef188d039521472210513e80" title="Ra::IO::AssimpAnimationData\lLoader::fetchAnimation" alt="" coords="763,2107,974,2148"/>
+<area shape="rect" id="node50" href="$classRa_1_1Core_1_1Asset_1_1AnimationData.html#a582bb3679315ce1bb32b7b3ba71ff15a" title="DEBUG. " alt="" coords="772,2172,965,2213"/>
+</map>

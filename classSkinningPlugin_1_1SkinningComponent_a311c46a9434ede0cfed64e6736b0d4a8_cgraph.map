@@ -1,0 +1,7 @@
+<map id="SkinningPlugin::SkinningComponent::showWeights" name="SkinningPlugin::SkinningComponent::showWeights">
+<area shape="rect" id="node2" href="$classRa_1_1Engine_1_1Mesh.html#ac6b2c0b356fedc903a39fc7b3393f7e4" title="Get the name expected for a given attrib. " alt="" coords="240,5,475,32"/>
+<area shape="rect" id="node3" href="$classRa_1_1Core_1_1Geometry_1_1TriangleMesh.html#a80e6c7e3b1dc8f1a6bd1913c5f7d1a05" title="Add attribute with the given name. " alt="" coords="268,57,447,98"/>
+<area shape="rect" id="node4" href="$classRa_1_1Core_1_1Geometry_1_1TriangleMesh.html#a209037ce5a11ec8539a9ada7ba763e8c" title="Get attribute by handle. " alt="" coords="269,122,445,163"/>
+<area shape="rect" id="node5" href="$classRa_1_1Core_1_1Geometry_1_1TriangleMesh.html#a316e86eab4e624183f1bfe5c25f8592c" title="Return the Handle to the attribute with the given name if it exists, an invalid handle otherwise..." alt="" coords="247,187,468,229"/>
+<area shape="rect" id="node6" href="$classRa_1_1Core_1_1Geometry_1_1TriangleMesh.html#a500ec734182d60422cfea1fb57f39462" title="Remove attribute by handle. " alt="" coords="255,253,459,294"/>
+</map>

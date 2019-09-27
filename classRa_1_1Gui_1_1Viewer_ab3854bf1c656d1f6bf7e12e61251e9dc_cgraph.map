@@ -1,0 +1,11 @@
+<map id="Ra::Gui::Viewer::grabFrame" name="Ra::Gui::Viewer::grabFrame">
+<area shape="rect" id="node2" href="$classRa_1_1Gui_1_1WindowQt.html#a78476baacd2df24a260f604d02c8ddc4" title="Make the OpenGL context associated with the viewer the current context. " alt="" coords="266,71,411,112"/>
+<area shape="rect" id="node3" href="$classRa_1_1Engine_1_1Renderer.html#a584cc744ee0f15884f5f853209c055cd" title="Ra::Engine::Renderer\l::grabFrame" alt="" coords="261,136,416,177"/>
+<area shape="rect" id="node9" href="$namespaceRa_1_1Core_1_1Utils.html#aad2a7bedc49e227d0503794d76acbfea" title="Ra::Core::Utils::getFileExt" alt="" coords="248,202,429,229"/>
+<area shape="rect" id="node10" href="$classRa_1_1Gui_1_1WindowQt.html#acd31b9e580f049491d13c16ef954d964" title="Reset the current OpenGL context that is no more the one associated with the viewer. " alt="" coords="266,253,411,295"/>
+<area shape="rect" id="node4" href="$classRa_1_1Engine_1_1Renderer.html#a8a68ecdea83da2148ef303176bcffac8" title="Get the currently displayed texture. " alt="" coords="481,5,636,47"/>
+<area shape="rect" id="node5" href="$classRa_1_1Engine_1_1Texture.html#a9ba7fb88d2b2b023ad5e68f2d4f3f1bb" title="Bind the texture to enable its use in a shader. " alt="" coords="487,71,630,112"/>
+<area shape="rect" id="node6" href="$classRa_1_1Engine_1_1Texture.html#a5fb64b92e7a9025f6ad315f84eba2dca" title="Ra::Engine::Texture\l::width" alt="" coords="487,136,630,177"/>
+<area shape="rect" id="node7" href="$classRa_1_1Engine_1_1Texture.html#a42c27099c6aa960f13485a4477517296" title="Ra::Engine::Texture\l::height" alt="" coords="487,201,630,243"/>
+<area shape="rect" id="node8" href="$namespaceRa_1_1Core_1_1Math.html#acc9f6f3b880b60bf0ee7723afabaf180" title="Component&#45;wise clamp() function on a floating&#45;point vector. " alt="" coords="477,267,640,294"/>
+</map>

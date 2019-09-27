@@ -1,0 +1,25 @@
+<map id="/home/travis/build/STORM&#45;IRIT/Radium&#45;Engine/Plugins/CameraManip/src/CameraManipPlugin.hpp" name="/home/travis/build/STORM&#45;IRIT/Radium&#45;Engine/Plugins/CameraManip/src/CameraManipPlugin.hpp">
+<area shape="rect" id="node2" href="$CoreMacros_8hpp.html" title="Core/CoreMacros.hpp" alt="" coords="286,825,446,852"/>
+<area shape="rect" id="node8" href="$RadiumPluginInterface_8hpp.html" title="PluginBase/RadiumPluginInterface.hpp" alt="" coords="1694,273,1961,300"/>
+<area shape="rect" id="node15" href="$CameraManipUI_8h.html" title="UI/CameraManipUI.h" alt="" coords="480,124,633,151"/>
+<area shape="rect" id="node44" href="$CameraManipPluginMacros_8hpp.html" title="CameraManipPluginMacros.hpp" alt="" coords="5,124,228,151"/>
+<area shape="rect" id="node13" href="$PluginContext_8hpp.html" title="PluginBase/PluginContext.hpp" alt="" coords="1793,355,2005,382"/>
+<area shape="rect" id="node14" href="$RaPluginBase_8hpp.html" title="PluginBase/RaPluginBase.hpp" alt="" coords="1794,512,2005,539"/>
+<area shape="rect" id="node17" href="$PickingManager_8hpp.html" title="GuiBase/Utils/PickingManager.hpp" alt="" coords="368,199,607,225"/>
+<area shape="rect" id="node18" href="$RaGuiBase_8hpp.html" title="GuiBase/RaGuiBase.hpp" alt="" coords="351,273,527,300"/>
+<area shape="rect" id="node19" href="$Renderer_8hpp.html" title="Engine/Renderer/Renderer.hpp" alt="" coords="651,273,865,300"/>
+<area shape="rect" id="node20" href="$RaEngine_8hpp.html" title="Engine/RaEngine.hpp" alt="" coords="1563,437,1719,464"/>
+<area shape="rect" id="node24" href="$Types_8hpp.html" title="Core/Types.hpp" alt="" coords="559,669,677,695"/>
+<area shape="rect" id="node29" href="$Color_8hpp.html" title="Core/Utils/Color.hpp" alt="" coords="428,512,576,539"/>
+<area shape="rect" id="node31" href="$Timer_8hpp.html" title="Core/Utils/Timer.hpp" alt="" coords="796,355,947,382"/>
+<area shape="rect" id="node32" href="$DisplayableObject_8hpp.html" title="Engine/Renderer/Displayable\l/DisplayableObject.hpp" alt="" coords="1071,348,1274,389"/>
+<area shape="rect" id="node25" href="$RaCore_8hpp.html" title="Core/RaCore.hpp" alt="" coords="825,751,955,777"/>
+<area shape="rect" id="node34" href="$VectorArray_8hpp.html" title="Core/Containers/VectorArray.hpp" alt="" coords="1323,587,1553,613"/>
+<area shape="rect" id="node37" href="$TriangleMesh_8hpp.html" title="Core/Geometry/TriangleMesh.hpp" alt="" coords="971,437,1206,464"/>
+<area shape="rect" id="node35" href="$AlignedStdVector_8hpp.html" title="Core/Containers/AlignedStd\lVector.hpp" alt="" coords="1324,661,1523,703"/>
+<area shape="rect" id="node38" href="$AbstractGeometry_8hpp.html" title="Core/Geometry/AbstractGeometry.hpp" alt="" coords="753,587,1021,613"/>
+<area shape="rect" id="node39" href="$Attribs_8hpp.html" title="Core/Utils/Attribs.hpp" alt="" coords="840,512,999,539"/>
+<area shape="rect" id="node43" href="$TriangleMesh_8inl.html" title="Core/Geometry/TriangleMesh.inl" alt="" coords="1023,512,1247,539"/>
+<area shape="rect" id="node40" href="$Index_8hpp.html" title="Core/Utils/Index.hpp" alt="" coords="1045,587,1196,613"/>
+<area shape="rect" id="node42" href="$Index_8inl.html" title="Core/Utils/Index.inl" alt="" coords="928,669,1068,695"/>
+</map>

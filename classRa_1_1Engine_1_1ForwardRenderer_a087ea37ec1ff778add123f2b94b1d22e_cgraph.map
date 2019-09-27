@@ -1,0 +1,5 @@
+<map id="Ra::Engine::ForwardRenderer::initializeInternal" name="Ra::Engine::ForwardRenderer::initializeInternal">
+<area shape="rect" id="node2" href="$namespaceRa_1_1Core_1_1Resources.html#a91355598fb65d39b0dd807304ba7250a" title="Get the base prefix to access the Radium resources in a filesystem. " alt="" coords="288,5,437,47"/>
+<area shape="rect" id="node3" href="$classRa_1_1Engine_1_1ShaderProgramManager.html#a82a7361639c0fbd401447e2d253dc961" title="Add a shader program to the program collection according to the given configuration. " alt="" coords="257,71,468,112"/>
+<area shape="rect" id="node4" href="$classRa_1_1Engine_1_1ShaderConfiguration.html#a164b0c07e18d6d833cfac76d4413352b" title="Ra::Engine::ShaderConfiguration\l::getNamedStrings" alt="" coords="516,71,744,112"/>
+</map>

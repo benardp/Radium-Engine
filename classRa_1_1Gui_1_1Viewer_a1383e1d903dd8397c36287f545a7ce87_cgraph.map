@@ -1,0 +1,35 @@
+<map id="Ra::Gui::Viewer::initializeGL" name="Ra::Gui::Viewer::initializeGL">
+<area shape="rect" id="node2" href="$classRa_1_1Gui_1_1WindowQt.html#aac16a1388a3a2f9d0ea1127ea700cafe" title="Ra::Gui::WindowQt::\lgetProcAddress" alt="" coords="289,52,434,93"/>
+<area shape="rect" id="node3" href="$classRa_1_1Gui_1_1Viewer.html#abcb7e8020ac7d36903b98cf4cbcaa350" title="create gizmos " alt="" coords="258,117,465,159"/>
+<area shape="rect" id="node4" href="$classRa_1_1Core_1_1Utils_1_1ColorBase.html#a7f0a6768d3dff7343b503929b142fc22" title="Ra::Core::Utils::ColorBase\l\&lt; Scalar \&gt;::Grey" alt="" coords="269,183,454,224"/>
+<area shape="rect" id="node5" href="$classRa_1_1Gui_1_1WindowQt.html#a78476baacd2df24a260f604d02c8ddc4" title="Make the OpenGL context associated with the viewer the current context. " alt="" coords="538,313,683,355"/>
+<area shape="rect" id="node6" href="$classRa_1_1Gui_1_1Viewer.html#a5038d663d3fe66ec87ad8a68f98f5cb0" title="Initialize renderer internal state + configure lights. " alt="" coords="524,248,697,289"/>
+<area shape="rect" id="node30" href="$classRa_1_1Gui_1_1WindowQt.html#acd31b9e580f049491d13c16ef954d964" title="Reset the current OpenGL context that is no more the one associated with the viewer. " alt="" coords="538,379,683,420"/>
+<area shape="rect" id="node31" href="$classRa_1_1Gui_1_1Viewer.html#a5507737ddc12ee86c6384cb77c450310" title="Add a renderer and return its index. " alt="" coords="258,350,465,377"/>
+<area shape="rect" id="node32" href="$classRa_1_1Gui_1_1Viewer.html#a94ca6b2d9205f3affdc98703e5d22a13" title="Set the renderer. " alt="" coords="247,451,476,478"/>
+<area shape="rect" id="node7" href="$classRa_1_1Engine_1_1Renderer.html#af7d65da9d3a185ede31e308d79398259" title="Initialize renderer. " alt="" coords="747,248,902,289"/>
+<area shape="rect" id="node28" href="$classRa_1_1Engine_1_1Renderer.html#a756b68241ef8d803e97ddf7f97c4ee39" title="Update the background color (does not trigger a redraw) " alt="" coords="745,313,904,355"/>
+<area shape="rect" id="node29" href="$classRa_1_1Engine_1_1Renderer.html#a3166160850c466595fe48a74116bc116" title="Lock rendering. " alt="" coords="747,404,902,445"/>
+<area shape="rect" id="node8" href="$namespaceRa_1_1Core_1_1Resources.html#a91355598fb65d39b0dd807304ba7250a" title="Get the base prefix to access the Radium resources in a filesystem. " alt="" coords="991,260,1141,301"/>
+<area shape="rect" id="node9" href="$classRa_1_1Engine_1_1ShaderProgramManager.html#a82a7361639c0fbd401447e2d253dc961" title="Add a shader program to the program collection according to the given configuration. " alt="" coords="961,325,1171,367"/>
+<area shape="rect" id="node11" href="$classRa_1_1Engine_1_1ShaderConfiguration.html#a8ffa1714a9e63a320acaa7873fb99797" title="Add a shader given its type. " alt="" coords="952,391,1180,432"/>
+<area shape="rect" id="node12" href="$namespaceRa_1_1Engine_1_1ShaderConfigurationFactory.html#a36842535508a390108fb1205210a5c49" title="Add a configuration to the factory. " alt="" coords="952,64,1180,105"/>
+<area shape="rect" id="node13" href="$namespaceRa_1_1Core_1_1Geometry.html#ad5f12dda8ca32de7363062238f1d6ccd" title="Create a 2D quad mesh given half extents, centered on the origin with z axis as normal. " alt="" coords="987,129,1145,171"/>
+<area shape="rect" id="node25" href="$classRa_1_1Engine_1_1Renderer.html#ab793c712188ab407165f2e8a5f80ceb0" title="initializeInternal Initialize the renderer dependant resources. " alt="" coords="989,195,1143,236"/>
+<area shape="rect" id="node26" href="$classRa_1_1Engine_1_1Renderer.html#a7343dbeb04c9699cc2abf2690c9941ee" title="Resize the viewport and all the screen textures, fbos. " alt="" coords="989,467,1143,508"/>
+<area shape="rect" id="node10" href="$classRa_1_1Engine_1_1ShaderConfiguration.html#a164b0c07e18d6d833cfac76d4413352b" title="Ra::Engine::ShaderConfiguration\l::getNamedStrings" alt="" coords="1228,325,1456,367"/>
+<area shape="rect" id="node14" href="$namespaceRa_1_1Core_1_1Geometry.html#a9f66e13e9a53313225543f2f1abcda8e" title="Create a 2D grid mesh with given number of row and columns. " alt="" coords="1268,129,1416,171"/>
+<area shape="rect" id="node15" href="$classRa_1_1Core_1_1Geometry_1_1TriangleMesh.html#a6ef9dbd18c0501f2ffd1316be6be56ce" title="Access the vertices positions. " alt="" coords="1789,71,1960,112"/>
+<area shape="rect" id="node16" href="$classRa_1_1Core_1_1Geometry_1_1TriangleMesh.html#ad7d3f6272b902171740e50232ba56114" title="Access the vertices normals. " alt="" coords="1789,136,1961,177"/>
+<area shape="rect" id="node17" href="$classRa_1_1Core_1_1Grid.html#ae9c02e6ec89130899fd0645dbfa4ece7" title="Access an element with a D&#45;dimensional index. " alt="" coords="1556,254,1687,281"/>
+<area shape="rect" id="node18" href="$classRa_1_1Core_1_1Geometry_1_1TriangleMesh.html#a51b5e7d49d82ffa036306e28a42cd92b" title="Utility function colorzing the mesh with a given color. Add the color attribute if needed..." alt="" coords="1537,20,1706,61"/>
+<area shape="rect" id="node20" href="$classRa_1_1Core_1_1Geometry_1_1TriangleMesh.html#a0b294c697e094dcc62b3adb3c0ac16af" title="Check that the mesh is well built, asserting when it is not. " alt="" coords="1504,188,1739,229"/>
+<area shape="rect" id="node19" href="$classRa_1_1Core_1_1Geometry_1_1TriangleMesh.html#a209037ce5a11ec8539a9ada7ba763e8c" title="Get attribute by handle. " alt="" coords="1787,5,1963,47"/>
+<area shape="rect" id="node21" href="$namespaceRa_1_1Core_1_1Geometry.html#aa04e6052d8911b1df1bd881474debb45" title="Ra::Core::Geometry::t" alt="" coords="1795,267,1955,294"/>
+<area shape="rect" id="node22" href="$namespaceRa_1_1Core_1_1Geometry.html#a178f2b7309fe2ea5bc31a3abcb25368e" title="Ra::Core::Geometry\l::triangleArea" alt="" coords="1801,201,1949,243"/>
+<area shape="rect" id="node23" href="$namespaceOpenMesh.html#a71e7f1dd3eac016d2b8245ac408a291c" title="OpenMesh::cross" alt="" coords="2011,183,2143,210"/>
+<area shape="rect" id="node24" href="$namespaceOpenMesh.html#a8205f789ce08919bc11c58383574596c" title="OpenMesh::norm" alt="" coords="2011,234,2143,261"/>
+<area shape="rect" id="node27" href="$classRa_1_1Engine_1_1Renderer.html#a18a293f1c7c6864e4f1de7f6b88b0f4a" title="resize the renderer dependent resources " alt="" coords="1265,467,1419,508"/>
+<area shape="rect" id="node33" href="$classRa_1_1Engine_1_1Renderer.html#aa1773ee0f741df643e10d21d968fbcc3" title="Unlock the rendering. " alt="" coords="533,547,688,588"/>
+<area shape="rect" id="node34" href="$classRa_1_1Engine_1_1Renderer.html#a56fec7b4244e68e76d80ce48cacb61eb" title="Get the name of the renderer, e.g to be displayed in the UI. " alt="" coords="533,612,688,653"/>
+</map>

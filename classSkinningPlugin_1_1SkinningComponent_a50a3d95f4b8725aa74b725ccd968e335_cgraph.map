@@ -1,0 +1,31 @@
+<map id="SkinningPlugin::SkinningComponent::handleWeightsLoading" name="SkinningPlugin::SkinningComponent::handleWeightsLoading">
+<area shape="rect" id="node2" href="$classRa_1_1Core_1_1Asset_1_1AssetData.html#a3f4a6e18b60f2de4a23c8898a7341d21" title="Acces to the name of the asset. " alt="" coords="305,312,499,353"/>
+<area shape="rect" id="node3" href="$classRa_1_1Core_1_1Asset_1_1HandleData.html#a456d73d7b367dbf29f03d037bedaeaba" title="Return the list of HandleComponentData. " alt="" coords="300,377,504,419"/>
+<area shape="rect" id="node4" href="$namespaceRa_1_1Core_1_1Animation.html#a386a12a440bf79de7a806c397023c443" title="Ra::Core::Animation\l::checkWeightMatrix" alt="" coords="327,443,477,484"/>
+<area shape="rect" id="node29" href="$namespaceRa_1_1Core_1_1Animation.html#a6a32b4881129c88ac07339fd783ebc49" title="In&#45;place normalization of the weights, such that matrix.row( k ).sum() = 1;. " alt="" coords="327,508,477,549"/>
+<area shape="rect" id="node5" href="$namespaceRa_1_1Core_1_1Math.html#ae18c7b57c072ca801413a45e8944b15d" title="Call std::isnormal on quaternion entries. " alt="" coords="552,443,753,484"/>
+<area shape="rect" id="node28" href="$namespaceRa_1_1Core_1_1Animation.html#a5f77b87a09e5e7bd707190d70e4f4b64" title="Ra::Core::Animation\l::checkNoWeightVertex" alt="" coords="569,377,737,419"/>
+<area shape="rect" id="node6" href="$namespaceRa_1_1Core_1_1Math.html#a5f25a31a29b0688e349dc35a353b9766" title="Get two vectors orthogonal to a given vector. " alt="" coords="801,5,1017,47"/>
+<area shape="rect" id="node9" href="$namespaceRa_1_1Core_1_1Math.html#a5306cf8ea65c31d4bbe0560ec7bb6bb4" title="Get the angle between two vectors. " alt="" coords="1071,155,1230,182"/>
+<area shape="rect" id="node10" href="$namespaceRa_1_1Core_1_1Math.html#a5130d4a8434d4ccc82fa04bcba73d2f0" title="Get the spherical linear interpolation between two unit non&#45;colinear vectors. " alt="" coords="832,239,987,266"/>
+<area shape="rect" id="node12" href="$namespaceRa_1_1Core_1_1Math.html#a4f441ac6a56092d52849a4f48e274aa8" title="Get the cosine of the angle between two vectors. " alt="" coords="1077,282,1224,309"/>
+<area shape="rect" id="node13" href="$namespaceRa_1_1Core_1_1Geometry.html#aa04e6052d8911b1df1bd881474debb45" title="Ra::Core::Geometry::t" alt="" coords="829,341,989,367"/>
+<area shape="rect" id="node14" href="$namespaceRa_1_1Core_1_1Math.html#ab5addcd796ee2477977a4e219145ea85" title="Ra::Core::Math::projectOn\lPlane" alt="" coords="816,173,1003,215"/>
+<area shape="rect" id="node15" href="$namespaceRa_1_1Core_1_1Math.html#a8667e211f2182821346ba4bcfe07b053" title="Get the cotangent of the angle between two vectors. " alt="" coords="829,391,989,418"/>
+<area shape="rect" id="node16" href="$namespaceRa_1_1Core_1_1Math.html#a19a397c8570c4f1df64d6c055d215659" title="Normalize a vector and returns its norm before normalization. " alt="" coords="806,443,1013,484"/>
+<area shape="rect" id="node18" href="$namespaceRa_1_1Core_1_1Math.html#add677f0ab64a79b894bd36d7aa6987f1" title="Normalize a vector and returns its norm before normalization. " alt="" coords="806,508,1013,549"/>
+<area shape="rect" id="node19" href="$namespaceRa_1_1Core_1_1Math.html#a15598e77958bb1790082f621851bddef" title="Transform a ray, direction is only transformed by linear part of the transformation, while origin is fully transformed corresponds to t*r. " alt="" coords="804,639,1015,666"/>
+<area shape="rect" id="node20" href="$namespaceRa_1_1Core_1_1Math.html#ad79b708fb40ed130ff8031d709b78504" title="Ra::Core::Math::lookAt" alt="" coords="827,690,991,717"/>
+<area shape="rect" id="node21" href="$namespaceRa_1_1Core_1_1Math.html#ab5436769ec59975b2a35b83a86defd2c" title="Ra::Core::Math::perspective" alt="" coords="810,741,1009,767"/>
+<area shape="rect" id="node22" href="$namespaceRa_1_1Core_1_1Math.html#a8b773ee57d017ddd6a3d2612dd426f71" title="Ra::Core::Math::orthographic" alt="" coords="807,791,1012,818"/>
+<area shape="rect" id="node23" href="$namespaceRa_1_1Core_1_1Math.html#a941baf20065c77d494ca251e6e104f31" title="Returns the quaternion q multipled by a scalar factor of k. " alt="" coords="831,842,988,869"/>
+<area shape="rect" id="node24" href="$namespaceRa_1_1Core_1_1Math.html#a0523a53d2d94a623e194830837863c4c" title="Returns the sum of two quaternions. " alt="" coords="835,893,983,919"/>
+<area shape="rect" id="node25" href="$namespaceRa_1_1Core_1_1Math.html#aa5c9bddd5fdbbdbcdb661348982ff204" title="Returns the sum of two quaternions, resolving antipodality by flipping the sign of q2 if q1..." alt="" coords="818,71,1001,98"/>
+<area shape="rect" id="node27" href="$namespaceRa_1_1Core_1_1Math.html#aa5414be6d83af5b67fb48c22e4f49679" title="Decompose a given rotation Qin into a swing rotation and a twist rotation. " alt="" coords="818,573,1001,615"/>
+<area shape="rect" id="node7" href="$namespaceRa_1_1Core_1_1Math.html#a90f0fe9079f5bb86c721ea4b61738470" title="Returns the sign of any numeric type as { &#45;1, 0, 1}. " alt="" coords="1075,17,1226,43"/>
+<area shape="rect" id="node8" href="$namespaceRa_1_1Core_1_1Math.html#ae4e681e0738fe7e5bfd028c6270b597a" title="Ra::Core::Math::signum" alt="" coords="1284,17,1455,43"/>
+<area shape="rect" id="node11" href="$namespaceOpenMesh.html#a575b338f0fc9ecb5393d23e977e6ac38" title="OpenMesh::dot" alt="" coords="1091,223,1210,250"/>
+<area shape="rect" id="node17" href="$namespaceOpenMesh.html#a8205f789ce08919bc11c58383574596c" title="OpenMesh::norm" alt="" coords="1085,515,1217,542"/>
+<area shape="rect" id="node26" href="$namespaceRa_1_1Core_1_1Math.html#a810d6d50b61cc01cda1d54527de864d0" title="Returns the sign of any numeric type as { &#45;1, 1} Note: signNZ(0) returns 1 for any integral type but ..." alt="" coords="1065,71,1236,98"/>
+<area shape="rect" id="node30" href="$namespaceRa_1_1Core_1_1Math.html#a46540d56930b4c1ff3b115872cde4893" title="Compare two numbers such that |x&#45;y| &lt; espilon*epsilonBoostFactor. " alt="" coords="557,508,748,549"/>
+</map>

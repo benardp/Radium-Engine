@@ -1,0 +1,12 @@
+<map id="MeshPaintPlugin::MeshPaintSystem::paintMesh" name="MeshPaintPlugin::MeshPaintSystem::paintMesh">
+<area shape="rect" id="node2" href="$classMeshPaintPlugin_1_1MeshPaintComponent.html#ad9bb2078c1824760a5394105ad9866e8" title="MeshPaintPlugin::MeshPaint\lComponent::paintMesh" alt="" coords="252,205,451,247"/>
+<area shape="rect" id="node3" href="$classRa_1_1Engine_1_1Component.html#a10b0bc182b76165744ebea603ae32dfe" title="Shortcut to access the render object manager. " alt="" coords="534,5,706,47"/>
+<area shape="rect" id="node4" href="$classRa_1_1Engine_1_1Displayable.html#aae62e0fc9bcee75aa66bc49f66843f94" title="Returns the picking rendermode advised by the object (default PickingRenderMode::NO_PICKING) ..." alt="" coords="535,71,705,112"/>
+<area shape="rect" id="node5" href="$classRa_1_1Engine_1_1Mesh.html#a7dd9018e643becd20e714a54cf6664db" title="Ra::Engine::Mesh::getRenderMode" alt="" coords="501,137,739,163"/>
+<area shape="rect" id="node7" href="$namespaceRa_1_1Core_1_1Geometry.html#aa04e6052d8911b1df1bd881474debb45" title="Ra::Core::Geometry::t" alt="" coords="991,158,1151,185"/>
+<area shape="rect" id="node8" href="$classRa_1_1Engine_1_1Mesh.html#aeb1eb176c4ac5a045a80b97a5e09e07e" title="Returns the underlying TriangleMesh. " alt="" coords="499,238,741,265"/>
+<area shape="rect" id="node9" href="$classRa_1_1Core_1_1Geometry_1_1TriangleMesh.html#a316e86eab4e624183f1bfe5c25f8592c" title="Return the Handle to the attribute with the given name if it exists, an invalid handle otherwise..." alt="" coords="509,289,731,331"/>
+<area shape="rect" id="node10" href="$classRa_1_1Core_1_1Geometry_1_1TriangleMesh.html#a209037ce5a11ec8539a9ada7ba763e8c" title="Get attribute by handle. " alt="" coords="532,355,708,396"/>
+<area shape="rect" id="node11" href="$classRa_1_1Engine_1_1Mesh.html#a9a1dcadf7fb4ff851b18c87b3a98ac6b" title="Mark one of the data types as dirty, forcing an update of the openGL buffer. " alt="" coords="525,421,715,447"/>
+<area shape="rect" id="node6" href="$namespaceRa_1_1Core_1_1Containers.html#a83257c42de08d550fe2081a5d8a13331" title="Stores a 3&#45;dimensional hierarchy of meshes of arbitrary type. " alt="" coords="789,121,943,163"/>
+</map>

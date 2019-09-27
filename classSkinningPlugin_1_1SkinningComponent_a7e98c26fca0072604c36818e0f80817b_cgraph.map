@@ -1,0 +1,20 @@
+<map id="SkinningPlugin::SkinningComponent::skin" name="SkinningPlugin::SkinningComponent::skin">
+<area shape="rect" id="node2" href="$classRa_1_1Core_1_1Animation_1_1Skeleton.html#acb6381c3f288f580800589eb718c1759" title="Ra::Core::Animation\l::Skeleton::getPose" alt="" coords="249,5,399,47"/>
+<area shape="rect" id="node3" href="$namespaceRa_1_1Core_1_1Animation.html#a11c1b81e9ee797fa8989a34dc2514d2f" title="Ra::Core::Animation\l::areEqual" alt="" coords="249,136,399,177"/>
+<area shape="rect" id="node5" href="$namespaceRa_1_1Core_1_1Animation.html#a03d7eb179bf339237a3e5b06d6d06100" title="Ra::Core::Animation\l::relativePose" alt="" coords="249,71,399,112"/>
+<area shape="rect" id="node6" href="$namespaceRa_1_1Core_1_1Animation.html#a19bc7bcc26d8a3662f182f6d9a61764d" title="Ra::Core::Animation\l::linearBlendSkinning" alt="" coords="467,205,621,247"/>
+<area shape="rect" id="node7" href="$namespaceRa_1_1Core_1_1Animation.html#a18e75548900106987573622831f3aae5" title="Ra::Core::Animation\l::computeDQ" alt="" coords="469,297,619,339"/>
+<area shape="rect" id="node12" href="$namespaceRa_1_1Core_1_1Animation.html#ac00813d1e8a00ddb0c98dccfc91d4828" title="Ra::Core::Animation\l::dualQuaternionSkinning" alt="" coords="233,487,415,528"/>
+<area shape="rect" id="node13" href="$namespaceRa_1_1Core_1_1Animation.html#a6ed92a8ce349fc8e84c099d05ae0a35b" title="Skin the vertices with the optimal centers of rotation. " alt="" coords="249,253,399,295"/>
+<area shape="rect" id="node14" href="$namespaceRa_1_1Core_1_1Animation.html#a6146eab259e0cce29f436870c6b8fc74" title="Apply the linear interpolation of transformations to the vertices of inMesh (STBS version)..." alt="" coords="229,421,419,463"/>
+<area shape="rect" id="node19" href="$namespaceRa_1_1Core_1_1Animation.html#a4e637369100a8526751be5b3a09f9fcd" title="Computes the dual quaternions from the given pose, skeleton states and sets of skinning weights (STBS..." alt="" coords="469,363,619,404"/>
+<area shape="rect" id="node4" href="$namespaceRa_1_1Core_1_1Animation.html#a44a3a0320649edf2829268bf80555800" title="Ra::Core::Animation\l::compatible" alt="" coords="469,125,619,167"/>
+<area shape="rect" id="node8" href="$namespaceRa_1_1Core_1_1Math.html#a90f0fe9079f5bb86c721ea4b61738470" title="Returns the sign of any numeric type as { &#45;1, 0, 1}. " alt="" coords="687,269,838,295"/>
+<area shape="rect" id="node10" href="$namespaceRa_1_1Core_1_1Math.html#a810d6d50b61cc01cda1d54527de864d0" title="Returns the sign of any numeric type as { &#45;1, 1} Note: signNZ(0) returns 1 for any integral type but ..." alt="" coords="677,319,848,346"/>
+<area shape="rect" id="node11" href="$namespaceOpenMesh.html#a575b338f0fc9ecb5393d23e977e6ac38" title="OpenMesh::dot" alt="" coords="703,370,822,397"/>
+<area shape="rect" id="node9" href="$namespaceRa_1_1Core_1_1Math.html#ae4e681e0738fe7e5bfd028c6270b597a" title="Ra::Core::Math::signum" alt="" coords="904,269,1075,295"/>
+<area shape="rect" id="node15" href="$classRa_1_1Core_1_1Animation_1_1Skeleton.html#a2422e1bb4c3016f4b07f03696e6a8383" title="Get the i&#45;th bone endpoints. " alt="" coords="669,421,856,463"/>
+<area shape="rect" id="node16" href="$classRa_1_1Core_1_1AdjacencyList.html#a068632657bfda6ab9034a879372a45e8" title="Return true if the node is a leaf node. " alt="" coords="904,453,1075,495"/>
+<area shape="rect" id="node18" href="$classRa_1_1Core_1_1AdjacencyList.html#a23393ccd75883f2eb35196d7c82ee94f" title="Ra::Core::AdjacencyList\l::children" alt="" coords="904,388,1075,429"/>
+<area shape="rect" id="node17" href="$classRa_1_1Core_1_1AdjacencyList.html#a15e425543855966a22c3b9339aa27b4d" title="Return the number of nodes in the graph. " alt="" coords="1123,453,1293,495"/>
+</map>

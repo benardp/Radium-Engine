@@ -1,0 +1,9 @@
+<map id="Ra::Core::Asset::BlinnPhongMaterialData" name="Ra::Core::Asset::BlinnPhongMaterialData">
+<area shape="rect" id="node2" href="$classRa_1_1Core_1_1Asset_1_1MaterialData.html" title="represent material data loaded by a file loader. " alt="" coords="106,1123,317,1274"/>
+<area shape="rect" id="node3" href="$classRa_1_1Core_1_1Asset_1_1AssetData.html" title="General interface of an asset data. " alt="" coords="107,499,302,621"/>
+<area shape="rect" id="node4" title="STL class. " alt="" coords="60,154,147,231"/>
+<area shape="rect" id="node5" title="STL class. " alt="" coords="35,5,172,97"/>
+<area shape="rect" id="node7" href="$classRa_1_1Core_1_1Utils_1_1ColorBase.html" title="{Ra::Core::Utils::ColorBase\l\&lt; Scalar \&gt;\n||+ ColorBase()\l+ ColorBase()\l+ ColorBase()\l+ ColorBase()\l+ operator VectorType()\l+ rgb()\l+ rgb()\l+ alpha()\l+ alpha()\l+ toRGBA32()\l+ toARGB32()\l+ sRGBToLinearRGB()\l+ linearRGBTosRGB()\l+ fromRGB()\l+ Alpha()\l+ Black()\l+ Red()\l+ Green()\l+ Blue()\l+ Yellow()\l+ Magenta()\l+ Cyan()\l+ White()\l+ Grey()\l+ Skin()\l+ fromChars()\l+ fromRGBA32()\l+ fromARGB32()\l+ fromHSV()\l+ scatter()\l}" alt="" coords="416,940,601,1457"/>
+<area shape="rect" id="node9" href="$classRa_1_1Core_1_1Utils_1_1ColorBase.html" title="{Ra::Core::Utils::ColorBase\l\&lt; _Scalar \&gt;\n||+ ColorBase()\l+ ColorBase()\l+ ColorBase()\l+ ColorBase()\l+ operator VectorType()\l+ rgb()\l+ rgb()\l+ alpha()\l+ alpha()\l+ toRGBA32()\l+ toARGB32()\l+ sRGBToLinearRGB()\l+ linearRGBTosRGB()\l+ fromRGB()\l+ Alpha()\l+ Black()\l+ Red()\l+ Green()\l+ Blue()\l+ Yellow()\l+ Magenta()\l+ Cyan()\l+ White()\l+ Grey()\l+ Skin()\l+ fromChars()\l+ fromRGBA32()\l+ fromARGB32()\l+ fromHSV()\l+ scatter()\l}" alt="" coords="560,301,745,819"/>
+<area shape="rect" id="node11" href="$classbool.html" title="{bool\n||}" alt="" coords="625,1160,675,1237"/>
+</map>

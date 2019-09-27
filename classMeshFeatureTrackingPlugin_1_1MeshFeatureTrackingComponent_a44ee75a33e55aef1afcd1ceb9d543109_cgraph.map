@@ -1,0 +1,9 @@
+<map id="MeshFeatureTrackingPlugin::MeshFeatureTrackingComponent::getMaxV" name="MeshFeatureTrackingPlugin::MeshFeatureTrackingComponent::getMaxV">
+<area shape="rect" id="node2" href="$classRa_1_1Engine_1_1Component.html#a10b0bc182b76165744ebea603ae32dfe" title="Shortcut to access the render object manager. " alt="" coords="301,5,473,47"/>
+<area shape="rect" id="node3" href="$classRa_1_1Engine_1_1Mesh.html#a1f562df5f54068d09b21d24967ed3169" title="Ra::Engine::Mesh::getNum\lVertices" alt="" coords="292,71,483,112"/>
+<area shape="rect" id="node4" href="$namespaceRa_1_1Engine.html#a4674a5cd2b0ff5b978b40172d0c24654" title="Ra::Engine::sendGLData" alt="" coords="531,78,707,105"/>
+<area shape="rect" id="node5" href="$namespaceRa_1_1Engine_1_1DrawPrimitives.html#ae5ee79fb923c94ae9382e98ce4516730" title="Displays given vector shown as an arrow originating from &#39;start&#39;. " alt="" coords="755,71,945,112"/>
+<area shape="rect" id="node6" href="$namespaceRa_1_1Core_1_1Math.html#a5f25a31a29b0688e349dc35a353b9766" title="Get two vectors orthogonal to a given vector. " alt="" coords="993,71,1209,112"/>
+<area shape="rect" id="node7" href="$namespaceRa_1_1Core_1_1Math.html#a90f0fe9079f5bb86c721ea4b61738470" title="Returns the sign of any numeric type as { &#45;1, 0, 1}. " alt="" coords="1257,78,1408,105"/>
+<area shape="rect" id="node8" href="$namespaceRa_1_1Core_1_1Math.html#ae4e681e0738fe7e5bfd028c6270b597a" title="Ra::Core::Math::signum" alt="" coords="1456,78,1627,105"/>
+</map>

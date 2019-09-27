@@ -1,0 +1,12 @@
+<map id="SkinningPlugin::SkinningPluginC::openGlInitialize" name="SkinningPlugin::SkinningPluginC::openGlInitialize">
+<area shape="rect" id="node2" href="$classRa_1_1GuiBase_1_1SelectionManager.html#a29cbd250208f1e18d2ab1e0f4d91105d" title="Return the current selected item, or an invalid entry if there is no current item. " alt="" coords="229,37,452,79"/>
+<area shape="rect" id="node6" href="$classRa_1_1Engine_1_1System.html#aafa5a9505889509fc498bfe61344199e" title="Returns the components stored for the given entity. " alt="" coords="256,103,425,144"/>
+<area shape="rect" id="node7" href="$classSkinningPlugin_1_1SkinningWidget.html#a82b3a8d0f4cbc8dbf049283174caaf6e" title="SkinningPlugin::Skinning\lWidget::setCurrent" alt="" coords="253,168,429,209"/>
+<area shape="rect" id="node10" href="$classSkinningPlugin_1_1SkinningSystem.html#aec998276dd4a51ab2d6250cb66327c8a" title="SkinningPlugin::Skinning\lSystem::showWeights" alt="" coords="253,233,429,275"/>
+<area shape="rect" id="node11" href="$classSkinningPlugin_1_1SkinningSystem.html#a8f136f491e27d19fc8cb5336b707b1d3" title="SkinningPlugin::Skinning\lSystem::showWeightsType" alt="" coords="247,299,435,340"/>
+<area shape="rect" id="node3" href="$classRa_1_1GuiBase_1_1SelectionManager.html#aec178a6b3de1c04e5e1d16ff72c6e966" title="Ra::GuiBase::SelectionManager\l::itemModel" alt="" coords="500,5,723,47"/>
+<area shape="rect" id="node4" href="$classRa_1_1GuiBase_1_1ItemModel.html#a3236433d461ad6cac5e9390b2685fa3f" title="Returns the entry corresponding to a given index or an invalid entry if the index doesn&#39;t match any e..." alt="" coords="524,71,699,112"/>
+<area shape="rect" id="node5" href="$classRa_1_1GuiBase_1_1TreeModel.html#a5aa24ace72c1c3d29e268cb34dc576f2" title="Get the tree item corresponding to the given index. " alt="" coords="771,71,941,112"/>
+<area shape="rect" id="node8" href="$classSkinningPlugin_1_1SkinningComponent.html#a412042af255abac6143f258152167a44" title="SkinningPlugin::Skinning\lComponent::getSkinningType" alt="" coords="507,136,715,177"/>
+<area shape="rect" id="node9" href="$classSkinningPlugin_1_1SkinningComponent.html#a9da330b1356de267daf5ac3ba1400d22" title="Sets the Skinning method to use. " alt="" coords="508,201,715,243"/>
+</map>

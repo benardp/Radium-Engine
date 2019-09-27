@@ -1,0 +1,5 @@
+<map id="Ra::Gui::KeyMappingManager::addAction" name="Ra::Gui::KeyMappingManager::addAction">
+<area shape="rect" id="node2" href="$classRa_1_1Gui_1_1KeyMappingManager.html#a77a25c034a6d0e90e3cf69c0eb311ad7" title="Save the configuration. " alt="" coords="260,5,467,47"/>
+<area shape="rect" id="node3" href="$classRa_1_1Gui_1_1KeyMappingManager.html#aad32ca0767b840cfe9efea43335de826" title="load configuration from filename, or default configration filename. " alt="" coords="515,5,721,47"/>
+<area shape="rect" id="node4" href="$classRa_1_1Core_1_1Utils_1_1Observable.html#a1ff45156475811658f92e8c9d352d419" title="Notify (i.e. call) each attached observer with argument p. " alt="" coords="769,5,961,47"/>
+</map>

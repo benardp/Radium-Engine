@@ -1,0 +1,12 @@
+<map id="Ra::IO::AssimpHandleDataLoader::loadData" name="Ra::IO::AssimpHandleDataLoader::loadData">
+<area shape="rect" id="node2" href="$namespaceRa_1_1IO.html#aef6c50424873964fcea0008be55d4a34" title="Ra::IO::assimpToCore" alt="" coords="268,5,424,32"/>
+<area shape="rect" id="node3" href="$classRa_1_1Core_1_1Asset_1_1HandleData.html#a9b6aadf86a2a5328c83fc9d17f09893c" title="Set the type of the Handle system. " alt="" coords="244,57,448,98"/>
+<area shape="rect" id="node4" href="$classRa_1_1Core_1_1Asset_1_1HandleData.html#afd1b588bb09b7e6ff3ed39d702d4b042" title="Set the name of the Handle system. " alt="" coords="244,122,448,163"/>
+<area shape="rect" id="node5" href="$classRa_1_1Core_1_1Asset_1_1HandleData.html#a583661ca8646175c80bd0964f23abf07" title="Set the transformation of the Handle system. " alt="" coords="244,187,448,229"/>
+<area shape="rect" id="node6" href="$classRa_1_1Core_1_1Asset_1_1HandleData.html#a1189e767e22ef4bb93527a724630cc56" title="Set the map from Handle names to Handle storage index. " alt="" coords="244,253,448,294"/>
+<area shape="rect" id="node7" href="$classRa_1_1Core_1_1Asset_1_1HandleData.html#acbae173d72a5e07eaec8e930c9fffecf" title="Set whether the Handle system needs end bones. " alt="" coords="244,318,448,359"/>
+<area shape="rect" id="node8" href="$classRa_1_1Core_1_1Asset_1_1HandleData.html#a2418d9eca693c1ce84e66837faef6091" title="Print stat info to the Debug output. " alt="" coords="244,383,448,425"/>
+<area shape="rect" id="node9" href="$classRa_1_1Core_1_1Asset_1_1HandleData.html#a456d73d7b367dbf29f03d037bedaeaba" title="Return the list of HandleComponentData. " alt="" coords="244,449,448,490"/>
+<area shape="rect" id="node10" href="$classRa_1_1Core_1_1Asset_1_1HandleData.html#ad517df66c4005d5768a68be7ccb29a1f" title="Add name to the list of bound mesh names. " alt="" coords="244,514,448,555"/>
+<area shape="rect" id="node11" href="$classRa_1_1Core_1_1Asset_1_1HandleData.html#a2ce8dde1d1d3848bcc76693a40e389de" title="Return the HandleSystem hierarchy, i.e. bones hierarchy. " alt="" coords="244,579,448,621"/>
+</map>
