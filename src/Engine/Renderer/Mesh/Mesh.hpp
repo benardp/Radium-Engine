@@ -104,7 +104,7 @@ class RA_ENGINE_API Mesh : public Displayable
     inline const Core::Geometry::TriangleMesh& getTriangleMesh() const;
     inline Core::Geometry::TriangleMesh& getTriangleMesh();
 
-    /// Use the given geometry as base for a display mesh. Normals are optionnal.
+    /// Use the given geometry as base for a display mesh. Normals are optional.
     void loadGeometry( Core::Geometry::TriangleMesh&& mesh );
 
     /**
@@ -119,11 +119,11 @@ class RA_ENGINE_API Mesh : public Displayable
                                       const std::vector<uint>& indices );
 
     /**
-     * Set additionnal vertex data.
+     * Set additional vertex data.
      * Initialize vertexAttrib if needed,
      * data must have the appropriate size (i.e. num vertex) or empty (to
      * remove the data)
-     * Theses functions might disapear to use directly Core::Geometry::TriangleMesh attribs.
+     * Theses functions might disappear to use directly Core::Geometry::TriangleMesh attribs.
      *
      * \note Attributes names are computed by #getAttribName
      */
@@ -181,7 +181,7 @@ class RA_ENGINE_API Mesh : public Displayable
     /// extensible. Now the only attribs should be the one defined in
     /// the enums MeshData, Vec3Data, Vec4Data.
 
-    /// Additionnal vertex vector 3 data handles, stored in Mesh, added
+    /// Additional vertex vector 3 data handles, stored in Mesh, added
     std::array<Core::Geometry::TriangleMesh::Vec3AttribHandle, MAX_VEC3> m_v3DataHandle;
     Core::Geometry::TriangleMesh::Vec3AttribHandle::Container m_dummy3;
     /// Additionnal vertex vector 4 data handles, stored in Mesh, added

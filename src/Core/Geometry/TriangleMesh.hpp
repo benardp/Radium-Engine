@@ -148,7 +148,7 @@ class RA_CORE_API TriangleMesh : public AbstractGeometry
 
     /// Copy only the required attributes from \p input. Existing attributes are
     /// kept untouched, except if overwritten by attributes copied from \p other.
-    /// \return True if the attributes have been sucessfully copied, false otherwise.
+    /// \return True if the attributes have been successfully copied, false otherwise.
     /// \note *this and \p input must have the same number of vertices.
     /// \warning The original handles are not valid for the mesh copy.
     template <typename... Handles>
@@ -156,7 +156,7 @@ class RA_CORE_API TriangleMesh : public AbstractGeometry
 
     /// Copy all the attributes from \p input. Existing attributes are
     /// kept untouched, except if overwritten by attributes copied from \p other.
-    /// \return True if the attributes have been sucessfully copied, false otherwise.
+    /// \return True if the attributes have been successfully copied, false otherwise.
     /// \note *this and \p input must have the same number of vertices.
     /// \warning The original handles are not valid for the mesh copy.
     inline bool copyAllAttributes( const TriangleMesh& input );

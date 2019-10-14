@@ -77,7 +77,7 @@ RA_ENGINE_API std::string getEntryName( const Engine::RadiumEngine* engine, cons
 /// Returns a list of all the render object indices belonging to the given item.
 /// RO item : it returns only the RO index.
 /// Component item : it returns all its ROs.
-/// Entity item : all ROs from all compoents of given entity.
+/// Entity item : all ROs from all components of given entity.
 RA_ENGINE_API std::vector<Ra::Core::Utils::Index> getItemROs( const Engine::RadiumEngine* engine,
                                                               const ItemEntry& ent );
 } // namespace Engine
