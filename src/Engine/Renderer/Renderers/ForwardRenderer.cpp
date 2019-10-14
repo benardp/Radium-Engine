@@ -164,6 +164,12 @@ void ForwardRenderer::renderInternal( const ViewingParameters& renderData ) {
     GL_ASSERT( glClearBufferfv( GL_COLOR, 3, clearZeros.data() ) );           // Clear specular
     GL_ASSERT( glClearBufferfv( GL_DEPTH, 0, &clearDepth ) );                 // Clear depth
 
+	if (m_wireframe)
+	{
+		glEnable(GL_POLYGON_OFFSET_FILL);
+		glPolygonOffset(1.0, 1.0);
+	}
+
     // Z prepass
     GL_ASSERT( glDepthFunc( GL_LESS ) );
     GL_ASSERT( glDisable( GL_BLEND ) );
@@ -222,6 +228,11 @@ void ForwardRenderer::renderInternal( const ViewingParameters& renderData ) {
     }
     else
     { LOG( logINFO ) << "Opaque : no light sources, unable to render"; }
+
+	if (m_wireframe)
+	{
+		glDisable(GL_POLYGON_OFFSET_FILL);
+	}
 
 #ifndef NO_TRANSPARENCY
     // Transparency (blending) pass
@@ -285,13 +296,13 @@ void ForwardRenderer::renderInternal( const ViewingParameters& renderData ) {
         glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
         glEnable( GL_LINE_SMOOTH );
         glLineWidth( 1.f );
-        glEnable( GL_POLYGON_OFFSET_LINE );
-        glPolygonOffset( -1.0f, -1.1f );
+        //glEnable( GL_POLYGON_OFFSET_LINE );
+		//glPolygonOffset(-0.25f, -1.f);
 
         // Light pass
         GL_ASSERT( glDepthFunc( GL_LEQUAL ) );
-        GL_ASSERT( glEnable( GL_BLEND ) );
-        GL_ASSERT( glBlendFunc( GL_ONE, GL_ONE ) );
+        GL_ASSERT( glDisable( GL_BLEND ) );
+        //GL_ASSERT( glBlendFunc( GL_ONE, GL_ONE ) );
 
         GL_ASSERT( glDrawBuffers( 1, buffers ) ); // Draw color texture
 
@@ -306,7 +317,7 @@ void ForwardRenderer::renderInternal( const ViewingParameters& renderData ) {
 
                 for ( const auto& ro : m_fancyRenderObjects )
                 {
-                    ro->render( wireframepassParams, renderData, RenderTechnique::LIGHTING_OPAQUE );
+                    ro->render( wireframepassParams, renderData, RenderTechnique::WIREFRAME);
                 }
                 // This will not work for the moment . skipping wireframe rendering of transparent
                 // objects
@@ -322,7 +333,7 @@ void ForwardRenderer::renderInternal( const ViewingParameters& renderData ) {
         { LOG( logINFO ) << "Wireframe : no light sources, unable to render"; }
 
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-        glDisable( GL_POLYGON_OFFSET_LINE );
+        //glDisable( GL_POLYGON_OFFSET_LINE );
     }
 
     // Restore state

@@ -34,6 +34,7 @@ class RA_ENGINE_API RenderTechnique final
         Z_PREPASS            = 0x1 << 0,
         LIGHTING_OPAQUE      = 0x1 << 1,
         LIGHTING_TRANSPARENT = 0x1 << 2,
+		WIREFRAME			 = 0x1 << 3,
         NO_PASS              = 0
     };
 
