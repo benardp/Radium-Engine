@@ -63,9 +63,6 @@ class RA_ENGINE_API TriangleMeshComponent : public Component
     // Give access to the mesh and (if deformable) to update it
     const Ra::Core::Geometry::TriangleMesh* getMeshOutput() const;
     Ra::Core::Geometry::TriangleMesh* getMeshRw();
-    Ra::Core::Vector3Array* getVerticesRw();
-    Ra::Core::Vector3Array* getNormalsRw();
-    Ra::Core::VectorArray<Ra::Core::Vector3ui>* getTrianglesRw();
 
     const Ra::Core::Utils::Index* roIndexRead() const;
 

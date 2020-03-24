@@ -92,7 +92,10 @@ TranslateGizmo::TranslateGizmo( Engine::Component* c,
             1, 1, Core::Vector2( arrowScale / 8_ra, arrowScale / 8_ra ), T, planeColor );
 
         // \FIXME this hack is here to be sure the plane will be selected (see shader)
-        plane.normals().getMap().fill( 0_ra );
+
+        auto& normals = plane.normalsWithLock();
+        normals.getMap().fill( 0_ra );
+        plane.normalsUnlock();
 
         std::shared_ptr<Engine::Mesh> mesh( new Engine::Mesh( "Gizmo Plane" ) );
         mesh->loadGeometry( std::move( plane ) );
@@ -135,12 +138,12 @@ void TranslateGizmo::updateTransform( Gizmo::Mode mode,
 
 void TranslateGizmo::selectConstraint( int drawableIdx ) {
     // reColor constraint
-    roMeshes()[0]->getTriangleMesh().colorize( Core::Utils::Color::Red() );
-    roMeshes()[1]->getTriangleMesh().colorize( Core::Utils::Color::Green() );
-    roMeshes()[2]->getTriangleMesh().colorize( Core::Utils::Color::Blue() );
-    roMeshes()[3]->getTriangleMesh().colorize( Core::Utils::Color::Red() );
-    roMeshes()[4]->getTriangleMesh().colorize( Core::Utils::Color::Green() );
-    roMeshes()[5]->getTriangleMesh().colorize( Core::Utils::Color::Blue() );
+    roMeshes()[0]->getCoreGeometry().colorize( Core::Utils::Color::Red() );
+    roMeshes()[1]->getCoreGeometry().colorize( Core::Utils::Color::Green() );
+    roMeshes()[2]->getCoreGeometry().colorize( Core::Utils::Color::Blue() );
+    roMeshes()[3]->getCoreGeometry().colorize( Core::Utils::Color::Red() );
+    roMeshes()[4]->getCoreGeometry().colorize( Core::Utils::Color::Green() );
+    roMeshes()[5]->getCoreGeometry().colorize( Core::Utils::Color::Blue() );
 
     // prepare selection
     m_selectedAxis  = -1;
@@ -155,17 +158,17 @@ void TranslateGizmo::selectConstraint( int drawableIdx ) {
             if ( i < 3 )
             {
                 m_selectedAxis = int( i );
-                roMeshes()[size_t( m_selectedAxis )]->getTriangleMesh().colorize(
+                roMeshes()[size_t( m_selectedAxis )]->getCoreGeometry().colorize(
                     Core::Utils::Color::Yellow() );
             }
             else
             {
                 m_selectedPlane = int( i - 3 );
-                roMeshes()[size_t( ( m_selectedPlane + 1 ) % 3 )]->getTriangleMesh().colorize(
+                roMeshes()[size_t( ( m_selectedPlane + 1 ) % 3 )]->getCoreGeometry().colorize(
                     Core::Utils::Color::Yellow() );
-                roMeshes()[size_t( ( m_selectedPlane + 2 ) % 3 )]->getTriangleMesh().colorize(
+                roMeshes()[size_t( ( m_selectedPlane + 2 ) % 3 )]->getCoreGeometry().colorize(
                     Core::Utils::Color::Yellow() );
-                roMeshes()[size_t( m_selectedPlane + 3 )]->getTriangleMesh().colorize(
+                roMeshes()[size_t( m_selectedPlane + 3 )]->getCoreGeometry().colorize(
                     Core::Utils::Color::Yellow() );
             }
         }

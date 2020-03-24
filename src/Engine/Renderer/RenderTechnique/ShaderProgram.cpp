@@ -114,26 +114,30 @@ void ShaderProgram::loadShader( ShaderType type,
     // Radium V2 : allow to define global replacement per renderer, shader, rendertechnique ...
     auto shaderSource = globjects::Shader::applyGlobalReplacements( fullsource.get() );
 
-    auto shader = globjects::Shader::create( getTypeAsGLEnum( type ) );
-
     // Workaround globject #include bug ...
     // Radium V2 : update globject to see if tis bug is always here ...
     std::string preprocessedSource = preprocessIncludes( name, shaderSource->string(), 0 );
 
     auto ptrSource = globjects::Shader::sourceFromString( preprocessedSource );
 
-    shader->setSource( ptrSource.get() );
+    addShaderFromSource( type, std::move( ptrSource ), name );
+}
+
+void ShaderProgram::addShaderFromSource( ShaderType type,
+                                         std::unique_ptr<globjects::StaticStringSource>&& ptrSource,
+                                         const std::string& name ) {
+
+    auto shader = globjects::Shader::create( getTypeAsGLEnum( type ) );
 
     shader->setName( name );
-
+    shader->setSource( ptrSource.get() );
     shader->compile();
 
     GL_CHECK_ERROR;
     m_shaderObjects[type].swap( shader );
-
-    // raw ptrSource are stored in shader object, need to keep them valid during
-    // shader life
     m_shaderSources[type].swap( ptrSource );
+    // ^^^ raw ptrSource are stored in shader object, need to keep them valid during
+    // shader life
 }
 
 GLenum ShaderProgram::getTypeAsGLEnum( ShaderType type ) const {
@@ -195,8 +199,6 @@ void ShaderProgram::load( const ShaderConfiguration& shaderConfig ) {
         ( "Shader program " + shaderConfig.m_name + " misses vertex or fragment shader." )
             .c_str() );
 
-    m_program = globjects::Program::create();
-
     for ( size_t i = 0; i < ShaderType_COUNT; ++i )
     {
         if ( !m_configuration.m_shaders[i].empty() )
@@ -211,7 +213,20 @@ void ShaderProgram::load( const ShaderConfiguration& shaderConfig ) {
     }
 
     link();
+}
 
+void ShaderProgram::link() {
+    m_program = globjects::Program::create();
+
+    for ( int i = 0; i < ShaderType_COUNT; ++i )
+    {
+        if ( m_shaderObjects[i] ) { m_program->attach( m_shaderObjects[i].get() ); }
+    }
+
+    m_program->setParameter( GL_PROGRAM_SEPARABLE, GL_TRUE );
+
+    m_program->link();
+    GL_CHECK_ERROR;
     int texUnit = 0;
     auto total  = GLuint( m_program->get( GL_ACTIVE_UNIFORMS ) );
     textureUnits.clear();
@@ -232,18 +247,6 @@ void ShaderProgram::load( const ShaderConfiguration& shaderConfig ) {
     }
 }
 
-void ShaderProgram::link() {
-    for ( int i = 0; i < ShaderType_COUNT; ++i )
-    {
-        if ( m_shaderObjects[i] ) { m_program->attach( m_shaderObjects[i].get() ); }
-    }
-
-    m_program->setParameter( GL_PROGRAM_SEPARABLE, GL_TRUE );
-
-    m_program->link();
-    GL_CHECK_ERROR;
-}
-
 void ShaderProgram::bind() const {
     m_program->use();
 }
@@ -260,7 +263,8 @@ void ShaderProgram::unbind() const {
 void ShaderProgram::reload() {
     for ( auto& s : m_shaderObjects )
     {
-        if ( s != nullptr )
+        /// \todo find a way to reload shader without source code file name.
+        if ( s != nullptr && !s->name().empty() )
         {
             LOG( logDEBUG ) << "Reloading shader " << s->name();
 
@@ -317,65 +321,63 @@ void ShaderProgram::setUniform( const char* name, std::vector<float> values ) co
 //!
 
 void ShaderProgram::setUniform( const char* name, const Core::Vector2i& value ) const {
-    m_program->setUniform( name, Core::toGlm( value ) );
+    m_program->setUniform( name, value );
 }
 
 void ShaderProgram::setUniform( const char* name, const Core::Vector2f& value ) const {
-    m_program->setUniform( name, Core::toGlm( value ) );
+    m_program->setUniform( name, value );
 }
 
 void ShaderProgram::setUniform( const char* name, const Core::Vector2d& value ) const {
-    m_program->setUniform( name, Core::toGlm( value.cast<float>().eval() ) );
+    m_program->setUniform( name, value.cast<float>().eval() );
 }
 
 void ShaderProgram::setUniform( const char* name, const Core::Vector3i& value ) const {
-    m_program->setUniform( name, Core::toGlm( value ) );
+    m_program->setUniform( name, value );
 }
 
 void ShaderProgram::setUniform( const char* name, const Core::Vector3f& value ) const {
-    m_program->setUniform( name, Core::toGlm( value ) );
+    m_program->setUniform( name, value );
 }
 
 void ShaderProgram::setUniform( const char* name, const Core::Vector3d& value ) const {
-    m_program->setUniform( name, Core::toGlm( value.cast<float>().eval() ) );
+    m_program->setUniform( name, value.cast<float>().eval() );
 }
 
 void ShaderProgram::setUniform( const char* name, const Core::Vector4i& value ) const {
-    m_program->setUniform( name, Core::toGlm( value ) );
+    m_program->setUniform( name, value );
 }
 
 void ShaderProgram::setUniform( const char* name, const Core::Vector4f& value ) const {
-    m_program->setUniform( name, Core::toGlm( value ) );
+    m_program->setUniform( name, value );
 }
 
 void ShaderProgram::setUniform( const char* name, const Core::Vector4d& value ) const {
-    m_program->setUniform( name, Core::toGlm( value.cast<float>().eval() ) );
+    m_program->setUniform( name, value.cast<float>().eval() );
 }
 
 void ShaderProgram::setUniform( const char* name, const Core::Matrix2f& value ) const {
-    m_program->setUniform( name, Core::toGlm( value ) );
+    m_program->setUniform( name, value );
 }
 
 void ShaderProgram::setUniform( const char* name, const Core::Matrix2d& value ) const {
-    m_program->setUniform( name, Core::toGlm( value.cast<float>().eval() ) );
+    m_program->setUniform( name, value.cast<float>().eval() );
 }
 
 void ShaderProgram::setUniform( const char* name, const Core::Matrix3f& value ) const {
-    m_program->setUniform( name, Core::toGlm( value ) );
+    m_program->setUniform( name, value );
 }
 
 void ShaderProgram::setUniform( const char* name, const Core::Matrix3d& value ) const {
-    Core::Matrix3f v = value.cast<float>();
-
-    m_program->setUniform( name, Core::toGlm( v ) );
+    m_program->setUniform( name, value.cast<float>().eval() );
 }
 
 void ShaderProgram::setUniform( const char* name, const Core::Matrix4f& value ) const {
-    m_program->setUniform( name, Core::toGlm( value ) );
+    m_program->setUniform( name, value );
 }
 
 void ShaderProgram::setUniform( const char* name, const Core::Matrix4d& value ) const {
-    m_program->setUniform( name, Core::toGlm( value.cast<float>().eval() ) );
+    m_program->setUniform( name, value.cast<float>().eval() );
 }
 
 void ShaderProgram::setUniform( const char* name, Texture* tex, int texUnit ) const {

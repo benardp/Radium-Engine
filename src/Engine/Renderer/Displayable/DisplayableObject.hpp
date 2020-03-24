@@ -12,6 +12,8 @@
 namespace Ra {
 namespace Engine {
 
+class ShaderProgram;
+
 /**
  * Base class of any displayable object.
  */
@@ -40,8 +42,9 @@ class RA_ENGINE_API Displayable
 
     /// Returns the underlying AbstractGeometry, which is in fact a TriangleMesh
     /// \see getTriangleMesh
-    virtual const Core::Geometry::AbstractGeometry& getGeometry() const = 0;
-    virtual Core::Geometry::AbstractGeometry& getGeometry()             = 0;
+    /// \todo not sure the displayable must have an abstract geometry ...
+    virtual const Core::Geometry::AbstractGeometry& getAbstractGeometry() const = 0;
+    virtual Core::Geometry::AbstractGeometry& getAbstractGeometry()             = 0;
 
     /**
      * This function is called at the start of the rendering. It will update the
@@ -49,8 +52,9 @@ class RA_ENGINE_API Displayable
      */
     virtual void updateGL() = 0;
 
-    /// Draw the mesh.
-    virtual void render() = 0;
+    /// Draw the mesh. Prog is used to set VertexAttribBinding, but it has to be
+    /// already binded
+    virtual void render( const ShaderProgram* prog ) = 0;
 
     //// Utility methods, used to display statistics
     virtual size_t getNumFaces() const { return 0; }

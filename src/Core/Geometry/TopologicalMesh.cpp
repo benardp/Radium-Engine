@@ -77,9 +77,13 @@ void copyAttribToCoreVertex( HandleAndValueVector<T>& data,
 
 template <typename T>
 void copyAttribToCore( TriangleMesh& triMesh, const HandleAndValueVector<T>& data ) {
+
     for ( auto pp : data )
     {
-        triMesh.getAttrib( pp.first ).data().push_back( pp.second );
+        auto& attr     = triMesh.getAttrib( pp.first );
+        auto& attrData = attr.getDataWithLock();
+        attrData.push_back( pp.second );
+        attr.unlock();
     }
 }
 
@@ -103,7 +107,7 @@ TopologicalMesh::TopologicalMesh( const TriangleMesh& triMesh ) {
     std::vector<PropPair<Vector4>> vprop_vec4;
 
     // loop over all attribs and build correspondance pair
-    triMesh.m_vertexAttribs.for_each_attrib(
+    triMesh.vertexAttribs().for_each_attrib(
         [&triMesh, this, &vprop_float, &vprop_vec2, &vprop_vec3, &vprop_vec4]( const auto& attr ) {
             // skip builtin attribs
             if ( attr->getName() != std::string( "in_position" ) &&
@@ -124,7 +128,7 @@ TopologicalMesh::TopologicalMesh( const TriangleMesh& triMesh ) {
             }
         } );
 
-    size_t num_triangles = triMesh.m_triangles.size();
+    size_t num_triangles = triMesh.m_indices.size();
 
     for ( unsigned int i = 0; i < num_triangles; i++ )
     {
@@ -132,7 +136,7 @@ TopologicalMesh::TopologicalMesh( const TriangleMesh& triMesh ) {
         std::vector<TopologicalMesh::Normal> face_normals( 3 );
         std::vector<unsigned int> face_vertexIndex( 3 );
 
-        const auto& triangle = triMesh.m_triangles[i];
+        const auto& triangle = triMesh.m_indices[i];
         for ( size_t j = 0; j < 3; ++j )
         {
             unsigned int inMeshVertexIndex = triangle[j];
@@ -176,7 +180,7 @@ TopologicalMesh::TopologicalMesh( const TriangleMesh& triMesh ) {
 }
 
 TriangleMesh TopologicalMesh::toTriangleMesh() {
-    struct VertexData {
+    struct VertexDataInternal {
         Vector3 _vertex;
         Vector3 _normal;
 
@@ -187,14 +191,14 @@ TriangleMesh TopologicalMesh::toTriangleMesh() {
 
         EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-        bool operator==( const VertexData& lhs ) const {
+        bool operator==( const VertexDataInternal& lhs ) const {
             return _vertex == lhs._vertex && _normal == lhs._normal && _float == lhs._float &&
                    _vec2 == lhs._vec2 && _vec3 == lhs._vec3 && _vec4 == lhs._vec4;
         }
     };
 
     struct hash_vec {
-        size_t operator()( const VertexData& lvalue ) const {
+        size_t operator()( const VertexDataInternal& lvalue ) const {
             size_t hx = std::hash<Scalar>()( lvalue._vertex[0] );
             size_t hy = std::hash<Scalar>()( lvalue._vertex[1] );
             size_t hz = std::hash<Scalar>()( lvalue._vertex[2] );
@@ -204,7 +208,7 @@ TriangleMesh TopologicalMesh::toTriangleMesh() {
 
     TriangleMesh out;
 
-    using VertexMap = std::unordered_map<VertexData, int, hash_vec>;
+    using VertexMap = std::unordered_map<VertexDataInternal, int, hash_vec>;
 
     VertexMap vertexHandles;
 
@@ -233,9 +237,12 @@ TriangleMesh TopologicalMesh::toTriangleMesh() {
     unsigned int vertexIndex = 0;
 
     // out will have at least n_vertices vertices and normals.
-    out.vertices().reserve( n_vertices() );
-    out.normals().reserve( n_vertices() );
-    out.m_triangles.reserve( n_faces() );
+    TriangleMesh::PointAttribHandle::Container vertices;
+    TriangleMesh::NormalAttribHandle::Container normals;
+
+    vertices.reserve( n_vertices() );
+    normals.reserve( n_vertices() );
+    out.m_indices.reserve( n_faces() );
 
     for ( TopologicalMesh::FaceIter f_it = faces_sbegin(); f_it != faces_end(); ++f_it )
     {
@@ -246,7 +253,7 @@ TriangleMesh TopologicalMesh::toTriangleMesh() {
         for ( TopologicalMesh::ConstFaceHalfedgeIter fh_it = cfh_iter( *f_it ); fh_it.is_valid();
               ++fh_it )
         {
-            VertexData v;
+            VertexDataInternal v;
             CORE_ASSERT( i < 3, "Non-triangular face found." );
             v._vertex = point( to_vertex_handle( *fh_it ) );
             v._normal = normal( to_vertex_handle( *fh_it ), *f_it );
@@ -262,8 +269,8 @@ TriangleMesh TopologicalMesh::toTriangleMesh() {
             {
                 vi = int( vertexIndex++ );
                 vertexHandles.insert( vtr, VertexMap::value_type( v, vi ) );
-                out.vertices().push_back( v._vertex );
-                out.normals().push_back( v._normal );
+                vertices.push_back( v._vertex );
+                normals.push_back( v._normal );
 
                 copyAttribToCore( out, v._float );
                 copyAttribToCore( out, v._vec2 );
@@ -276,13 +283,18 @@ TriangleMesh TopologicalMesh::toTriangleMesh() {
             property( m_outputTriangleMeshIndexPph, *fh_it ) = vi;
             i++;
         }
-        out.m_triangles.emplace_back( indices[0], indices[1], indices[2] );
+        out.m_indices.emplace_back( indices[0], indices[1], indices[2] );
     }
-
-    CORE_ASSERT( vertexIndex == out.vertices().size(),
+    out.setVertices( vertices );
+    out.setNormals( normals );
+    CORE_ASSERT( vertexIndex == vertices.size(),
                  "Inconsistent number of faces in generated TriangleMesh." );
 
     return out;
+}
+
+void TopologicalMesh::updateTriangleMesh( Ra::Core::Geometry::TriangleMesh& /*mesh*/ ) {
+    ///\todo ;)
 }
 
 bool TopologicalMesh::splitEdge( TopologicalMesh::EdgeHandle eh, Scalar f ) {

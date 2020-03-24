@@ -7,12 +7,14 @@
 #include <vector>
 
 #include <Core/Containers/VectorArray.hpp>
+#include <Core/Types.hpp>
 #include <Core/Utils/Color.hpp>
 #include <Core/Utils/Singleton.hpp>
 
 namespace Ra {
 namespace Engine {
-class Mesh;
+class ShaderProgram;
+class AttribArrayDisplayable;
 } // namespace Engine
 } // namespace Ra
 
@@ -37,7 +39,7 @@ class RA_ENGINE_API DebugRender final
     void addPoint( const Core::Vector3& p, const Core::Utils::Color& color );
     void addPoints( const Core::Vector3Array& p, const Core::Utils::Color& color );
     void addPoints( const Core::Vector3Array& p, const Core::Vector4Array& colors );
-    void addMesh( const std::shared_ptr<Mesh>& mesh,
+    void addMesh( const std::shared_ptr<AttribArrayDisplayable>& mesh,
                   const Core::Transform& transform = Core::Transform::Identity() );
 
     // Shortcuts
@@ -80,7 +82,7 @@ class RA_ENGINE_API DebugRender final
     };
 
     struct DbgMesh {
-        std::shared_ptr<Mesh> mesh;
+        std::shared_ptr<AttribArrayDisplayable> mesh;
         Core::Transform transform;
     };
 
@@ -89,9 +91,9 @@ class RA_ENGINE_API DebugRender final
     void renderMeshes( const Core::Matrix4f& view, const Core::Matrix4f& proj );
 
   private:
-    uint m_lineProg;
-    uint m_pointProg;
-    uint m_meshProg;
+    std::unique_ptr<ShaderProgram> m_lineProg;
+    std::unique_ptr<ShaderProgram> m_pointProg;
+    std::unique_ptr<ShaderProgram> m_meshProg;
 
     uint m_modelLineLoc;
     uint m_viewLineLoc;

@@ -8,8 +8,12 @@ namespace Ra::Gui {
 using namespace Core::Utils; // log
 
 KeyMappingManager::KeyMappingManager() :
-    m_defaultConfigFile( std::string( Core::Resources::getBaseDir() ) +
+    m_defaultConfigFile( std::string( Core::Resources::getRadiumResourcesDir() ) +
+#ifndef OS_MACOS
                          std::string( "Configs/default.xml" ) ),
+#else
+                         std::string( "Configs/macos.xml" ) ),
+#endif
     m_domDocument( "Key Mapping QDomDocument" ),
     m_metaEnumKey( QMetaEnum::fromType<Qt::Key>() ),
     m_file( nullptr ) {

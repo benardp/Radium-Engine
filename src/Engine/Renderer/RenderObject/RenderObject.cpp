@@ -167,9 +167,10 @@ Core::Matrix4 RenderObject::getTransformAsMatrix() const {
 }
 
 Core::Aabb RenderObject::computeAabb() const {
-    auto aabb = m_mesh->getGeometry().computeAabb();
-    Core::Aabb result;
+    auto aabb = m_mesh->getAbstractGeometry().computeAabb();
+    if ( aabb.isEmpty() ) { return aabb; }
 
+    Core::Aabb result;
     for ( int i = 0; i < 8; ++i )
     {
         result.extend( getTransform() * aabb.corner( Core::Aabb::CornerType( i ) ) );
@@ -224,11 +225,13 @@ void RenderObject::render( const RenderParameters& lightParams,
         shader->setUniform( "transform.worldNormal", normalMatrix );
         lightParams.bind( shader );
 
+        GL_CHECK_ERROR;
         auto material = m_renderTechnique->getMaterial();
         if ( material != nullptr ) material->bind( shader );
-
+        GL_CHECK_ERROR;
         // render
-        getMesh()->render();
+
+        getMesh()->render( shader );
     }
 }
 

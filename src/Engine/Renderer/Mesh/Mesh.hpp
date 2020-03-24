@@ -12,8 +12,38 @@
 #include <Core/Geometry/TriangleMesh.hpp>
 #include <Core/Utils/Color.hpp>
 
+#include <Core/Utils/Log.hpp>
+
+// from .inl, temporary include, remove when compiles
+#include <Engine/Renderer/OpenGL/OpenGL.hpp>
+#include <Engine/Renderer/RenderTechnique/ShaderProgram.hpp>
+#include <globjects/Buffer.h>
+#include <globjects/Program.h>
+#include <globjects/VertexArray.h>
+#include <globjects/VertexAttributeBinding.h>
+
+namespace globjects {
+
+class VertexArray;
+class Buffer;
+
+} // namespace globjects
+
 namespace Ra {
 namespace Engine {
+class ShaderProgram;
+using namespace Ra::Core::Utils;
+
+/// VAO + VBO attributes management,
+/// also manage draw calls
+class RA_ENGINE_API Vao
+{
+    /// \todo not used for now ... but may be if we allow multiple vao per mesh
+    std::unique_ptr<globjects::VertexArray> m_vao;
+    std::vector<std::unique_ptr<globjects::Buffer>> m_vbos;
+    std::vector<bool> m_dataDirty;
+    std::map<std::string, int> m_handleToBuffer;
+};
 
 /**
  * A class representing an openGL general mesh to be displayed.
@@ -22,45 +52,28 @@ namespace Engine {
  * It maintains the attributes and keeps them in sync with the GPU.
  * \note Attribute names are used to automatic location binding when using shaders.
  */
-class RA_ENGINE_API Mesh : public Displayable
+class RA_ENGINE_API AttribArrayDisplayable : public Displayable
 {
   public:
-    /// \name List of all possible vertex attributes.
-    ///@{
-    // This is also the layout of the "dirty bit" and "vbo" arrays.
-
+    /// List of standard vertex attributes.
+    /// Corresponding standard vertex attribute names are obtained with getAttribName
     /// Information which is in the mesh geometry
     enum MeshData : uint {
-        INDEX = 0,       ///< Vertex indices
-        VERTEX_POSITION, ///< Vertex positions
-        VERTEX_NORMAL,   ///< Vertex normals
-
-        MAX_MESH
-    };
-
-    /// Optional vector 3 data.
-    enum Vec3Data : uint {
-        VERTEX_TANGENT = 0, ///< Vertex tangent 1
-        VERTEX_BITANGENT,   ///< Vertex tangent 2
-        VERTEX_TEXCOORD,    ///< U,V  texture coords (last coordinate not used)
-
-        MAX_VEC3
-    };
-
-    /// Optional vector 4 data
-    enum Vec4Data : uint {
-        VERTEX_COLOR = 0,  ///< RGBA color.
+        VERTEX_POSITION,   ///< Vertex positions
+        VERTEX_NORMAL,     ///< Vertex normals
+        VERTEX_TANGENT,    ///< Vertex tangent 1
+        VERTEX_BITANGENT,  ///< Vertex tangent 2
+        VERTEX_TEXCOORD,   ///< U,V  texture coords (last coordinate not used)
+        VERTEX_COLOR,      ///< RGBA color.
         VERTEX_WEIGHTS,    ///< Skinning weights (not used)
         VERTEX_WEIGHT_IDX, ///< Associated weight bones
 
-        MAX_VEC4
+        MAX_DATA
     };
-    ///@}
 
-    /**
-     * Mesh render mode enum.
-     * values taken from OpenGL specification
-     */
+    /// Render mode enum used when render()/
+    /// values taken from OpenGL specification
+    /// @see https://www.khronos.org/registry/OpenGL/api/GL/glcorearb.h
     enum MeshRenderMode : uint {
         RM_POINTS                   = 0x0000,
         RM_LINES                    = 0x0001, // decimal value: 1
@@ -79,130 +92,270 @@ class RA_ENGINE_API Mesh : public Displayable
         RM_PATCHES                  = 0x000E, // decimal value: 14
     };
 
-    /// Total number of vertex attributes.
-    constexpr static uint MAX_DATA = MAX_MESH + MAX_VEC3 + MAX_VEC4;
-
   public:
-    explicit Mesh( const std::string& name, MeshRenderMode renderMode = RM_TRIANGLES );
-    Mesh( const Mesh& rhs ) = delete;
-    void operator=( const Mesh& rhs ) = delete;
+    explicit AttribArrayDisplayable( const std::string& name,
+                                     MeshRenderMode renderMode = RM_TRIANGLES );
+    AttribArrayDisplayable( const AttribArrayDisplayable& rhs ) = delete;
+    void operator=( const AttribArrayDisplayable& rhs ) = delete;
 
-    ~Mesh() override;
+    // no need to detach listener since TriangleMesh is owned by Mesh.
+    ~AttribArrayDisplayable(){};
 
     using Displayable::getName;
 
-    /// GL_POINTS, GL_LINES, GL_TRIANGLES, GL_TRIANGLE_ADJACENCY, etc...
+    /// Set the render mode.
     inline void setRenderMode( MeshRenderMode mode );
-    MeshRenderMode getRenderMode() const { return m_renderMode; }
+    /// Get the render mode.
+    inline MeshRenderMode getRenderMode() const;
 
-    /// Returns the underlying AbstractGeometry, which is in fact a TriangleMesh
-    /// \see getTriangleMesh
-    inline const Core::Geometry::AbstractGeometry& getGeometry() const override;
-    inline Core::Geometry::AbstractGeometry& getGeometry() override;
+    /// @name
+    /// Mark attrib data as dirty, forcing an update of the OpenGL buffer.
+    ///@{
 
-    /// Returns the underlying TriangleMesh
-    inline const Core::Geometry::TriangleMesh& getTriangleMesh() const;
-    inline Core::Geometry::TriangleMesh& getTriangleMesh();
+    /// Use getAttribName to find the corresponding name and call setDirty(const std::string& name).
+    /// \param type: the data to set to dirty.
+    void setDirty( const MeshData& type );
 
-    /// Use the given geometry as base for a display mesh. Normals are optionnal.
-    void loadGeometry( Core::Geometry::TriangleMesh&& mesh );
+    /// \param name: data buffer name to set to dirty
+    void setDirty( const std::string& name );
+
+    /// If index is greater than then number of buffer, this function as no effect.
+    /// \param index: the data buffer index to set to dirty.
+    void setDirty( unsigned int index );
+    ///@}
+
+    /// This function is called at the start of the rendering.
+    /// It will update the necessary openGL buffers.
+    void updateGL() override = 0;
+
+    //@{
+    /// Get the name expected for a given attrib.
+    static inline std::string getAttribName( MeshData type );
+    //@}
+
+  protected:
+    /// Update the picking render mode according to the object render mode
+    void updatePickingRenderMode();
+
+    class AttribObserver
+    {
+      public:
+        explicit AttribObserver( AttribArrayDisplayable* displayable, int idx ) :
+            m_displayable( displayable ),
+            m_idx( idx ) {}
+        void operator()() {
+            m_displayable->m_dataDirty[m_idx] = true;
+            m_displayable->m_isDirty          = true;
+        }
+
+      private:
+        AttribArrayDisplayable* m_displayable;
+        int m_idx;
+    };
+
+  protected:
+    std::unique_ptr<globjects::VertexArray> m_vao;
+
+    MeshRenderMode m_renderMode{MeshRenderMode::RM_TRIANGLES};
+
+    // m_vbos and m_dataDirty have the same size and are indexed thru m_handleToBuffer[attribName]
+    std::vector<std::unique_ptr<globjects::Buffer>> m_vbos;
+    std::vector<bool> m_dataDirty;
+
+    // Geometry attrib name (std::string) to buffer id (int)
+    // buffer id are indices in m_vbos and m_dataDirty
+    std::map<std::string, unsigned int> m_handleToBuffer;
+
+    /// General dirty bit of the mesh. Must be equivalent of the "or" of the other dirty flags.
+    /// an empty mesh is not dirty
+    bool m_isDirty{false};
+};
+
+/// Concept class to ensure consistent naming of VaoIndices accross derived classes.
+class RA_ENGINE_API VaoIndices
+{
+  public:
+    /// Tag the indices as dirty, asking for a update to gpu.
+    inline void setIndicesDirty();
+
+  protected:
+    std::unique_ptr<globjects::Buffer> m_indices;
+    bool m_indicesDirty{true};
+    /// number of elements to draw (i.e number of indices to use)
+    size_t m_numElements{0};
+};
+
+/// This class handles an attrib array displayable on gpu only, without core
+/// geometry. Use only when you don't need to access the cpu geometry again, or
+/// when you need to specify special indices.
+template <typename I>
+class IndexedAttribArrayDisplayable : public AttribArrayDisplayable, public VaoIndices
+{
+    using IndexType          = I;
+    using IndexContainerType = Ra::Core::AlignedStdVector<IndexType>;
+
+    template <typename T>
+    inline void addAttrib( const std::string& name,
+                           const typename Ra::Core::Utils::Attrib<T>::Container& data );
+    template <typename T>
+    inline void addAttrib( const std::string& name,
+                           const typename Ra::Core ::Utils::Attrib<T>::Container&& data );
+    inline void updateGL() override;
+    inline void autoVertexAttribPointer( const ShaderProgram* prog );
+    inline void render( const ShaderProgram* prog ) override;
+    IndexContainerType m_cpu_indices;
+    AttribManager m_attribManager;
+};
+
+/// Template class to manage the Displayable aspect of a Core Geomertry, such as TriangleMesh.
+template <typename T>
+class CoreGeometryDisplayable : public AttribArrayDisplayable
+{
+  public:
+    using CoreGeometry = T;
+    using AttribArrayDisplayable::AttribArrayDisplayable;
+    explicit CoreGeometryDisplayable( const std::string& name,
+                                      CoreGeometry&& geom,
+                                      MeshRenderMode renderMode = RM_TRIANGLES );
+    ///@{
+    /**  Returns the underlying CoreGeometry as an Core::Geometry::AbstractGeometry */
+    inline const Core::Geometry::AbstractGeometry& getAbstractGeometry() const;
+    inline Core::Geometry::AbstractGeometry& getAbstractGeometry();
+    ///@}
+
+    ///@{
+    /// Returns the underlying CoreGeometry
+    inline const CoreGeometry& getCoreGeometry() const;
+    inline CoreGeometry& getCoreGeometry();
+    ///@}
+
+    /// Helper function that calls Ra::Core::CoreGeometry::addAttrib()
+    template <typename A>
+    inline Ra::Core::Utils::AttribHandle<A> addAttrib( const std::string& name,
+                                                       const typename Core::VectorArray<A>& data );
+    inline size_t getNumVertices() const override;
+
+    /// Use the given geometry as base for a display mesh.
+    /// This will move \p mesh and *this will take the ownership
+    /// of the data.
+    /// The currently owned mesh is deleted, if any.
+    /// This method should be called to set or replace the CoreGeometry, if you
+    /// want to update attributes or indices, use getCoreGeometry and
+    /// Core::Geometry::AttribArrayGeometry setters instead.
+    /// \warning For indices, you must call setIndicesDirty after modification.
+    /// \todo add observer mecanism for indices.
+    virtual void loadGeometry( CoreGeometry&& mesh );
+
+    /// Update (i.e. send to GPU) the buffers marked as dirty
+    void updateGL() override;
+
+    /// Bind meshAttribName to shaderAttribName.
+    /// meshAttribName is a vertex attrib added to the underlying CoreGeometry
+    /// shaderAttribName is the name of the input paramter of the shader.
+    /// By default the same name is used, but this mecanism allows to override
+    /// this behavior.
+    /// Only one shaderAttribName can be bound to a meshAttribName and the other
+    /// way round.
+    /// \param meshAttribName: name of the attribute on the CoreGeomtry side
+    /// \param shaderAttribName: name of the input vertex attribute on the
+    /// shader side.
+    void setAttribNameCorrespondance( const std::string& meshAttribName,
+                                      const std::string& shaderAttribName );
+
+  protected:
+    virtual void updateGL_specific_impl(){};
+
+    void loadGeometry_common( CoreGeometry&& mesh );
+    void autoVertexAttribPointer( const ShaderProgram* prog );
+
+    /// m_mesh Observer method, called whenever an attrib is added or removed from
+    /// m_mesh.
+    /// it adds an observer to the new attrib.
+    void addAttribObserver( const std::string& name );
+
+    /// Core::Mesh attrib name to Render::Mesh attrib name
+    using TranslationTable = std::map<std::string, std::string>;
+    TranslationTable m_translationTableMeshToShader;
+    TranslationTable m_translationTableShaderToMesh;
+
+    CoreGeometry m_mesh;
+};
+
+/// A PointCloud without indices
+class RA_ENGINE_API PointCloud : public CoreGeometryDisplayable<Core::Geometry::PointCloud>
+{
+    using base = CoreGeometryDisplayable<Core::Geometry::PointCloud>;
+
+  public:
+    using CoreGeometryDisplayable<Core::Geometry::PointCloud>::CoreGeometryDisplayable;
+
+    /// use glDrawArrays to draw all the points in the point cloud
+    void render( const ShaderProgram* prog ) override;
+
+    void loadGeometry( Core::Geometry::PointCloud&& mesh ) override;
+
+  protected:
+    void updateGL_specific_impl() override;
+};
+
+/// A CoreGeometry, with indices
+template <typename T>
+class IndexedGeometry : public CoreGeometryDisplayable<T>, public VaoIndices
+{
+  public:
+    using base = CoreGeometryDisplayable<T>;
+    using CoreGeometryDisplayable<T>::CoreGeometryDisplayable;
+    explicit IndexedGeometry(
+        const std::string& name,
+        typename base::CoreGeometry&& geom,
+        typename base::MeshRenderMode renderMode = base::MeshRenderMode::RM_TRIANGLES );
+
+    void render( const ShaderProgram* prog ) override;
+
+    void loadGeometry( T&& mesh ) override;
+
+  protected:
+    void updateGL_specific_impl();
+};
+
+/// LineMesh, own a Core::Geometry::LineMesh
+class RA_ENGINE_API LineMesh : public IndexedGeometry<Core::Geometry::LineMesh>
+{
+    using base = IndexedGeometry<Core::Geometry::LineMesh>;
+
+  public:
+    using base::IndexedGeometry;
+    inline explicit LineMesh(
+        const std::string& name,
+        typename base::CoreGeometry&& geom,
+        typename base::MeshRenderMode renderMode = base::MeshRenderMode::RM_LINES );
+
+  protected:
+  private:
+};
+
+/// Mesh, own a Core::Geometry::TriangleMesh
+class RA_ENGINE_API Mesh : public IndexedGeometry<Core::Geometry::TriangleMesh>
+{
+    using base = IndexedGeometry<Core::Geometry::TriangleMesh>;
+
+  public:
+    using base::IndexedGeometry;
+    size_t getNumFaces() const override;
 
     /**
      * Use the given vertices and indices to build a display mesh according to
      * the MeshRenderMode.
      * \note This has to be used for non RM_TRIANGLES meshes only.
      * \note Also removes all vertex attributes.
-     * \warning This might disappear when line meshes will be managed.
+     * \warning This will disappear as soon as old code will be removed.
      */
-    // Had to keep this for line meshes and Render Primitives.
+    using base::loadGeometry;
     [[deprecated]] void loadGeometry( const Core::Vector3Array& vertices,
                                       const std::vector<uint>& indices );
 
-    /**
-     * Set additionnal vertex data.
-     * Initialize vertexAttrib if needed,
-     * data must have the appropriate size (i.e. num vertex) or empty (to
-     * remove the data)
-     * Theses functions might disapear to use directly Core::Geometry::TriangleMesh attribs.
-     *
-     * \note Attributes names are computed by #getAttribName
-     */
-    [[deprecated]] void addData( const Vec3Data& type, const Core::Vector3Array& data );
-    [[deprecated]] void addData( const Vec4Data& type, const Core::Vector4Array& data );
-
-    /// Access the additionnal data arrays by type.
-    inline const Core::Vector3Array& getData( const Vec3Data& type ) const;
-    inline const Core::Vector4Array& getData( const Vec4Data& type ) const;
-
-    /// Mark one of the data types as dirty, forcing an update of the openGL buffer.
-    inline void setDirty( const MeshData& type );
-    /// Mark one of the data types as dirty, forcing an update of the openGL buffer.
-    /// \param handleAdded Set to true when a new attribute of type #type has been added (mandatory
-    /// when attributes are added after calling loadGeometry)
-    inline void setDirty( const Vec3Data& type, bool handleAdded = false );
-    /// \param handleAdded Set to true when a new attribute of type #type has been added (mandatory
-    /// when attributes are added after calling loadGeometry)
-    inline void setDirty( const Vec4Data& type, bool handleAdded = false );
-
-    /**
-     * This function is called at the start of the rendering. It will update the
-     * necessary openGL buffers.
-     */
-    void updateGL() override;
-
-    /// Draw the mesh.
-    void render() override;
-
-    size_t getNumFaces() const override;
-    inline size_t getNumVertices() const override { return m_mesh.vertices().size(); }
-
-    /// Get the name expected for a given attrib.
-    static inline std::string getAttribName( Vec3Data type );
-    static inline std::string getAttribName( Vec4Data type );
-
+  protected:
   private:
-    /// Helper function to send buffer data to openGL.
-    template <typename type>
-    friend void
-    sendGLData( Ra::Engine::Mesh* mesh, const Ra::Core::VectorArray<type>& arr, uint vboIdx );
-
-    /// Update the picking render mode according to the object render mode
-    void updatePickingRenderMode();
-
-  private:
-    uint m_vao{0}; /// Index of our openGL VAO
-    MeshRenderMode m_renderMode{
-        MeshRenderMode::RM_TRIANGLES}; /// Render mode (GL_TRIANGLES or GL_LINES, etc.)
-
-    Core::Geometry::TriangleMesh m_mesh; /// Base geometry : vertices, triangles
-                                         /// and normals
-
-    ///\todo @dlyr cleanup this mechanism to have something
-    /// extensible. Now the only attribs should be the one defined in
-    /// the enums MeshData, Vec3Data, Vec4Data.
-
-    /// Additionnal vertex vector 3 data handles, stored in Mesh, added
-    std::array<Core::Geometry::TriangleMesh::Vec3AttribHandle, MAX_VEC3> m_v3DataHandle;
-    Core::Geometry::TriangleMesh::Vec3AttribHandle::Container m_dummy3;
-    /// Additionnal vertex vector 4 data handles, stored in Mesh, added
-    std::array<Core::Geometry::TriangleMesh::Vec4AttribHandle, MAX_VEC4> m_v4DataHandle;
-    Core::Geometry::TriangleMesh::Vec4AttribHandle::Container m_dummy4;
-
-    // Combined arrays store the flags in this order Mesh, then Vec3 then Vec4 data.
-    // Following the enum declaration above.
-    // Our first VBO index is actually the indices buffer index.
-    // The following are for vertex data.
-    // Each data type has a corresponding openGL attribute number, which is
-    // vbo index - 1 (thus vertex position is VBO number 1 but attribute 0).
-
-    std::array<uint, MAX_DATA> m_vbos      = {{0}};     /// Indices of our openGL VBOs.
-    std::array<bool, MAX_DATA> m_dataDirty = {{false}}; /// Dirty bits of our vertex data.
-
-    size_t m_numElements{0}; /// number of elements to draw. For triangles this is 3*numTriangles
-                             /// but not for lines.
-    /// General dirty bit of the mesh. Must be equivalent of the  "or" of the other dirty flags.
-    /// an empty mesh is not dirty
-    bool m_isDirty{false};
 };
 
 } // namespace Engine

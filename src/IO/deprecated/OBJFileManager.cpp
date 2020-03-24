@@ -26,6 +26,8 @@ std::string OBJFileManager::fileExtension() const {
 bool OBJFileManager::importData( std::istream& file, Geometry::TriangleMesh& data ) {
     data.clear();
     std::string line;
+    Geometry::TriangleMesh::PointAttribHandle::Container vertices;
+    Geometry::TriangleMesh::NormalAttribHandle::Container normals;
     while ( std::getline( file, line ) )
     {
         std::istringstream iss( line );
@@ -37,13 +39,13 @@ bool OBJFileManager::importData( std::istream& file, Geometry::TriangleMesh& dat
         {
             Vector3 v;
             iss >> v[0] >> v[1] >> v[2];
-            data.vertices().push_back( v );
+            vertices.push_back( v );
         }
         if ( token == "vn" )
         {
             Vector3 n;
             iss >> n[0] >> n[1] >> n[2];
-            data.normals().push_back( n );
+            normals.push_back( n );
         }
         if ( token == "vt" ) { continue; }
         if ( token == "vp" ) { continue; }
@@ -69,14 +71,17 @@ bool OBJFileManager::importData( std::istream& file, Geometry::TriangleMesh& dat
                 }
                 count++;
             }
-            data.m_triangles.push_back( f );
+            data.m_indices.push_back( f );
         }
     }
-    if ( data.vertices().size() == 0 )
+    if ( vertices.size() == 0 )
     {
         addLogErrorEntry( "MESH IS EMPTY." );
         return false;
     }
+
+    data.setVertices( vertices );
+    data.setNormals( normals );
     return true;
 }
 
@@ -100,7 +105,7 @@ bool OBJFileManager::exportData( std::ostream& file, const Geometry::TriangleMes
                    std::to_string( n[2] ) + "\n";
     }
     // Triangle
-    for ( const auto& f : data.m_triangles )
+    for ( const auto& f : data.m_indices )
     {
         content += "f " + std::to_string( f[0] + 1 ) + " " + std::to_string( f[1] + 1 ) + " " +
                    std::to_string( f[2] + 1 ) + "\n";

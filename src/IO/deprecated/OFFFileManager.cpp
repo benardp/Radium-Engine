@@ -43,15 +43,16 @@ bool OFFFileManager::importData( std::istream& file, Geometry::TriangleMesh& dat
     uint e_size;
     file >> v_size >> f_size >> e_size;
     data.clear();
-    data.vertices().resize( v_size );
-    data.m_triangles.resize( f_size );
+    Geometry::TriangleMesh::PointAttribHandle::Container vertices;
+    vertices.resize( v_size );
+    data.m_indices.resize( f_size );
 
     // Vertices
     for ( uint i = 0; i < v_size; ++i )
     {
         Vector3 v;
         file >> v[0] >> v[1] >> v[2];
-        data.vertices()[i] = v;
+        vertices[i] = v;
     }
 
     // Edge
@@ -69,9 +70,11 @@ bool OFFFileManager::importData( std::istream& file, Geometry::TriangleMesh& dat
         if ( side == 3 )
         {
             file >> f[0] >> f[1] >> f[2];
-            data.m_triangles.push_back( f );
+            data.m_indices.push_back( f );
         }
     }
+
+    data.setVertices( std::move( vertices ) );
 
     return true;
 }
@@ -79,7 +82,7 @@ bool OFFFileManager::importData( std::istream& file, Geometry::TriangleMesh& dat
 bool OFFFileManager::exportData( std::ostream& file, const Geometry::TriangleMesh& data ) {
     std::string content = "";
     const uint v_size   = data.vertices().size();
-    const uint f_size   = data.m_triangles.size();
+    const uint f_size   = data.m_indices.size();
     const uint e_size   = 0;
 
     if ( v_size == 0 )
@@ -100,7 +103,7 @@ bool OFFFileManager::exportData( std::ostream& file, const Geometry::TriangleMes
     }
 
     // Triangle
-    for ( const auto& f : data.m_triangles )
+    for ( const auto& f : data.m_indices )
     {
         content += "3 " + std::to_string( f[0] ) + " " + std::to_string( f[1] ) + " " +
                    std::to_string( f[2] ) + "\n";

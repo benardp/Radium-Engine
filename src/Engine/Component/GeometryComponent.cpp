@@ -10,6 +10,7 @@
 #include <Core/Utils/Color.hpp>
 
 #include <Engine/Managers/ComponentMessenger/ComponentMessenger.hpp>
+
 #include <Engine/Renderer/RenderObject/RenderObjectManager.hpp>
 
 #include <Engine/Renderer/Mesh/Mesh.hpp>
@@ -69,51 +70,57 @@ void TriangleMeshComponent::generateTriangleMesh( const Ra::Core::Asset::Geometr
     m_displayMesh = Ra::Core::make_shared<Mesh>( meshName );
 
     Ra::Core::Geometry::TriangleMesh mesh;
+    Ra::Core::Geometry::TriangleMesh::PointAttribHandle::Container vertices;
+    Ra::Core::Geometry::TriangleMesh::NormalAttribHandle::Container normals;
+    
     const auto T = data->getFrame();
     const Ra::Core::Transform N( ( T.matrix() ).inverse().transpose() );
 
-    mesh.vertices().resize( data->getVerticesSize(), Ra::Core::Vector3::Zero() );
+    vertices.resize( data->getVerticesSize(), Ra::Core::Vector3::Zero() );
 
 #pragma omp parallel for
     for ( int i = 0; i < int( data->getVerticesSize() ); ++i )
     {
-        mesh.vertices()[i] = T * data->getVertices()[i];
+        vertices[i] = T * data->getVertices()[i];
     }
 
     if ( data->hasNormals() )
     {
-        mesh.normals().resize( data->getVerticesSize(), Ra::Core::Vector3::Zero() );
+        normals.resize( data->getVerticesSize(), Ra::Core::Vector3::Zero() );
 #pragma omp parallel for
-        for ( int i = 0; i < data->getVerticesSize(); ++i )
+        for ( int i = 0; i < int( data->getVerticesSize() ); ++i )
         {
-            mesh.normals()[i] = ( N * data->getNormals()[i] ).normalized();
+            normals[i] = ( N * data->getNormals()[i] ).normalized();
         }
     }
 
     const auto& faces = data->getFaces();
-    mesh.m_triangles.resize( faces.size(), Ra::Core::Vector3ui::Zero() );
+    mesh.m_indices.resize( faces.size(), Ra::Core::Vector3ui::Zero() );
 #pragma omp parallel for
     for ( int i = 0; i < int( faces.size() ); ++i )
     {
-        mesh.m_triangles[i] = faces[i].head<3>();
+        mesh.m_indices[i] = faces[i].head<3>();
     }
 
-    m_displayMesh->loadGeometry( std::move( mesh ) );
+    mesh.setVertices( std::move( vertices ) );
+    mesh.setNormals( std::move( normals ) );
 
     if ( data->hasTangents() )
-    { m_displayMesh->addData( Mesh::VERTEX_TANGENT, data->getTangents() ); }
+    { mesh.addAttrib( Mesh::getAttribName( Mesh::VERTEX_TANGENT ), data->getTangents() ); }
 
     if ( data->hasBiTangents() )
-    { m_displayMesh->addData( Mesh::VERTEX_BITANGENT, data->getBiTangents() ); }
+    { mesh.addAttrib( Mesh::getAttribName( Mesh::VERTEX_BITANGENT ), data->getBiTangents() ); }
 
     if ( data->hasTextureCoordinates() )
-    { m_displayMesh->addData( Mesh::VERTEX_TEXCOORD, data->getTexCoords() ); }
+    { mesh.addAttrib( Mesh::getAttribName( Mesh::VERTEX_TEXCOORD ), data->getTexCoords() ); }
 
     if ( data->hasColors() )
-    { m_displayMesh->addData( Mesh::VERTEX_COLOR, data->getColors() ); }
+    { mesh.addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), data->getColors() ); }
 
     // To be discussed: Should not weights be part of the geometry ?
     //        mesh->addData( Mesh::VERTEX_WEIGHTS, meshData.weights );
+
+    m_displayMesh->loadGeometry( std::move( mesh ) );
 
     finalizeROFromGeometry( data->hasMaterial() ? &( data->getMaterial() ) : nullptr );
 }
@@ -147,20 +154,20 @@ void TriangleMeshComponent::finalizeROFromGeometry( const Core::Asset::MaterialD
         mat->m_ks            = Ra::Core::Utils::Color::White();
         mat->m_renderAsSplat = m_displayMesh->getNumFaces() == 0;
         mat->m_hasPerVertexKd =
-            m_displayMesh->getTriangleMesh().hasAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ) );
+            m_displayMesh->getCoreGeometry().hasAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ) );
         rt.setMaterial( mat );
         auto builder = EngineRenderTechniques::getDefaultTechnique( "BlinnPhong" );
         builder.second( rt, false );
     }
 
-    if ( m_displayMesh->getTriangleMesh().m_triangles.empty() ) // add geometry shader for splatting
+    if ( m_displayMesh->getCoreGeometry().m_indices.empty() ) // add geometry shader for splatting
     {
         auto addGeomShader = [&rt]( RenderTechnique::PassName pass ) {
             if ( rt.hasConfiguration( pass ) )
             {
                 ShaderConfiguration config = rt.getConfiguration( pass );
                 config.addShader( ShaderType_GEOMETRY,
-                                  std::string( Core::Resources::getBaseDir() ) +
+                                  std::string( Core::Resources::getRadiumResourcesDir() ) +
                                       "Shaders/PointCloud.geom.glsl" );
                 rt.setConfiguration( config, pass );
             }
@@ -188,7 +195,7 @@ Ra::Core::Utils::Index TriangleMeshComponent::getRenderObjectIndex() const {
 
 const Ra::Core::Geometry::TriangleMesh& TriangleMeshComponent::getMesh() const {
     CORE_ASSERT( m_displayMesh != nullptr, "DisplayMesh should exist while component is alive" );
-    return m_displayMesh->getTriangleMesh();
+    return m_displayMesh->getCoreGeometry();
 }
 
 Mesh* TriangleMeshComponent::getDisplayMesh() {
@@ -216,59 +223,15 @@ void TriangleMeshComponent::setupIO( const std::string& id ) {
         std::bind( &TriangleMeshComponent::roIndexRead, this );
     ComponentMessenger::getInstance()->registerOutput<Ra::Core::Utils::Index>(
         getEntity(), this, id, roOut );
-
-    ComponentMessenger::CallbackTypes<Ra::Core::Vector3Array>::ReadWrite vRW =
-        std::bind( &TriangleMeshComponent::getVerticesRw, this );
-    ComponentMessenger::getInstance()->registerReadWrite<Ra::Core::Vector3Array>(
-        getEntity(), this, id + "v", vRW );
-
-    ComponentMessenger::CallbackTypes<Ra::Core::Vector3Array>::ReadWrite nRW =
-        std::bind( &TriangleMeshComponent::getNormalsRw, this );
-    ComponentMessenger::getInstance()->registerReadWrite<Ra::Core::Vector3Array>(
-        getEntity(), this, id + "n", nRW );
-
-    ComponentMessenger::CallbackTypes<TriangleArray>::ReadWrite tRW =
-        std::bind( &TriangleMeshComponent::getTrianglesRw, this );
-    ComponentMessenger::getInstance()->registerReadWrite<TriangleArray>(
-        getEntity(), this, id + "t", tRW );
 }
 
 const Ra::Core::Geometry::TriangleMesh* TriangleMeshComponent::getMeshOutput() const {
-    return &m_displayMesh->getTriangleMesh();
+    return &m_displayMesh->getCoreGeometry();
 }
 
 Ra::Core::Geometry::TriangleMesh* TriangleMeshComponent::getMeshRw() {
     CORE_ASSERT( m_displayMesh != nullptr, "DisplayMesh should exist while component is alive" );
-    m_displayMesh->setDirty( Mesh::VERTEX_POSITION );
-    m_displayMesh->setDirty( Mesh::VERTEX_NORMAL );
-    m_displayMesh->setDirty( Mesh::INDEX );
-    m_displayMesh->setDirty( Mesh::VERTEX_TANGENT, true );
-    m_displayMesh->setDirty( Mesh::VERTEX_BITANGENT, true );
-    m_displayMesh->setDirty( Mesh::VERTEX_TEXCOORD, true );
-    m_displayMesh->setDirty( Mesh::VERTEX_COLOR, true );
-    m_displayMesh->setDirty( Mesh::VERTEX_WEIGHTS, true );
-    m_displayMesh->setDirty( Mesh::VERTEX_WEIGHT_IDX, true );
-    return &( m_displayMesh->getTriangleMesh() );
-}
-
-Ra::Core::Geometry::TriangleMesh::PointAttribHandle::Container*
-TriangleMeshComponent::getVerticesRw() {
-    CORE_ASSERT( m_displayMesh != nullptr, "DisplayMesh should exist while component is alive" );
-    m_displayMesh->setDirty( Mesh::VERTEX_POSITION );
-    return &( m_displayMesh->getTriangleMesh().vertices() );
-}
-
-Ra::Core::Geometry::TriangleMesh::NormalAttribHandle::Container*
-TriangleMeshComponent::getNormalsRw() {
-    CORE_ASSERT( m_displayMesh != nullptr, "DisplayMesh should exist while component is alive" );
-    m_displayMesh->setDirty( Mesh::VERTEX_NORMAL );
-    return &( m_displayMesh->getTriangleMesh().normals() );
-}
-
-Ra::Core::VectorArray<Ra::Core::Vector3ui>* TriangleMeshComponent::getTrianglesRw() {
-    CORE_ASSERT( m_displayMesh != nullptr, "DisplayMesh should exist while component is alive" );
-    m_displayMesh->setDirty( Mesh::INDEX );
-    return &( m_displayMesh->getTriangleMesh().m_triangles );
+    return &( m_displayMesh->getCoreGeometry() );
 }
 
 const Ra::Core::Utils::Index* TriangleMeshComponent::roIndexRead() const {

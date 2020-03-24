@@ -12,16 +12,18 @@
 #include <Engine/Renderer/Material/BlinnPhongMaterial.hpp>
 
 #include <algorithm>
+#include <numeric>
 
 namespace Ra {
 
+using namespace Core;
 using namespace Core::Geometry;
 
 namespace Engine {
 namespace DrawPrimitives {
 RenderObject* Primitive( Component* component, const MeshPtr& mesh ) {
     ShaderConfiguration config;
-    if ( mesh->getRenderMode() == GL_LINES )
+    if ( mesh->getRenderMode() == Mesh::RM_LINES )
     { config = ShaderConfigurationFactory::getConfiguration( "Lines" ); }
     else
     { config = ShaderConfigurationFactory::getConfiguration( "Plain" ); }
@@ -35,42 +37,34 @@ RenderObject* Primitive( Component* component, const MeshPtr& mesh ) {
         mesh->getName(), component, RenderObjectType::Debug, mesh, rt );
 }
 
-MeshPtr Point( const Core::Vector3& point, const Core::Utils::Color& color, Scalar scale ) {
-    Core::Vector3Array vertices = {( point + ( scale * Core::Vector3::UnitX() ) ),
-                                   ( point - ( scale * Core::Vector3::UnitX() ) ),
+LineMeshPtr Point( const Core::Vector3& point, const Core::Utils::Color& color, Scalar scale ) {
 
-                                   ( point + ( scale * Core::Vector3::UnitY() ) ),
-                                   ( point - ( scale * Core::Vector3::UnitY() ) ),
+    Geometry::LineMesh geom;
+    geom.setVertices( {( point + ( scale * Core::Vector3::UnitX() ) ),
+                       ( point - ( scale * Core::Vector3::UnitX() ) ),
+                       ( point + ( scale * Core::Vector3::UnitY() ) ),
+                       ( point - ( scale * Core::Vector3::UnitY() ) ),
+                       ( point + ( scale * Core::Vector3::UnitZ() ) ),
+                       ( point - ( scale * Core::Vector3::UnitZ() ) )} );
+    geom.m_indices = {{0, 1}, {2, 3}, {4, 5}};
+    geom.addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ),
+                    Core::Vector4Array{geom.vertices().size(), color} );
 
-                                   ( point + ( scale * Core::Vector3::UnitZ() ) ),
-                                   ( point - ( scale * Core::Vector3::UnitZ() ) )};
-
-    std::vector<uint> indices = {0, 1, 2, 3, 4, 5};
-
-    Core::Vector4Array colors( vertices.size(), color );
-
-    MeshPtr mesh( new Mesh( "Point Primitive", Mesh::RM_LINES ) );
-    mesh->loadGeometry( vertices, indices );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
-
-    return mesh;
+    return make_shared<LineMesh>( "Point Primitive", std::move( geom ) );
 }
 
-MeshPtr Line( const Core::Vector3& a, const Core::Vector3& b, const Core::Utils::Color& color ) {
-    Core::Vector3Array vertices = {a, b};
+LineMeshPtr
+Line( const Core::Vector3& a, const Core::Vector3& b, const Core::Utils::Color& color ) {
+    Geometry::LineMesh geom;
+    geom.setVertices( {a, b} );
+    geom.m_indices = {{0, 1}};
+    geom.addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ),
+                    Core::Vector4Array{geom.vertices().size(), color} );
 
-    std::vector<uint> indices = {0, 1};
-
-    Core::Vector4Array colors( vertices.size(), color );
-
-    MeshPtr mesh( new Mesh( "Line Primitive", Mesh::RM_LINES ) );
-    mesh->loadGeometry( vertices, indices );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
-
-    return mesh;
+    return make_shared<LineMesh>( "Line Primitive", std::move( geom ) );
 }
 
-MeshPtr
+LineMeshPtr
 Vector( const Core::Vector3& start, const Core::Vector3& v, const Core::Utils::Color& color ) {
     Core::Vector3 end = start + v;
     Core::Vector3 a, b;
@@ -80,60 +74,54 @@ Vector( const Core::Vector3& start, const Core::Vector3& v, const Core::Utils::C
 
     const Scalar arrowFract = 0.1f;
 
-    Core::Vector3Array vertices = {
-        start,
-        end,
-        start + ( ( 1.f - arrowFract ) * v ) + ( ( arrowFract * l ) * a ),
-        start + ( ( 1.f - arrowFract ) * v ) - ( ( arrowFract * l ) * a )};
-    std::vector<uint> indices = {0, 1, 1, 2, 1, 3};
+    Geometry::LineMesh geom;
+    geom.setVertices( {start,
+                       end,
+                       start + ( ( 1.f - arrowFract ) * v ) + ( ( arrowFract * l ) * a ),
+                       start + ( ( 1.f - arrowFract ) * v ) - ( ( arrowFract * l ) * a )} );
+    geom.m_indices = {{0, 1}, {1, 2}, {1, 3}};
+    geom.addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ),
+                    Core::Vector4Array{geom.vertices().size(), color} );
 
-    Core::Vector4Array colors( vertices.size(), color );
-
-    MeshPtr mesh( new Mesh( "Vector Primitive", Mesh::RM_LINES ) );
-    mesh->loadGeometry( vertices, indices );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
-
-    return mesh;
+    return make_shared<LineMesh>( "Vector Primitive", std::move( geom ) );
 }
 
-MeshPtr Ray( const Core::Ray& ray, const Core::Utils::Color& color ) {
-    Core::Vector3 end = ray.pointAt( 1000.f );
-
-    Core::Vector3Array vertices = {ray.origin(), end};
-    std::vector<uint> indices   = {0, 1};
-
-    Core::Vector4Array colors( vertices.size(), color );
-
-    MeshPtr mesh( new Mesh( "Ray Primitive", Mesh::RM_LINES ) );
-    mesh->loadGeometry( vertices, indices );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
-
-    return mesh;
+LineMeshPtr Ray( const Core::Ray& ray, const Core::Utils::Color& color, Scalar len ) {
+    Geometry::LineMesh geom;
+    Core::Vector3 end = ray.pointAt( len );
+    geom.setVertices( {ray.origin(), end} );
+    geom.m_indices = {{0, 1}};
+    geom.addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ),
+                    Core::Vector4Array{geom.vertices().size(), color} );
+    return make_shared<LineMesh>( "Ray Primitive", std::move( geom ) );
 }
 
-MeshPtr Triangle( const Core::Vector3& a,
-                  const Core::Vector3& b,
-                  const Core::Vector3& c,
-                  const Core::Utils::Color& color,
-                  bool fill ) {
-    Core::Vector3Array vertices = {a, b, c};
-    std::vector<uint> indices;
-
-    if ( fill ) { indices = {0, 1, 2}; }
+AttribArrayDisplayablePtr Triangle( const Core::Vector3& a,
+                                    const Core::Vector3& b,
+                                    const Core::Vector3& c,
+                                    const Core::Utils::Color& color,
+                                    bool fill ) {
+    if ( fill )
+    {
+        Geometry::TriangleMesh geom;
+        geom.setVertices( {a, b, c} );
+        geom.m_indices = {{0, 1, 2}};
+        geom.addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ),
+                        Core::Vector4Array{geom.vertices().size(), color} );
+        return make_shared<Mesh>( "Triangle Primitive", std::move( geom ) );
+    }
     else
-    { indices = {0, 1, 1, 2, 2, 0}; }
-
-    Mesh::MeshRenderMode renderType = fill ? Mesh::RM_TRIANGLES : Mesh::RM_LINES;
-
-    Core::Vector4Array colors( vertices.size(), color );
-
-    MeshPtr mesh( new Mesh( "Triangle Primitive", renderType ) );
-    mesh->loadGeometry( vertices, indices );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
-
-    return mesh;
+    {
+        Geometry::LineMesh geom;
+        geom.setVertices( {a, b, c} );
+        geom.m_indices = {{0, 1}, {1, 2}, {2, 0}};
+        geom.addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ),
+                        Core::Vector4Array{geom.vertices().size(), color} );
+        return make_shared<LineMesh>( "Triangle Primitive", std::move( geom ) );
+    }
 }
 
+/// \todo continue to convert mesh creation and remove call to deprecated Mesh::loadGeometry
 MeshPtr QuadStrip( const Core::Vector3& a,
                    const Core::Vector3& x,
                    const Core::Vector3& y,
@@ -160,20 +148,20 @@ MeshPtr QuadStrip( const Core::Vector3& a,
 
     MeshPtr mesh( new Mesh( "Quad Strip Primitive", Mesh::RM_TRIANGLE_STRIP ) );
     mesh->loadGeometry( vertices, indices );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
-
+    mesh->getCoreGeometry().addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), colors );
     return mesh;
 }
 
-MeshPtr Circle( const Core::Vector3& center,
-                const Core::Vector3& normal,
-                Scalar radius,
-                uint segments,
-                const Core::Utils::Color& color ) {
-    CORE_ASSERT( segments > 2, "Cannot draw a circle with less than 3 points" );
+LineMeshPtr Circle( const Core::Vector3& center,
+                    const Core::Vector3& normal,
+                    Scalar radius,
+                    uint segments,
+                    const Core::Utils::Color& color ) {
+    CORE_ASSERT( segments >= 2, "Cannot draw a circle with less than 3 points" );
 
-    Core::Vector3Array vertices( segments );
-    std::vector<uint> indices( segments );
+    Geometry::LineMesh geom;
+    Core::Vector3Array vertices( segments + 1 );
+    geom.m_indices.resize( segments );
 
     Core::Vector3 xPlane, yPlane;
     Core::Math::getOrthogonalVectors( normal, xPlane, yPlane );
@@ -182,31 +170,34 @@ MeshPtr Circle( const Core::Vector3& center,
 
     Scalar thetaInc( Core::Math::PiMul2 / Scalar( segments ) );
     Scalar theta( 0.0 );
-    for ( uint i = 0; i < segments; ++i )
+    vertices[0] = center + radius * ( std::cos( theta ) * xPlane + std::sin( theta ) * yPlane );
+    theta += thetaInc;
+
+    for ( uint i = 1; i <= segments; ++i )
     {
         vertices[i] = center + radius * ( std::cos( theta ) * xPlane + std::sin( theta ) * yPlane );
-        indices[i]  = i;
-
+        geom.m_indices[i - 1] = {i - 1, i};
         theta += thetaInc;
     }
 
-    Core::Vector4Array colors( vertices.size(), color );
+    geom.setVertices( vertices );
 
-    MeshPtr mesh( new Mesh( "Circle Primitive", Mesh::RM_LINE_LOOP ) );
-    mesh->loadGeometry( vertices, indices );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
+    geom.addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ),
+                    Core::Vector4Array{geom.vertices().size(), color} );
 
-    return mesh;
+    return make_shared<LineMesh>( "Circle Primitive", std::move( geom ) );
 }
 
-MeshPtr CircleArc( const Core::Vector3& center,
-                   const Core::Vector3& normal,
-                   Scalar radius,
-                   Scalar angle,
-                   uint segments,
-                   const Core::Utils::Color& color ) {
-    Core::Vector3Array vertices( segments );
-    std::vector<uint> indices( segments );
+LineMeshPtr CircleArc( const Core::Vector3& center,
+                       const Core::Vector3& normal,
+                       Scalar radius,
+                       Scalar angle,
+                       uint segments,
+                       const Core::Utils::Color& color ) {
+
+    Geometry::LineMesh geom;
+    Core::Vector3Array vertices( segments + 1 );
+    geom.m_indices.resize( segments );
 
     Core::Vector3 xPlane, yPlane;
     Core::Math::getOrthogonalVectors( normal, xPlane, yPlane );
@@ -215,37 +206,37 @@ MeshPtr CircleArc( const Core::Vector3& center,
 
     Scalar thetaInc( 2 * angle / Scalar( segments ) );
     Scalar theta( 0.0 );
-    for ( uint i = 0; i < segments; ++i )
+    vertices[0] = center + radius * ( std::cos( theta ) * xPlane + std::sin( theta ) * yPlane );
+    theta += thetaInc;
+
+    for ( uint i = 1; i <= segments; ++i )
     {
         vertices[i] = center + radius * ( std::cos( theta ) * xPlane + std::sin( theta ) * yPlane );
-        indices[i]  = i;
+        geom.m_indices[i - 1] = {i - 1, i};
 
         theta += thetaInc;
     }
 
-    Core::Vector4Array colors( vertices.size(), color );
+    geom.setVertices( vertices );
+    geom.addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ),
+                    Core::Vector4Array{geom.vertices().size(), color} );
 
-    MeshPtr mesh( new Mesh( "Arc Circle Primitive", Mesh::RM_LINE_STRIP ) );
-    mesh->loadGeometry( vertices, indices );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
-
-    return mesh;
+    return make_shared<LineMesh>( "Arc Circle Primitive", std::move( geom ) );
 }
 
 MeshPtr Sphere( const Core::Vector3& center, Scalar radius, const Core::Utils::Color& color ) {
-    TriangleMesh sphere = makeGeodesicSphere( radius, 2 );
+    auto geom      = makeGeodesicSphere( radius, 2 );
+    auto handle    = geom.getAttribHandle<TriangleMesh::Point>( "in_position" );
+    auto& vertices = geom.getAttrib<TriangleMesh::Point>( handle );
+    auto& data     = vertices.getDataWithLock();
 
-    std::for_each( sphere.vertices().begin(),
-                   sphere.vertices().end(),
-                   [center]( Core::Vector3& v ) { v += center; } );
+    std::for_each( data.begin(), data.end(), [center]( Core::Vector3& v ) { v += center; } );
+    vertices.unlock();
 
-    Core::Vector4Array colors( sphere.vertices().size(), color );
+    geom.addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ),
+                    Core::Vector4Array{geom.vertices().size(), color} );
 
-    MeshPtr mesh( new Mesh( "Sphere Primitive", Mesh::RM_LINES ) );
-    mesh->loadGeometry( std::move( sphere ) );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
-
-    return mesh;
+    return make_shared<Mesh>( "Sphere Primitive", std::move( geom ) );
 }
 
 MeshPtr Capsule( const Core::Vector3& p1,
@@ -254,7 +245,7 @@ MeshPtr Capsule( const Core::Vector3& p1,
                  const Core::Utils::Color& color ) {
     const Scalar l = ( p2 - p1 ).norm();
 
-    TriangleMesh capsule = makeCapsule( l, radius );
+    TriangleMesh geom = makeCapsule( l, radius );
 
     // Compute the transform so that
     // (0,0,-l/2) maps to p1 and (0,0,l/2) maps to p2
@@ -266,18 +257,26 @@ MeshPtr Capsule( const Core::Vector3& p1,
     Core::Transform t = Core::Transform::Identity();
     t.rotate( rot );
     t.pretranslate( trans );
+    Matrix3 normalMatrix = t.linear().inverse().transpose();
 
-    std::for_each( capsule.vertices().begin(), capsule.vertices().end(), [t]( Core::Vector3& v ) {
-        v = t * v;
+    auto vertHandle  = geom.getAttribHandle<TriangleMesh::Point>( "in_position" );
+    auto& vertAttrib = geom.getAttrib<TriangleMesh::Point>( vertHandle );
+    auto& vertData   = vertAttrib.getDataWithLock();
+    std::for_each( vertData.begin(), vertData.end(), [t]( Core::Vector3& v ) { v = t * v; } );
+    vertAttrib.unlock();
+
+    auto normalHandle  = geom.getAttribHandle<TriangleMesh::Point>( "in_normal" );
+    auto& normalAttrib = geom.getAttrib<TriangleMesh::Point>( normalHandle );
+    auto& normalData   = normalAttrib.getDataWithLock();
+    std::for_each( normalData.begin(), normalData.end(), [normalMatrix]( Core::Vector3& n ) {
+        n = normalMatrix * n;
     } );
+    normalAttrib.unlock();
 
-    Core::Vector4Array colors( capsule.vertices().size(), color );
+    geom.addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ),
+                    Core::Vector4Array{geom.vertices().size(), color} );
 
-    MeshPtr mesh( new Mesh( "Sphere Primitive", Mesh::RM_LINES ) );
-    mesh->loadGeometry( std::move( capsule ) );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
-
-    return mesh;
+    return make_shared<Mesh>( "Capsule Primitive", std::move( geom ) );
 }
 
 MeshPtr Disk( const Core::Vector3& center,
@@ -314,7 +313,7 @@ MeshPtr Disk( const Core::Vector3& center,
 
     MeshPtr mesh( new Mesh( "Disk Primitive", Mesh::RM_TRIANGLE_FAN ) );
     mesh->loadGeometry( vertices, indices );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
+    mesh->getCoreGeometry().addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), colors );
 
     return mesh;
 }
@@ -354,7 +353,7 @@ MeshPtr Normal( const Core::Vector3& point,
 
     MeshPtr mesh( new Mesh( "Normal Primitive", Mesh::RM_LINES ) );
     mesh->loadGeometry( vertices, indices );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
+    mesh->getCoreGeometry().addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), colors );
 
     return mesh;
 }
@@ -383,7 +382,7 @@ MeshPtr Frame( const Core::Transform& frameFromEntity, Scalar scale ) {
 
     MeshPtr mesh( new Mesh( "Frame Primitive", Mesh::RM_LINES_ADJACENCY ) );
     mesh->loadGeometry( vertices, indices );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
+    mesh->getCoreGeometry().addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), colors );
 
     return mesh;
 }
@@ -399,31 +398,38 @@ MeshPtr Grid( const Core::Vector3& center,
     Core::Vector3Array vertices;
     std::vector<uint> indices;
 
-    Scalar halfWidth = ( cellSize * res ) / 2.f;
-
+    const Scalar halfWidth{( cellSize * res ) / 2.f};
+    const Core::Vector3 deltaPosX{cellSize * x};
+    const Core::Vector3 startPosX{center - halfWidth * x};
+    const Core::Vector3 endPosX{center + halfWidth * x};
+    const Core::Vector3 deltaPosY{cellSize * y};
+    const Core::Vector3 startPosY{center - halfWidth * y};
+    const Core::Vector3 endPosY{center + halfWidth * y};
+    Core::Vector3 currentPosX{startPosX};
     for ( uint i = 0; i < res + 1; ++i )
     {
-        Scalar xStep = Scalar( i ) - Scalar( res ) * cellSize / 2.f;
-        vertices.push_back( center - halfWidth * y + xStep * x );
-        vertices.push_back( center + halfWidth * y + xStep * x );
+        vertices.push_back( startPosY + currentPosX );
+        vertices.push_back( endPosY + currentPosX );
         indices.push_back( uint( vertices.size() ) - 2 );
         indices.push_back( uint( vertices.size() ) - 1 );
+        currentPosX += deltaPosX;
     }
 
+    Core::Vector3 currentPosY = startPosY;
     for ( uint i = 0; i < res + 1; ++i )
     {
-        Scalar yStep = Scalar( i ) - Scalar( res ) * cellSize / 2.f;
-        vertices.push_back( center - halfWidth * x + yStep * y );
-        vertices.push_back( center + halfWidth * x + yStep * y );
+        vertices.push_back( startPosX + currentPosY );
+        vertices.push_back( endPosX + currentPosY );
         indices.push_back( uint( vertices.size() ) - 2 );
         indices.push_back( uint( vertices.size() ) - 1 );
+        currentPosY += deltaPosY;
     }
 
     Core::Vector4Array colors( vertices.size(), color );
 
     MeshPtr mesh( new Mesh( "GridPrimitive", Mesh::RM_LINES ) );
     mesh->loadGeometry( vertices, indices );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
+    mesh->getCoreGeometry().addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), colors );
 
     return mesh;
 }
@@ -446,7 +452,7 @@ MeshPtr AABB( const Core::Aabb& aabb, const Core::Utils::Color& color ) {
 
     MeshPtr mesh( new Mesh( "AABB Primitive", Mesh::RM_LINES ) );
     mesh->loadGeometry( vertices, indices );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
+    mesh->getCoreGeometry().addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), colors );
 
     return mesh;
 }
@@ -469,7 +475,7 @@ MeshPtr OBB( const Obb& obb, const Core::Utils::Color& color ) {
 
     MeshPtr mesh( new Mesh( "OBB Primitive", Mesh::RM_LINES ) );
     mesh->loadGeometry( vertices, indices );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
+    mesh->getCoreGeometry().addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), colors );
 
     return mesh;
 }
@@ -501,7 +507,7 @@ MeshPtr Spline( const Core::Geometry::Spline<3, 3>& spline,
 
     MeshPtr mesh( new Mesh( "Spline Primitive", Mesh::RM_LINES ) );
     mesh->loadGeometry( vertices, indices );
-    mesh->addData( Mesh::VERTEX_COLOR, colors );
+    mesh->getCoreGeometry().addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), colors );
 
     return mesh;
 }

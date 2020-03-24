@@ -30,11 +30,11 @@ struct RA_CORE_API HandleComponentData {
     /// Handle transformation in model space.
     Core::Transform m_frame;
 
-    /// Matrix from mesh space to local space.
-    Core::Transform m_offset{Core::Transform::Identity()};
+    /// Per skinned-mesh matrix from mesh space to bone space (local).
+    std::map<std::string, Core::Transform> m_bindMatrices;
 
     /// Per skinned-mesh vertex weigths.
-    std::map<std::string, std::vector<std::pair<uint, Scalar>>> m_weight;
+    std::map<std::string, std::vector<std::pair<uint, Scalar>>> m_weights;
 };
 
 /**
@@ -56,7 +56,7 @@ class RA_CORE_API HandleData : public AssetData
 
     ~HandleData();
 
-    /// \name HandleSystem
+    /// \name HandleArray
     /// \{
 
     /**
@@ -149,34 +149,34 @@ class RA_CORE_API HandleData : public AssetData
     inline void setComponents( const Core::AlignedStdVector<HandleComponentData>& components );
 
     /**
-     * Return the HandleSystem hierarchy, i.e.\ bones hierarchy.
+     * Return the HandleArray hierarchy, i.e.\ bones hierarchy.
      */
-    inline const Core::AlignedStdVector<Core::Vector2i>& getEdgeData() const;
+    inline const Core::AlignedStdVector<Core::Vector2ui>& getEdgeData() const;
 
     /**
-     * Return the HandleSystem hierarchy, i.e.\ bones hierarchy.
+     * Return the HandleArray hierarchy, i.e.\ bones hierarchy.
      */
-    inline Core::AlignedStdVector<Core::Vector2i>& getEdgeData();
+    inline Core::AlignedStdVector<Core::Vector2ui>& getEdgeData();
 
     /**
-     * Set the HandleSystem linear hierarchy part, i.e.\ bones hierarchy.
+     * Set the HandleArray linear hierarchy part, i.e.\ bones hierarchy.
      */
-    inline void setEdges( const Core::AlignedStdVector<Core::Vector2i>& edgeList );
+    inline void setEdges( const Core::AlignedStdVector<Core::Vector2ui>& edgeList );
 
     /**
-     * Return the HandleSystem N-Dimensional parts, i.e.\ cage polyhedra.
+     * Return the HandleArray N-Dimensional parts, i.e.\ cage polyhedra.
      */
-    inline const Core::AlignedStdVector<Core::VectorNi>& getFaceData() const;
+    inline const Core::AlignedStdVector<Core::VectorNui>& getFaceData() const;
 
     /**
-     * Return the HandleSystem N-Dimensional parts, i.e.\ cage polyhedra.
+     * Return the HandleArray N-Dimensional parts, i.e.\ cage polyhedra.
      */
-    inline Core::AlignedStdVector<Core::VectorNi>& getFaceData();
+    inline Core::AlignedStdVector<Core::VectorNui>& getFaceData();
 
     /**
-     * Set the HandleSystem N-Dimensional parts, i.e.\ cage polyhedra.
+     * Set the HandleArray N-Dimensional parts, i.e.\ cage polyhedra.
      */
-    inline void setFaces( const Core::AlignedStdVector<Core::VectorNi>& faceList );
+    inline void setFaces( const Core::AlignedStdVector<Core::VectorNui>& faceList );
 
     /**
      * Set whether the Handle system needs end bones.
@@ -256,11 +256,11 @@ class RA_CORE_API HandleData : public AssetData
     /// The list of HandleComponentData.
     Core::AlignedStdVector<HandleComponentData> m_component;
 
-    /// The HandleSystem hierarchy, i.e.\ bones hierarchy.
-    Core::AlignedStdVector<Core::Vector2i> m_edge;
+    /// The HandleArray hierarchy, i.e.\ bones hierarchy.
+    Core::AlignedStdVector<Core::Vector2ui> m_edge;
 
-    /// The HandleSystem N-Dimensional parts, i.e.\ cage polyhedra.
-    Core::AlignedStdVector<Core::VectorNi> m_face;
+    /// The HandleArray N-Dimensional parts, i.e.\ cage polyhedra.
+    Core::AlignedStdVector<Core::VectorNui> m_face;
 };
 
 } // namespace Asset

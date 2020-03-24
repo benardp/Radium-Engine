@@ -122,7 +122,7 @@ int Gui::Viewer::addRenderer( const std::shared_ptr<Engine::Renderer>& e ) {
     if ( m_glInitialized.load() )
     {
         makeCurrent();
-        intializeRenderer( e.get() );
+        initializeRenderer( e.get() );
         doneCurrent();
     }
     else
@@ -176,7 +176,7 @@ bool Gui::Viewer::initializeGL() {
 
     createGizmoManager();
     // create default camera interface : trackball
-    m_camera = std::make_unique<Gui::TrackballCameraManipulator>(width(), height() );
+    m_camera = std::make_unique<Gui::TrackballCameraManipulator>( width(), height() );
     auto headlight =
         new Engine::DirectionalLight( Ra::Engine::SystemEntity::getInstance(), "headlight" );
     headlight->setColor( Ra::Core::Utils::Color::Grey( 1.0_ra ) );
@@ -192,7 +192,7 @@ bool Gui::Viewer::initializeGL() {
     {
         for ( auto& rptr : m_renderers )
         {
-            intializeRenderer( rptr.get() );
+            initializeRenderer( rptr.get() );
             LOG( logINFO ) << "[Viewer] Deferred initialization of " << rptr->getRendererName();
         }
     }
@@ -266,7 +266,7 @@ void Gui::Viewer::onResized() {
     emit needUpdate();
 }
 
-void Gui::Viewer::intializeRenderer( Engine::Renderer* renderer ) {
+void Gui::Viewer::initializeRenderer( Engine::Renderer* renderer ) {
     // see issue #261 Qt Event order and default viewport management (Viewer.cpp)
     // https://github.com/STORM-IRIT/Radium-Engine/issues/261
 #ifndef OS_MACOS
@@ -521,6 +521,8 @@ void Gui::Viewer::keyPressEvent( QKeyEvent* event ) {
     {
 
         if ( actionViewer == VIEWER_TOGGLE_WIREFRAME ) { m_currentRenderer->toggleWireframe(); }
+        else if ( actionViewer == VIEWER_RELOAD_SHADERS )
+        { reloadShaders(); }
         else if ( actionViewer == VIEWER_PICKING_MULTI_CIRCLE )
         {
             m_isBrushPickingEnabled = !m_isBrushPickingEnabled;
@@ -655,7 +657,7 @@ void Gui::Viewer::startRendering( const Scalar dt ) {
 }
 
 void Gui::Viewer::swapBuffers() {
-    m_context->swapBuffers( this );
+    if ( isExposed() ) { m_context->swapBuffers( this ); }
     doneCurrent();
 }
 

@@ -15,40 +15,45 @@ namespace Engine {
 class RenderObject;
 class Component;
 class Mesh;
+class AttribArrayDisplayable;
+class LineMesh;
 
 /// A set of convenient functions to instantiate simple displays such as points, lines, etc.
 /// note that objects will be drawn in their entity's local frame.
 /// For "instant" debug drawing, @see DebugDisplay.
 namespace DrawPrimitives {
-using MeshPtr = std::shared_ptr<Mesh>;
-
+using MeshPtr                   = std::shared_ptr<Mesh>;
+using LineMeshPtr               = std::shared_ptr<LineMesh>;
+using AttribArrayDisplayablePtr = std::shared_ptr<AttribArrayDisplayable>;
 RA_ENGINE_API RenderObject* Primitive( Component* comp, const MeshPtr& mesh );
 
 /// Displays given point shown as the crossing of 3 lines of length 'scale'
-RA_ENGINE_API MeshPtr Point( const Core::Vector3& point,
-                             const Core::Utils::Color& color,
-                             Scalar scale = 0.1f );
+RA_ENGINE_API LineMeshPtr Point( const Core::Vector3& point,
+                                 const Core::Utils::Color& color,
+                                 Scalar scale = 0.1f );
 
 /// Displays given line
-RA_ENGINE_API MeshPtr Line( const Core::Vector3& a,
-                            const Core::Vector3& b,
-                            const Core::Utils::Color& color );
+RA_ENGINE_API LineMeshPtr Line( const Core::Vector3& a,
+                                const Core::Vector3& b,
+                                const Core::Utils::Color& color );
 
 /// Displays given vector shown as an arrow originating from 'start'
-RA_ENGINE_API MeshPtr Vector( const Core::Vector3& start,
-                              const Core::Vector3& v,
-                              const Core::Utils::Color& color );
+RA_ENGINE_API LineMeshPtr Vector( const Core::Vector3& start,
+                                  const Core::Vector3& v,
+                                  const Core::Utils::Color& color );
 
 /// Displays given ray as a straight line.
-RA_ENGINE_API MeshPtr Ray( const Core::Ray& ray, const Core::Utils::Color& color );
+RA_ENGINE_API LineMeshPtr Ray( const Core::Ray& ray,
+                               const Core::Utils::Color& color,
+                               Scalar len = 1000_ra );
 
 /// Displays given triangle ABC, either in wireframe (fill = false)
 /// or filled with the color(fill = true).
-RA_ENGINE_API MeshPtr Triangle( const Core::Vector3& a,
-                                const Core::Vector3& b,
-                                const Core::Vector3& c,
-                                const Core::Utils::Color& color,
-                                bool fill = false );
+RA_ENGINE_API AttribArrayDisplayablePtr Triangle( const Core::Vector3& a,
+                                                  const Core::Vector3& b,
+                                                  const Core::Vector3& c,
+                                                  const Core::Utils::Color& color,
+                                                  bool fill = false );
 
 /// Displays a strip of n quads, starting at A and with directions X and Y.
 RA_ENGINE_API MeshPtr QuadStrip( const Core::Vector3& a,
@@ -60,21 +65,21 @@ RA_ENGINE_API MeshPtr QuadStrip( const Core::Vector3& a,
 /// Displays circle computed with given center and radius,
 /// in plane normal to given vector in wireframe
 /// @note normal must be a normalized vector.
-RA_ENGINE_API MeshPtr Circle( const Core::Vector3& center,
-                              const Core::Vector3& normal,
-                              Scalar radius,
-                              uint segments,
-                              const Core::Utils::Color& color );
+RA_ENGINE_API LineMeshPtr Circle( const Core::Vector3& center,
+                                  const Core::Vector3& normal,
+                                  Scalar radius,
+                                  uint segments,
+                                  const Core::Utils::Color& color );
 
 /// Displays arc of a circle computed with given center, radius and angle
 /// in plane normal to given vector in wireframe
 /// @note normal must be a normalized vector.
-RA_ENGINE_API MeshPtr CircleArc( const Core::Vector3& center,
-                                 const Core::Vector3& normal,
-                                 Scalar radius,
-                                 Scalar angle,
-                                 uint segments,
-                                 const Core::Utils::Color& color );
+RA_ENGINE_API LineMeshPtr CircleArc( const Core::Vector3& center,
+                                     const Core::Vector3& normal,
+                                     Scalar radius,
+                                     Scalar angle,
+                                     uint segments,
+                                     const Core::Utils::Color& color );
 
 /// Displays sphere computed with given center and radius
 RA_ENGINE_API MeshPtr Sphere( const Core::Vector3& center,
@@ -111,7 +116,7 @@ RA_ENGINE_API MeshPtr Normal( const Core::Vector3& point,
 RA_ENGINE_API MeshPtr Frame( const Core::Transform& frameFromEntity, Scalar scale = 0.1f );
 
 /// Create a res*res square grid centered on center,
-/// in plane normal to normal.
+/// in plane defined by the vectors x and y.
 RA_ENGINE_API MeshPtr Grid( const Core::Vector3& center,
                             const Core::Vector3& x,
                             const Core::Vector3& y,
