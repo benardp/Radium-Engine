@@ -96,11 +96,9 @@ void AssimpGeometryDataLoader::loadMeshData( const aiMesh& mesh,
     }
     if ( mesh.HasTextureCoords( 0 ) ) { fetchTextureCoordinates( mesh, data ); }
 
-    /*
-     if( mesh.HasVertexColors() ) {
-     fetchColors( mesh, data );
-     }
-     */
+    if( mesh.GetNumColorChannels() > 0 ) {
+        fetchColors( mesh, data ); 
+    }
 }
 
 void AssimpGeometryDataLoader::loadMeshFrame(
@@ -253,7 +251,21 @@ void AssimpGeometryDataLoader::fetchTextureCoordinates( const aiMesh& mesh,
 }
 
 void AssimpGeometryDataLoader::fetchColors( const aiMesh& mesh, GeometryData& data ) const {
-    // TO DO
+    auto& colors = data.getColors();
+    colors.resize( data.getVerticesSize() );
+
+    // Find the first non empty vertex color channel
+    int channel = 0;
+    while(!mesh.HasVertexColors(channel) && channel < AI_MAX_NUMBER_OF_COLOR_SETS){
+        channel++;
+    }
+    
+    // Copy vertex colors
+    aiColor4D* vertexColors = mesh.mColors[channel];
+#pragma omp parallel for
+    for(size_t i =0; i <colors.size(); ++i ) {
+        colors[i] = Core::Vector4(vertexColors[i].r, vertexColors[i].g, vertexColors[i].b, vertexColors[i].a);
+    }
 }
 
 void AssimpGeometryDataLoader::loadMaterial( const aiMaterial& material,

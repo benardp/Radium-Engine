@@ -12,9 +12,11 @@ namespace Engine {
 using namespace Core::Utils; // log
 
 // For iterating on the enum easily
-const std::array<RenderTechnique::PassName, 3> allPasses = {RenderTechnique::Z_PREPASS,
+const std::array<RenderTechnique::PassName, 4> allPasses = {RenderTechnique::Z_PREPASS,
                                                             RenderTechnique::LIGHTING_OPAQUE,
-                                                            RenderTechnique::LIGHTING_TRANSPARENT};
+                                                            RenderTechnique::LIGHTING_TRANSPARENT,
+                                                            RenderTechnique::WIREFRAME };
+
 
 std::shared_ptr<Ra::Engine::RenderTechnique> RadiumDefaultRenderTechnique( nullptr );
 

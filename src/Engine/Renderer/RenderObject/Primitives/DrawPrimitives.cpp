@@ -37,6 +37,17 @@ RenderObject* Primitive( Component* component, const MeshPtr& mesh ) {
         mesh->getName(), component, RenderObjectType::Debug, mesh, rt );
 }
 
+RenderObject* Primitive( Component* component, const LineMeshPtr& mesh ) {
+    ShaderConfiguration config = ShaderConfigurationFactory::getConfiguration( "Lines" );
+    auto mat = Core::make_shared<BlinnPhongMaterial>( "Default material" );
+    RenderTechnique rt;
+    rt.setMaterial( mat );
+    rt.setConfiguration( config );
+
+    return RenderObject::createRenderObject(
+        mesh->getName(), component, RenderObjectType::Debug, mesh, rt );
+}
+
 LineMeshPtr Point( const Core::Vector3& point, const Core::Utils::Color& color, Scalar scale ) {
 
     Geometry::LineMesh geom;
