@@ -141,8 +141,7 @@ class RA_ENGINE_API AttribArrayDisplayable : public Displayable
     {
       public:
         explicit AttribObserver( AttribArrayDisplayable* displayable, int idx ) :
-            m_displayable( displayable ),
-            m_idx( idx ) {}
+            m_displayable( displayable ), m_idx( idx ) {}
         void operator()() {
             m_displayable->m_dataDirty[m_idx] = true;
             m_displayable->m_isDirty          = true;
@@ -179,7 +178,7 @@ class RA_ENGINE_API VaoIndices
     inline void setIndicesDirty();
 
   protected:
-    std::unique_ptr<globjects::Buffer> m_indices;
+    std::unique_ptr<globjects::Buffer> m_indices{nullptr};
     bool m_indicesDirty{true};
     /// number of elements to draw (i.e number of indices to use)
     size_t m_numElements{0};
@@ -219,8 +218,8 @@ class CoreGeometryDisplayable : public AttribArrayDisplayable
                                       MeshRenderMode renderMode = RM_TRIANGLES );
     ///@{
     /**  Returns the underlying CoreGeometry as an Core::Geometry::AbstractGeometry */
-    inline const Core::Geometry::AbstractGeometry& getAbstractGeometry() const;
-    inline Core::Geometry::AbstractGeometry& getAbstractGeometry();
+    inline const Core::Geometry::AbstractGeometry& getAbstractGeometry() const override;
+    inline Core::Geometry::AbstractGeometry& getAbstractGeometry() override;
     ///@}
 
     ///@{
@@ -287,7 +286,11 @@ class RA_ENGINE_API PointCloud : public CoreGeometryDisplayable<Core::Geometry::
     using base = CoreGeometryDisplayable<Core::Geometry::PointCloud>;
 
   public:
-    using CoreGeometryDisplayable<Core::Geometry::PointCloud>::CoreGeometryDisplayable;
+    using base::CoreGeometryDisplayable;
+    inline explicit PointCloud(
+        const std::string& name,
+        typename base::CoreGeometry&& geom,
+        typename base::MeshRenderMode renderMode = base::MeshRenderMode::RM_POINTS );
 
     /// use glDrawArrays to draw all the points in the point cloud
     void render( const ShaderProgram* prog ) override;
@@ -315,7 +318,7 @@ class IndexedGeometry : public CoreGeometryDisplayable<T>, public VaoIndices
     void loadGeometry( T&& mesh ) override;
 
   protected:
-    void updateGL_specific_impl();
+    void updateGL_specific_impl() override;
 };
 
 /// LineMesh, own a Core::Geometry::LineMesh

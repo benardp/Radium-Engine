@@ -9,7 +9,7 @@
 #include <Engine/Renderer/RenderTechnique/ShaderConfigFactory.hpp>
 
 #include <Core/Containers/MakeShared.hpp>
-#include <Engine/Renderer/Material/BlinnPhongMaterial.hpp>
+#include <Engine/Renderer/Material/PlainMaterial.hpp>
 
 #include <algorithm>
 #include <numeric>
@@ -22,19 +22,18 @@ using namespace Core::Geometry;
 namespace Engine {
 namespace DrawPrimitives {
 RenderObject* Primitive( Component* component, const MeshPtr& mesh ) {
-    ShaderConfiguration config;
-    if ( mesh->getRenderMode() == Mesh::RM_LINES )
-    { config = ShaderConfigurationFactory::getConfiguration( "Lines" ); }
-    else
-    { config = ShaderConfigurationFactory::getConfiguration( "Plain" ); }
-
-    auto mat = Core::make_shared<BlinnPhongMaterial>( "Default material" );
     RenderTechnique rt;
-    rt.setMaterial( mat );
-    rt.setConfiguration( config );
+    auto builder = EngineRenderTechniques::getDefaultTechnique( "Plain" );
+    builder.second( rt, false );
+    auto roMaterial = Core::make_shared<PlainMaterial>( "Default material" );
+    roMaterial->m_perVertexColor =
+        mesh->getCoreGeometry().hasAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ) );
+    rt.setParametersProvider( roMaterial );
 
-    return RenderObject::createRenderObject(
+    auto ro = RenderObject::createRenderObject(
         mesh->getName(), component, RenderObjectType::Debug, mesh, rt );
+    ro->setMaterial( roMaterial );
+    return ro;
 }
 
 LineMeshPtr Point( const Core::Vector3& point, const Core::Utils::Color& color, Scalar scale ) {
@@ -369,8 +368,6 @@ MeshPtr Frame( const Core::Transform& frameFromEntity, Scalar scale ) {
     Core::Vector3Array vertices = {
         pos, pos + scale * x, pos, pos + scale * y, pos, pos + scale * z};
 
-    std::vector<uint> indices = {0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5};
-
     Core::Vector4Array colors = {
         Core::Utils::Color::Red(),
         Core::Utils::Color::Red(),
@@ -380,7 +377,9 @@ MeshPtr Frame( const Core::Transform& frameFromEntity, Scalar scale ) {
         Core::Utils::Color::Blue(),
     };
 
-    MeshPtr mesh( new Mesh( "Frame Primitive", Mesh::RM_LINES_ADJACENCY ) );
+    std::vector<uint> indices = {0, 1, 2, 3, 4, 5};
+    MeshPtr mesh( new Mesh( "Frame Primitive", Mesh::RM_LINES ) );
+
     mesh->loadGeometry( vertices, indices );
     mesh->getCoreGeometry().addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), colors );
 
@@ -509,6 +508,25 @@ MeshPtr Spline( const Core::Geometry::Spline<3, 3>& spline,
     mesh->loadGeometry( vertices, indices );
     mesh->getCoreGeometry().addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), colors );
 
+    return mesh;
+}
+
+MeshPtr LineStrip( const Core::Vector3Array& vertices, const Core::Vector4Array& colors ) {
+
+    std::vector<uint> indices( vertices.size() );
+    std::iota( indices.begin(), indices.end(), 0 );
+    auto r = ( vertices.size() % 3 );
+    if ( r != 0 )
+    {
+        for ( ; r < 3; ++r )
+        {
+            indices.push_back( vertices.size() - 1 );
+        }
+    }
+    MeshPtr mesh( new Mesh( "Line Strip Primitive", Mesh::RM_LINE_STRIP ) );
+    mesh->loadGeometry( vertices, indices );
+    if ( colors.size() > 0 )
+    { mesh->getCoreGeometry().addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), colors ); }
     return mesh;
 }
 } // namespace DrawPrimitives

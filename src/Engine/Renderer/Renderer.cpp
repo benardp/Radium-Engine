@@ -6,7 +6,7 @@
 #include <Core/Utils/Log.hpp>
 #include <Engine/Managers/LightManager/LightManager.hpp>
 #include <Engine/RadiumEngine.hpp>
-#include <Engine/Renderer/Camera/Camera.hpp>
+#include <Engine/Renderer/Camera/ViewingParameters.hpp>
 #include <Engine/Renderer/Material/Material.hpp>
 #include <Engine/Renderer/Mesh/Mesh.hpp>
 #include <Engine/Renderer/OpenGL/OpenGL.hpp>
@@ -65,26 +65,26 @@ void Renderer::initialize( uint width, uint height ) {
     TextureManager::createInstance();
 
     m_shaderMgr->addShaderProgram( {{"DrawScreen"},
-                                    resourcesRootDir + "Shaders/Basic2D.vert.glsl",
-                                    resourcesRootDir + "Shaders/DrawScreen.frag.glsl"} );
+                                    resourcesRootDir + "Shaders/2DShaders/Basic2D.vert.glsl",
+                                    resourcesRootDir + "Shaders/2DShaders/DrawScreen.frag.glsl"} );
     m_shaderMgr->addShaderProgram( {{"DrawScreenI"},
-                                    resourcesRootDir + "Shaders/Basic2D.vert.glsl",
-                                    resourcesRootDir + "Shaders/DrawScreenI.frag.glsl"} );
+                                    resourcesRootDir + "Shaders/2DShaders/Basic2D.vert.glsl",
+                                    resourcesRootDir + "Shaders/2DShaders/DrawScreenI.frag.glsl"} );
     m_shaderMgr->addShaderProgram( {{"CircleBrush"},
-                                    resourcesRootDir + "Shaders/Basic2D.vert.glsl",
-                                    resourcesRootDir + "Shaders/CircleBrush.frag.glsl"} );
+                                    resourcesRootDir + "Shaders/2DShaders/Basic2D.vert.glsl",
+                                    resourcesRootDir + "Shaders/2DShaders/CircleBrush.frag.glsl"} );
     m_shaderMgr->addShaderProgram(
         {{"DisplayDepthBuffer"},
-         resourcesRootDir + "Shaders/Basic2D.vert.glsl",
-         resourcesRootDir + "Shaders/DepthDisplay/DepthDisplay.frag.glsl"} );
+         resourcesRootDir + "Shaders/2DShaders/Basic2D.vert.glsl",
+         resourcesRootDir + "Shaders/2DShaders//DepthDisplay.frag.glsl"} );
 
     ShaderConfiguration pickingPointsConfig( "PickingPoints" );
     pickingPointsConfig.addShader( ShaderType_VERTEX,
-                                   resourcesRootDir + "Shaders/Picking.vert.glsl" );
+                                   resourcesRootDir + "Shaders/Picking/Picking.vert.glsl" );
     pickingPointsConfig.addShader( ShaderType_GEOMETRY,
-                                   resourcesRootDir + "Shaders/PickingPoints.geom.glsl" );
+                                   resourcesRootDir + "Shaders/Picking/PickingPoints.geom.glsl" );
     pickingPointsConfig.addShader( ShaderType_FRAGMENT,
-                                   resourcesRootDir + "Shaders/Picking.frag.glsl" );
+                                   resourcesRootDir + "Shaders/Picking/Picking.frag.glsl" );
     ShaderConfigurationFactory::addConfiguration( pickingPointsConfig );
     {
         auto pickingShader = m_shaderMgr->addShaderProgram( pickingPointsConfig );
@@ -94,11 +94,11 @@ void Renderer::initialize( uint width, uint height ) {
 
     ShaderConfiguration pickingLinesConfig( "PickingLines" );
     pickingLinesConfig.addShader( ShaderType_VERTEX,
-                                  resourcesRootDir + "Shaders/Picking.vert.glsl" );
+                                  resourcesRootDir + "Shaders/Picking/Picking.vert.glsl" );
     pickingLinesConfig.addShader( ShaderType_GEOMETRY,
-                                  resourcesRootDir + "Shaders/PickingLines.geom.glsl" );
+                                  resourcesRootDir + "Shaders/Picking/PickingLines.geom.glsl" );
     pickingLinesConfig.addShader( ShaderType_FRAGMENT,
-                                  resourcesRootDir + "Shaders/Picking.frag.glsl" );
+                                  resourcesRootDir + "Shaders/Picking/Picking.frag.glsl" );
     ShaderConfigurationFactory::addConfiguration( pickingLinesConfig );
     {
         auto pickingShader = m_shaderMgr->addShaderProgram( pickingLinesConfig );
@@ -108,11 +108,11 @@ void Renderer::initialize( uint width, uint height ) {
 
     ShaderConfiguration pickingLinesAdjacencyConfig( "PickingLinesAdjacency" );
     pickingLinesAdjacencyConfig.addShader( ShaderType_VERTEX,
-                                           resourcesRootDir + "Shaders/Picking.vert.glsl" );
+                                           resourcesRootDir + "Shaders/Picking/Picking.vert.glsl" );
     pickingLinesAdjacencyConfig.addShader(
-        ShaderType_GEOMETRY, resourcesRootDir + "Shaders/PickingLinesAdjacency.geom.glsl" );
+        ShaderType_GEOMETRY, resourcesRootDir + "Shaders/Picking/PickingLinesAdjacency.geom.glsl" );
     pickingLinesAdjacencyConfig.addShader( ShaderType_FRAGMENT,
-                                           resourcesRootDir + "Shaders/Picking.frag.glsl" );
+                                           resourcesRootDir + "Shaders/Picking/Picking.frag.glsl" );
     ShaderConfigurationFactory::addConfiguration( pickingLinesAdjacencyConfig );
     {
         auto pickingShader = m_shaderMgr->addShaderProgram( pickingLinesAdjacencyConfig );
@@ -122,11 +122,11 @@ void Renderer::initialize( uint width, uint height ) {
 
     ShaderConfiguration pickingTrianglesConfig( "PickingTriangles" );
     pickingTrianglesConfig.addShader( ShaderType_VERTEX,
-                                      resourcesRootDir + "Shaders/Picking.vert.glsl" );
-    pickingTrianglesConfig.addShader( ShaderType_GEOMETRY,
-                                      resourcesRootDir + "Shaders/PickingTriangles.geom.glsl" );
+                                      resourcesRootDir + "Shaders/Picking/Picking.vert.glsl" );
+    pickingTrianglesConfig.addShader(
+        ShaderType_GEOMETRY, resourcesRootDir + "Shaders/Picking/PickingTriangles.geom.glsl" );
     pickingTrianglesConfig.addShader( ShaderType_FRAGMENT,
-                                      resourcesRootDir + "Shaders/Picking.frag.glsl" );
+                                      resourcesRootDir + "Shaders/Picking/Picking.frag.glsl" );
     ShaderConfigurationFactory::addConfiguration( pickingTrianglesConfig );
     {
         auto pickingShader = m_shaderMgr->addShaderProgram( pickingTrianglesConfig );
@@ -177,8 +177,6 @@ void Renderer::initialize( uint width, uint height ) {
 
     resize( m_width, m_height );
 
-    glDrawBuffer( GL_BACK );
-    glReadBuffer( GL_BACK );
 }
 
 Renderer::PickingResult Renderer::doPickingNow( const PickingQuery& query,
@@ -245,17 +243,22 @@ void Renderer::render( const ViewingParameters& data ) {
     saveExternalFBOInternal();
 
     // 1. Gather render objects if needed
+    // TODO : make this only once and only update modified objects at each frame
+    //  Actually, this correspond to 3 loops over all ROs. Could be done without loops, just by
+    //  using observers
     feedRenderQueuesInternal( data );
 
     m_timerData.feedRenderQueuesEnd = Core::Utils::Clock::now();
 
     // 2. Update them (from an opengl point of view)
-    // FIXME(Charly): Maybe we could just update objects if they need it
-    // before drawing them, that would be cleaner (performance problem ?)
+    // TODO : This naively updates the OpenGL State of objects at each frame.
+    //  Do it only for modified objects (With an observer ?)
     updateRenderObjectsInternal( data );
     m_timerData.updateEnd = Core::Utils::Clock::now();
 
     // 3. Do picking if needed
+    // TODO : Make picking much more effient.
+    //  Do not need to loop twice on objects to implement picking.
     m_pickingResults.clear();
     if ( !m_pickingQueries.empty() ) { doPicking( data ); }
     m_lastFramePickingQueries = m_pickingQueries;
@@ -282,6 +285,9 @@ void Renderer::render( const ViewingParameters& data ) {
     m_timerData.renderEnd = Core::Utils::Clock::now();
 
     // 9. Tell renderobjects they have been drawn (to decreaase the counter)
+    // TODO : this must be done when rendering the object, not after.
+    // doing this here make looping on Ros twice (at least) and even much more due to
+    // implementations of indirectly called methods.
     notifyRenderObjectsRenderingInternal();
 }
 
@@ -458,7 +464,8 @@ void Renderer::doPicking( const ViewingParameters& renderData ) {
                     const int x = query.m_screenCoords.x() + i;
                     const int y = query.m_screenCoords.y() - j;
                     // skip query if out of window (can occur when picking while moving outside)
-                    if ( x < 0 || x > m_width - 1 || y < 0 || y > m_height - 1 ) { continue; }
+                    if ( x < 0 || x > int( m_width ) - 1 || y < 0 || y > int( m_height ) - 1 )
+                    { continue; }
                     GL_ASSERT( glReadPixels( x, y, 1, 1, GL_RGBA_INTEGER, GL_INT, pick ) );
                     resultPerRO[pick[0]].m_roIdx = pick[0];
                     resultPerRO[pick[0]].m_vertexIdx.emplace_back( pick[1] );
@@ -466,18 +473,15 @@ void Renderer::doPicking( const ViewingParameters& renderData ) {
                     resultPerRO[pick[0]].m_edgeIdx.emplace_back( pick[3] );
                 }
             }
-            int maxRO = -1;
-            int nbMax = 0;
-            for ( const auto& res : resultPerRO )
-            {
-                if ( res.second.m_roIdx == -1 ) { continue; }
-                if ( res.second.m_vertexIdx.size() > nbMax )
-                {
-                    maxRO = res.first;
-                    nbMax = res.second.m_vertexIdx.size();
-                }
-            }
-            result = resultPerRO[maxRO];
+
+            auto itr = std::max_element(
+                resultPerRO.begin(),
+                resultPerRO.end(),
+                []( const std::map<int, PickingResult>::value_type& a,
+                    const std::map<int, PickingResult>::value_type& b ) -> bool {
+                    return a.second.m_vertexIdx.size() < b.second.m_vertexIdx.size();
+                } );
+            result = itr->second;
         }
         result.m_mode = query.m_mode;
         m_pickingResults.push_back( result );
@@ -557,12 +561,10 @@ void Renderer::restoreExternalFBOInternal() {
     if ( m_qtPlz == 0 )
     {
         GL_ASSERT( glBindFramebuffer( GL_FRAMEBUFFER, 0 ) );
-        glDrawBuffer( GL_BACK );
     }
     else
     {
         GL_ASSERT( glBindFramebuffer( GL_FRAMEBUFFER, m_qtPlz ) );
-        GL_ASSERT( glDrawBuffers( 1, buffers ) );
     }
 }
 
@@ -712,6 +714,19 @@ bool Renderer::hasLight() const {
     for ( auto m : m_lightmanagers )
         n += m->count();
     return n != 0;
+}
+
+int Renderer::buildAllRenderTechniques() const {
+    std::vector<RenderObjectPtr> renderObjects;
+    m_roMgr->getRenderObjectsByType( renderObjects, RenderObjectType::Geometry );
+    if ( renderObjects.size() > 0 )
+    {
+        for ( auto& ro : renderObjects )
+        {
+            buildRenderTechnique( ro.get() );
+        }
+    }
+    return 0;
 }
 } // namespace Engine
 } // namespace Ra

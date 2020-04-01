@@ -7,19 +7,15 @@ void RenderParameters::bind( const ShaderProgram* shader ) const {
     m_intParamsVector.bind( shader );
     m_uintParamsVector.bind( shader );
     m_scalarParamsVector.bind( shader );
-
     m_intsParamsVector.bind( shader );
     m_uintsParamsVector.bind( shader );
     m_scalarsParamsVector.bind( shader );
-
     m_vec2ParamsVector.bind( shader );
     m_vec3ParamsVector.bind( shader );
     m_vec4ParamsVector.bind( shader );
-
     m_mat2ParamsVector.bind( shader );
     m_mat3ParamsVector.bind( shader );
     m_mat4ParamsVector.bind( shader );
-
     m_texParamsVector.bind( shader );
 }
 
@@ -77,42 +73,6 @@ void RenderParameters::addParameter( const char* name, const Core::Matrix4& valu
 
 void RenderParameters::addParameter( const char* name, Texture* tex, int texUnit ) {
     m_texParamsVector[name] = TextureParameter( name, tex, texUnit );
-}
-
-void RenderParameters::updateParameter( const char* name, int value ) {
-    m_intParamsVector[name] = IntParameter( name, value );
-}
-
-void RenderParameters::updateParameter( const char* name, uint value ) {
-    m_uintParamsVector[name] = UIntParameter( name, value );
-}
-
-void RenderParameters::updateParameter( const char* name, Scalar value ) {
-    m_scalarParamsVector[name] = ScalarParameter( name, value );
-}
-
-void RenderParameters::updateParameter( const char* name, const Core::Vector2& value ) {
-    m_vec2ParamsVector[name] = Vec2Parameter( name, value );
-}
-
-void RenderParameters::updateParameter( const char* name, const Core::Vector3& value ) {
-    m_vec3ParamsVector[name] = Vec3Parameter( name, value );
-}
-
-void RenderParameters::updateParameter( const char* name, const Core::Vector4& value ) {
-    m_vec4ParamsVector[name] = Vec4Parameter( name, value );
-}
-
-void RenderParameters::updateParameter( const char* name, const Core::Matrix2& value ) {
-    m_mat2ParamsVector[name] = Mat2Parameter( name, value );
-}
-
-void RenderParameters::updateParameter( const char* name, const Core::Matrix3& value ) {
-    m_mat3ParamsVector[name] = Mat3Parameter( name, value );
-}
-
-void RenderParameters::updateParameter( const char* name, const Core::Matrix4& value ) {
-    m_mat4ParamsVector[name] = Mat4Parameter( name, value );
 }
 
 void RenderParameters::concatParameters( const RenderParameters& params ) {

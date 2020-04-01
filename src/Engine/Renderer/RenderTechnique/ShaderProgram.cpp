@@ -12,14 +12,6 @@
 
 #include <regex>
 
-#ifdef OS_WINDOWS
-#    include <direct.h>
-#    define getCurrentDir _getcwd
-#else
-#    include <unistd.h>
-#    define getCurrentDir getcwd
-#endif
-
 #include <Core/Math/GlmAdapters.hpp>
 
 #include <Core/Utils/Log.hpp>
@@ -33,14 +25,67 @@ namespace Engine {
 
 using namespace Core::Utils; // log
 
+// The two following methods are independent of any ShaderProgram object.
+// Fixed : made them local function to remove dependency on openGL.h for the class header
+GLenum getTypeAsGLEnum( ShaderType type ) {
+    switch ( type )
+    {
+    case ShaderType_VERTEX:
+        return GL_VERTEX_SHADER;
+    case ShaderType_FRAGMENT:
+        return GL_FRAGMENT_SHADER;
+    case ShaderType_GEOMETRY:
+        return GL_GEOMETRY_SHADER;
+    case ShaderType_TESS_EVALUATION:
+        return GL_TESS_EVALUATION_SHADER;
+    case ShaderType_TESS_CONTROL:
+        return GL_TESS_CONTROL_SHADER;
+#ifndef OS_MACOS
+        // GL_COMPUTE_SHADER requires OpenGL >= 4.2, Apple provides OpenGL 4.1
+    case ShaderType_COMPUTE:
+        return GL_COMPUTE_SHADER;
+#endif
+    default:
+        CORE_ERROR( "Wrong ShaderType" );
+    }
+
+    // Should never get there
+    return GL_ZERO;
+}
+
+ShaderType getGLenumAsType( GLenum type ) {
+    switch ( type )
+    {
+    case GL_VERTEX_SHADER:
+        return ShaderType_VERTEX;
+    case GL_FRAGMENT_SHADER:
+        return ShaderType_FRAGMENT;
+    case GL_GEOMETRY_SHADER:
+        return ShaderType_GEOMETRY;
+    case GL_TESS_EVALUATION_SHADER:
+        return ShaderType_TESS_EVALUATION;
+    case GL_TESS_CONTROL_SHADER:
+        return ShaderType_TESS_CONTROL;
+#ifndef OS_MACOS
+    case GL_COMPUTE_SHADER:
+        return ShaderType_COMPUTE;
+#endif
+    default:
+        CORE_ERROR( "Wrong GLenum" );
+    }
+
+    // Should never get there
+    return ShaderType_COUNT;
+}
+
 ShaderProgram::ShaderProgram() : m_program{nullptr} {
-    std::fill( m_shaderObjects.begin(), m_shaderObjects.end(), nullptr );
+    std::generate( m_shaderObjects.begin(), m_shaderObjects.end(), []() {
+        return std::pair<bool, std::unique_ptr<globjects::Shader>>{false, nullptr};
+    } );
     std::fill( m_shaderSources.begin(), m_shaderSources.end(), nullptr );
 }
 
-ShaderProgram::ShaderProgram( const ShaderConfiguration& config ) : m_program{nullptr} {
-    std::fill( m_shaderObjects.begin(), m_shaderObjects.end(), nullptr );
-    std::fill( m_shaderSources.begin(), m_shaderSources.end(), nullptr );
+ShaderProgram::ShaderProgram( const ShaderConfiguration& config ) : ShaderProgram() {
     load( config );
 }
 
@@ -50,7 +95,7 @@ ShaderProgram::~ShaderProgram() {
     // See ~Shader (setSource(nullptr)
     for ( auto& s : m_shaderObjects )
     {
-        s.reset( nullptr );
+        s.second.reset( nullptr );
     }
     for ( auto& s : m_shaderSources )
     {
@@ -63,6 +108,7 @@ void ShaderProgram::loadShader( ShaderType type,
                                 const std::string& name,
                                 const std::set<std::string>& props,
                                 const std::vector<std::pair<std::string, ShaderType>>& includes,
+                                bool fromFile,
                                 const std::string& version ) {
 #ifdef OS_MACOS
     if ( type == ShaderType_COMPUTE )
@@ -75,8 +121,6 @@ void ShaderProgram::loadShader( ShaderType type,
     // Paths in which globjects will be looking for shaders includes.
     // "/" refer to the root of the directory structure conaining the shader (i.e. the Shaders/
     // directory).
-
-    auto loadedSource = globjects::Shader::sourceFromFile( name );
 
     // header string that contains #version and pre-declarations ...
     std::string shaderHeader;
@@ -109,23 +153,36 @@ void ShaderProgram::loadShader( ShaderType type,
             { return a; }
         } );
 
-    auto fullsource = globjects::Shader::sourceFromString( shaderHeader + loadedSource->string() );
+    std::unique_ptr<globjects::StaticStringSource> fullsource{nullptr};
+    if ( fromFile )
+    {
+        LOG( logDEBUG ) << "Loading shader " << name;
+        auto loadedSource = globjects::Shader::sourceFromFile( name );
+        fullsource = globjects::Shader::sourceFromString( shaderHeader + loadedSource->string() );
+    }
+    else
+    { fullsource = globjects::Shader::sourceFromString( shaderHeader + name ); }
 
     // Radium V2 : allow to define global replacement per renderer, shader, rendertechnique ...
     auto shaderSource = globjects::Shader::applyGlobalReplacements( fullsource.get() );
 
-    // Workaround globject #include bug ...
-    // Radium V2 : update globject to see if tis bug is always here ...
+#if 1
+    // Workaround for #include directive
+    // Radium VB2 : rely on GL_ARB_shading_language_include to manage includes
     std::string preprocessedSource = preprocessIncludes( name, shaderSource->string(), 0 );
 
     auto ptrSource = globjects::Shader::sourceFromString( preprocessedSource );
-
-    addShaderFromSource( type, std::move( ptrSource ), name );
+#else
+    // this code do not work, include are not processed :( maybe a globjects bug.
+    auto ptrSource = globjects::Shader::sourceFromString( shaderSource->string() );
+#endif
+    addShaderFromSource( type, std::move( ptrSource ), name, fromFile );
 }
 
 void ShaderProgram::addShaderFromSource( ShaderType type,
                                          std::unique_ptr<globjects::StaticStringSource>&& ptrSource,
-                                         const std::string& name ) {
+                                         const std::string& name,
+                                         bool fromFile ) {
 
     auto shader = globjects::Shader::create( getTypeAsGLEnum( type ) );
 
@@ -134,61 +191,12 @@ void ShaderProgram::addShaderFromSource( ShaderType type,
     shader->compile();
 
     GL_CHECK_ERROR;
-    m_shaderObjects[type].swap( shader );
+    m_shaderObjects[type].first = fromFile;
+    m_shaderObjects[type].second.swap( shader );
+
     m_shaderSources[type].swap( ptrSource );
     // ^^^ raw ptrSource are stored in shader object, need to keep them valid during
     // shader life
-}
-
-GLenum ShaderProgram::getTypeAsGLEnum( ShaderType type ) const {
-    switch ( type )
-    {
-    case ShaderType_VERTEX:
-        return GL_VERTEX_SHADER;
-    case ShaderType_FRAGMENT:
-        return GL_FRAGMENT_SHADER;
-    case ShaderType_GEOMETRY:
-        return GL_GEOMETRY_SHADER;
-    case ShaderType_TESS_EVALUATION:
-        return GL_TESS_EVALUATION_SHADER;
-    case ShaderType_TESS_CONTROL:
-        return GL_TESS_CONTROL_SHADER;
-#ifndef OS_MACOS
-    // GL_COMPUTE_SHADER requires OpenGL >= 4.2, Apple provides OpenGL 4.1
-    case ShaderType_COMPUTE:
-        return GL_COMPUTE_SHADER;
-#endif
-    default:
-        CORE_ERROR( "Wrong ShaderType" );
-    }
-
-    // Should never get there
-    return GL_ZERO;
-}
-
-ShaderType ShaderProgram::getGLenumAsType( GLenum type ) const {
-    switch ( type )
-    {
-    case GL_VERTEX_SHADER:
-        return ShaderType_VERTEX;
-    case GL_FRAGMENT_SHADER:
-        return ShaderType_FRAGMENT;
-    case GL_GEOMETRY_SHADER:
-        return ShaderType_GEOMETRY;
-    case GL_TESS_EVALUATION_SHADER:
-        return ShaderType_TESS_EVALUATION;
-    case GL_TESS_CONTROL_SHADER:
-        return ShaderType_TESS_CONTROL;
-#ifndef OS_MACOS
-    case GL_COMPUTE_SHADER:
-        return ShaderType_COMPUTE;
-#endif
-    default:
-        CORE_ERROR( "Wrong GLenum" );
-    }
-
-    // Should never get there
-    return ShaderType_COUNT;
 }
 
 void ShaderProgram::load( const ShaderConfiguration& shaderConfig ) {
@@ -201,13 +209,13 @@ void ShaderProgram::load( const ShaderConfiguration& shaderConfig ) {
 
     for ( size_t i = 0; i < ShaderType_COUNT; ++i )
     {
-        if ( !m_configuration.m_shaders[i].empty() )
+        if ( !m_configuration.m_shaders[i].first.empty() )
         {
-            LOG( logDEBUG ) << "Loading shader " << m_configuration.m_shaders[i];
             loadShader( ShaderType( i ),
-                        m_configuration.m_shaders[i],
+                        m_configuration.m_shaders[i].first,
                         m_configuration.getProperties(),
                         m_configuration.getIncludes(),
+                        m_configuration.m_shaders[i].second,
                         m_configuration.m_version );
         }
     }
@@ -218,9 +226,9 @@ void ShaderProgram::load( const ShaderConfiguration& shaderConfig ) {
 void ShaderProgram::link() {
     m_program = globjects::Program::create();
 
-    for ( int i = 0; i < ShaderType_COUNT; ++i )
+    for ( unsigned int i = 0; i < ShaderType_COUNT; ++i )
     {
-        if ( m_shaderObjects[i] ) { m_program->attach( m_shaderObjects[i].get() ); }
+        if ( m_shaderObjects[i].second ) { m_program->attach( m_shaderObjects[i].second.get() ); }
     }
 
     m_program->setParameter( GL_PROGRAM_SEPARABLE, GL_TRUE );
@@ -237,9 +245,28 @@ void ShaderProgram::link() {
         auto type = m_program->getActiveUniform( i, GL_UNIFORM_TYPE );
 
         //!\todo add other sampler type (or manage all type of sampler automatically)
-        if ( type == GL_SAMPLER_2D || type == GL_SAMPLER_CUBE || type == GL_SAMPLER_2D_RECT ||
-             type == GL_SAMPLER_2D_SHADOW || type == GL_SAMPLER_3D ||
-             type == GL_SAMPLER_CUBE_SHADOW )
+        if ( type == GL_SAMPLER_1D || type == GL_SAMPLER_2D || type == GL_SAMPLER_3D ||
+             type == GL_SAMPLER_CUBE || type == GL_SAMPLER_1D_SHADOW ||
+             type == GL_SAMPLER_2D_SHADOW || type == GL_SAMPLER_CUBE_SHADOW ||
+             type == GL_SAMPLER_2D_RECT || type == GL_SAMPLER_2D_RECT_SHADOW ||
+             type == GL_SAMPLER_1D_ARRAY || type == GL_SAMPLER_2D_ARRAY ||
+             type == GL_SAMPLER_BUFFER || type == GL_SAMPLER_1D_ARRAY_SHADOW ||
+             type == GL_SAMPLER_2D_ARRAY_SHADOW || type == GL_INT_SAMPLER_1D ||
+             type == GL_INT_SAMPLER_2D || type == GL_INT_SAMPLER_3D ||
+             type == GL_INT_SAMPLER_CUBE || type == GL_INT_SAMPLER_2D_RECT ||
+             type == GL_INT_SAMPLER_1D_ARRAY || type == GL_INT_SAMPLER_2D_ARRAY ||
+             type == GL_INT_SAMPLER_BUFFER || type == GL_UNSIGNED_INT_SAMPLER_1D ||
+             type == GL_UNSIGNED_INT_SAMPLER_2D || type == GL_UNSIGNED_INT_SAMPLER_3D ||
+             type == GL_UNSIGNED_INT_SAMPLER_CUBE || type == GL_UNSIGNED_INT_SAMPLER_2D_RECT ||
+             type == GL_UNSIGNED_INT_SAMPLER_1D_ARRAY || type == GL_UNSIGNED_INT_SAMPLER_2D_ARRAY ||
+             type == GL_UNSIGNED_INT_SAMPLER_BUFFER || type == GL_SAMPLER_CUBE_MAP_ARRAY ||
+             type == GL_SAMPLER_CUBE_MAP_ARRAY_SHADOW || type == GL_INT_SAMPLER_CUBE_MAP_ARRAY ||
+             type == GL_UNSIGNED_INT_SAMPLER_CUBE_MAP_ARRAY || type == GL_SAMPLER_2D_MULTISAMPLE ||
+             type == GL_INT_SAMPLER_2D_MULTISAMPLE ||
+             type == GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE ||
+             type == GL_SAMPLER_2D_MULTISAMPLE_ARRAY ||
+             type == GL_INT_SAMPLER_2D_MULTISAMPLE_ARRAY ||
+             type == GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY )
         {
             auto location      = m_program->getUniformLocation( name );
             textureUnits[name] = TextureBinding( texUnit++, location );
@@ -263,16 +290,16 @@ void ShaderProgram::unbind() const {
 void ShaderProgram::reload() {
     for ( auto& s : m_shaderObjects )
     {
-        /// \todo find a way to reload shader without source code file name.
-        if ( s != nullptr && !s->name().empty() )
+        if ( s.second != nullptr )
         {
-            LOG( logDEBUG ) << "Reloading shader " << s->name();
+            if ( s.first ) { LOG( logDEBUG ) << "Reloading shader " << s.second->name(); }
 
-            m_program->detach( s.get() );
-            loadShader( getGLenumAsType( s->type() ),
-                        s->name(),
+            m_program->detach( s.second.get() );
+            loadShader( getGLenumAsType( s.second->type() ),
+                        s.second->name(),
                         m_configuration.getProperties(),
-                        m_configuration.getIncludes() );
+                        m_configuration.getIncludes(),
+                        s.first );
         }
     }
 
@@ -406,6 +433,7 @@ std::string ShaderProgram::preprocessIncludes( const std::string& name,
                                                const std::string& shader,
                                                int level,
                                                int line ) {
+    CORE_UNUSED( line ); // left for radium v2 ??
     CORE_ERROR_IF( level < 32, "Shader inclusion depth limit reached." );
 
     std::string result{};

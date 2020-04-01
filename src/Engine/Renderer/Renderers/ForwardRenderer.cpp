@@ -1,12 +1,12 @@
 #include <Engine/Renderer/Renderers/ForwardRenderer.hpp>
 
+#include <Core/Containers/MakeShared.hpp>
 #include <Core/Resources/Resources.hpp>
 #include <Core/Utils/Color.hpp>
 #include <Core/Utils/Log.hpp>
 
 #include <Engine/Managers/CameraManager/DefaultCameraManager.hpp>
 #include <Engine/Managers/LightManager/DefaultLightManager.hpp>
-#include <Engine/Renderer/Light/DirLight.hpp>
 #include <Engine/Renderer/Light/Light.hpp>
 #include <Engine/Renderer/Material/Material.hpp>
 #include <Engine/Renderer/Mesh/Mesh.hpp>
@@ -18,7 +18,6 @@
 #include <Engine/Renderer/Texture/Texture.hpp>
 #include <globjects/Framebuffer.h>
 
-//#define NO_TRANSPARENCY
 namespace Ra {
 namespace Engine {
 
@@ -37,7 +36,7 @@ const GLenum buffers[] = {GL_COLOR_ATTACHMENT0,
 
 ForwardRenderer::ForwardRenderer() : Renderer() {}
 
-ForwardRenderer::~ForwardRenderer(){};
+ForwardRenderer::~ForwardRenderer() {}
 
 void ForwardRenderer::initializeInternal() {
     initShaders();
@@ -62,13 +61,11 @@ void ForwardRenderer::initShaders() {
     /// For internal resources management in a filesystem
     std::string resourcesRootDir = {Core::Resources::getRadiumResourcesDir()};
     m_shaderMgr->addShaderProgram( {{"Hdr2Ldr"},
-                                    resourcesRootDir + "Shaders/HdrToLdr/Hdr2Ldr.vert.glsl",
-                                    resourcesRootDir + "Shaders/HdrToLdr/Hdr2Ldr.frag.glsl"} );
-#ifndef NO_TRANSPARENCY
+                                    resourcesRootDir + "Shaders/2DShaders/Basic2D.vert.glsl",
+                                    resourcesRootDir + "Shaders/2DShaders/Hdr2Ldr.frag.glsl"} );
     m_shaderMgr->addShaderProgram( {{"ComposeOIT"},
-                                    resourcesRootDir + "Shaders/Basic2D.vert.glsl",
-                                    resourcesRootDir + "Shaders/ComposeOIT.frag.glsl"} );
-#endif
+                                    resourcesRootDir + "Shaders/2DShaders/Basic2D.vert.glsl",
+                                    resourcesRootDir + "Shaders/2DShaders/ComposeOIT.frag.glsl"} );
 }
 
 void ForwardRenderer::initBuffers() {
@@ -76,6 +73,7 @@ void ForwardRenderer::initBuffers() {
     m_oitFbo         = std::make_unique<globjects::Framebuffer>();
     m_postprocessFbo = std::make_unique<globjects::Framebuffer>();
     m_uiXrayFbo      = std::make_unique<globjects::Framebuffer>();
+    m_volumeFbo      = std::make_unique<globjects::Framebuffer>();
     // Forward renderer internal textures texture
 
     TextureParameters texparams;
@@ -117,6 +115,9 @@ void ForwardRenderer::initBuffers() {
     texparams.name                            = "OIT Revealage";
     m_textures[RendererTextures_OITRevealage] = std::make_unique<Texture>( texparams );
 
+    texparams.name                      = "Volume";
+    m_textures[RendererTextures_Volume] = std::make_unique<Texture>( texparams );
+
     m_secondaryTextures["Depth (fw)"]       = m_textures[RendererTextures_Depth].get();
     m_secondaryTextures["HDR Texture"]      = m_textures[RendererTextures_HDR].get();
     m_secondaryTextures["Normal Texture"]   = m_textures[RendererTextures_Normal].get();
@@ -124,11 +125,16 @@ void ForwardRenderer::initBuffers() {
     m_secondaryTextures["Specular Texture"] = m_textures[RendererTextures_Specular].get();
     m_secondaryTextures["OIT Accum"]        = m_textures[RendererTextures_OITAccum].get();
     m_secondaryTextures["OIT Revealage"]    = m_textures[RendererTextures_OITRevealage].get();
+
+    // Volume texture is not exposed ...
+    m_secondaryTextures["Volume"] = m_textures[RendererTextures_Volume].get();
 }
 
 void ForwardRenderer::updateStepInternal( const ViewingParameters& renderData ) {
-#ifndef NO_TRANSPARENCY
+    CORE_UNUSED( renderData );
+
     m_transparentRenderObjects.clear();
+    m_volumetricRenderObjects.clear();
     for ( auto it = m_fancyRenderObjects.begin(); it != m_fancyRenderObjects.end(); )
     {
         if ( ( *it )->isTransparent() )
@@ -137,11 +143,20 @@ void ForwardRenderer::updateStepInternal( const ViewingParameters& renderData ) 
             it = m_fancyRenderObjects.erase( it );
         }
         else
-        { ++it; }
+        {
+            auto material = ( *it )->getMaterial();
+            if ( material &&
+                 material->getMaterialAspect() == Material::MaterialAspect::MAT_DENSITY )
+            {
+                m_volumetricRenderObjects.push_back( *it );
+                it = m_fancyRenderObjects.erase( it );
+            }
+            else
+            { ++it; }
+        }
     }
     m_fancyTransparentCount = m_transparentRenderObjects.size();
-    // Question for Radiumv V2 Do we want ui too  ?
-#endif
+    m_fancyVolumetricCount  = m_volumetricRenderObjects.size();
 }
 
 void ForwardRenderer::renderInternal( const ViewingParameters& renderData ) {
@@ -174,17 +189,16 @@ void ForwardRenderer::renderInternal( const ViewingParameters& renderData ) {
     RenderParameters zprepassParams;
     for ( const auto& ro : m_fancyRenderObjects )
     {
-        ro->render( zprepassParams, renderData, RenderTechnique::Z_PREPASS );
+        ro->render( zprepassParams, renderData, DefaultRenderingPasses::Z_PREPASS );
     }
-#ifndef NO_TRANSPARENCY
     // Transparent objects are rendered in the Z-prepass, but only their fully opaque fragments (if
     // any) might influence the z-buffer Rendering transparent objects assuming that they discard
     // all their non-opaque fragments
     for ( const auto& ro : m_transparentRenderObjects )
     {
-        ro->render( zprepassParams, renderData, RenderTechnique::Z_PREPASS );
+        ro->render( zprepassParams, renderData, DefaultRenderingPasses::Z_PREPASS );
     }
-#endif
+    // Volumetric objects are not rendered in the Z-prepass
 
     // Opaque Lighting pass
     GL_ASSERT( glDepthFunc( GL_LEQUAL ) );
@@ -208,22 +222,21 @@ void ForwardRenderer::renderInternal( const ViewingParameters& renderData ) {
 
             for ( const auto& ro : m_fancyRenderObjects )
             {
-                ro->render( lightingpassParams, renderData, RenderTechnique::LIGHTING_OPAQUE );
+                ro->render(
+                    lightingpassParams, renderData, DefaultRenderingPasses::LIGHTING_OPAQUE );
             }
-#ifndef NO_TRANSPARENCY
             // Rendering transparent objects assuming that they discard all their non-opaque
             // fragments
             for ( const auto& ro : m_transparentRenderObjects )
             {
-                ro->render( lightingpassParams, renderData, RenderTechnique::LIGHTING_OPAQUE );
+                ro->render(
+                    lightingpassParams, renderData, DefaultRenderingPasses::LIGHTING_OPAQUE );
             }
-#endif
         }
     }
     else
     { LOG( logINFO ) << "Opaque : no light sources, unable to render"; }
 
-#ifndef NO_TRANSPARENCY
     // Transparency (blending) pass
     if ( !m_transparentRenderObjects.empty() )
     {
@@ -253,8 +266,9 @@ void ForwardRenderer::renderInternal( const ViewingParameters& renderData ) {
 
                 for ( const auto& ro : m_transparentRenderObjects )
                 {
-                    ro->render(
-                        trasparencypassParams, renderData, RenderTechnique::LIGHTING_TRANSPARENT );
+                    ro->render( trasparencypassParams,
+                                renderData,
+                                DefaultRenderingPasses::LIGHTING_TRANSPARENT );
                 }
             }
         }
@@ -278,7 +292,45 @@ void ForwardRenderer::renderInternal( const ViewingParameters& renderData ) {
         }
         GL_ASSERT( glEnable( GL_DEPTH_TEST ) );
     }
-#endif
+    // Volumetric pass
+    // Z-test is enabled but z-write must be disable to allow access to the z-buffer in the shader.
+    // This pass render in its own FBO and copy the result to the main colortexture
+    if ( !m_volumetricRenderObjects.empty() )
+    {
+        m_volumeFbo->bind();
+        GL_ASSERT( glDrawBuffers( 1, buffers ) );
+        GL_ASSERT( glClearBufferfv( GL_COLOR, 0, Core::Utils::Color::Alpha().data() ) );
+        GL_ASSERT( glDisable( GL_BLEND ) );
+        // for ( const auto& l : m_lights )
+        for ( size_t i = 0; i < m_lightmanagers[0]->count(); ++i )
+        {
+            const auto l = m_lightmanagers[0]->getLight( i );
+            RenderParameters passParams;
+            l->getRenderParameters( passParams );
+            passParams.addParameter( "imageColor", m_textures[RendererTextures_HDR].get() );
+            passParams.addParameter( "imageDepth", m_textures[RendererTextures_Depth].get() );
+
+            for ( const auto& ro : m_volumetricRenderObjects )
+            {
+                ro->render( passParams, renderData, DefaultRenderingPasses::LIGHTING_VOLUMETRIC );
+            }
+        }
+        m_volumeFbo->unbind();
+
+        m_fbo->bind();
+        GL_ASSERT( glDrawBuffers( 1, buffers ) );
+        GL_ASSERT( glDisable( GL_DEPTH_TEST ) );
+        GL_ASSERT( glEnable( GL_BLEND ) );
+        GL_ASSERT( glBlendFunc( GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA ) );
+        {
+            auto shader = m_shaderMgr->getShaderProgram( "ComposeVolume" );
+            shader->bind();
+            shader->setUniform( "volumeImage", m_textures[RendererTextures_Volume].get(), 0 );
+            m_quadMesh->render( shader );
+        }
+        GL_ASSERT( glEnable( GL_DEPTH_TEST ) );
+    }
+    // TODO : verify if this must be done before or after volumetric pass
     if ( m_wireframe )
     {
         //        m_fbo->bind();
@@ -307,7 +359,8 @@ void ForwardRenderer::renderInternal( const ViewingParameters& renderData ) {
 
                 for ( const auto& ro : m_fancyRenderObjects )
                 {
-                    ro->render( wireframepassParams, renderData, RenderTechnique::LIGHTING_OPAQUE );
+                    ro->render(
+                        wireframepassParams, renderData, DefaultRenderingPasses::LIGHTING_OPAQUE );
                 }
                 // This will not work for the moment . skipping wireframe rendering of transparent
                 // objects
@@ -336,8 +389,6 @@ void ForwardRenderer::renderInternal( const ViewingParameters& renderData ) {
 void ForwardRenderer::debugInternal( const ViewingParameters& renderData ) {
     if ( m_drawDebug )
     {
-        const ShaderProgram* shader;
-
         m_postprocessFbo->bind();
         GL_ASSERT( glDisable( GL_BLEND ) );
         GL_ASSERT( glEnable( GL_DEPTH_TEST ) );
@@ -359,29 +410,13 @@ void ForwardRenderer::debugInternal( const ViewingParameters& renderData ) {
         // Draw X rayed objects always on top of normal objects
         GL_ASSERT( glDepthMask( GL_TRUE ) );
         GL_ASSERT( glClear( GL_DEPTH_BUFFER_BIT ) );
+        RenderParameters xrayLightParams;
+        xrayLightParams.addParameter( "light.color", Ra::Core::Utils::Color::Grey( 5.0 ) );
+        xrayLightParams.addParameter( "light.type", Light::LightType::DIRECTIONAL );
+        xrayLightParams.addParameter( "light.directional.direction", Core::Vector3( 0, -1, 0 ) );
         for ( const auto& ro : m_xrayRenderObjects )
         {
-            if ( ro->isVisible() )
-            {
-                shader = ro->getRenderTechnique()->getShader();
-
-                // bind data
-                shader->bind();
-                // lighting for Xray : fixed
-                shader->setUniform( "light.color", Ra::Core::Utils::Color::Grey( 5.0 ) );
-                shader->setUniform( "light.type", Light::LightType::DIRECTIONAL );
-                shader->setUniform( "light.directional.direction", Core::Vector3( 0, -1, 0 ) );
-
-                Core::Matrix4 M = ro->getTransformAsMatrix();
-                shader->setUniform( "transform.proj", renderData.projMatrix );
-                shader->setUniform( "transform.view", renderData.viewMatrix );
-                shader->setUniform( "transform.model", M );
-
-                ro->getRenderTechnique()->getMaterial()->bind( shader );
-
-                // render
-                ro->getMesh()->render( shader );
-            }
+            if ( ro->isVisible() ) { ro->render( xrayLightParams, renderData ); }
         }
         m_uiXrayFbo->unbind();
     }
@@ -389,7 +424,6 @@ void ForwardRenderer::debugInternal( const ViewingParameters& renderData ) {
 
 // Draw UI stuff, always drawn on top of everything else + clear ZMask
 void ForwardRenderer::uiInternal( const ViewingParameters& renderData ) {
-    const ShaderProgram* shader;
 
     m_uiXrayFbo->bind();
     glDrawBuffers( 1, buffers );
@@ -402,7 +436,7 @@ void ForwardRenderer::uiInternal( const ViewingParameters& renderData ) {
     {
         if ( ro->isVisible() )
         {
-            shader = ro->getRenderTechnique()->getShader();
+            auto shader = ro->getRenderTechnique()->getShader();
 
             // bind data
             shader->bind();
@@ -421,7 +455,8 @@ void ForwardRenderer::uiInternal( const ViewingParameters& renderData ) {
             shader->setUniform( "transform.view", renderData.viewMatrix );
             shader->setUniform( "transform.model", M );
 
-            ro->getRenderTechnique()->getMaterial()->bind( shader );
+            auto shaderParameter = ro->getRenderTechnique()->getParametersProvider();
+            if ( shaderParameter != nullptr ) shaderParameter->getParameters().bind( shader );
 
             // render
             ro->getMesh()->render( shader );
@@ -461,6 +496,7 @@ void ForwardRenderer::resizeInternal() {
     m_textures[RendererTextures_Specular]->resize( m_width, m_height );
     m_textures[RendererTextures_OITAccum]->resize( m_width, m_height );
     m_textures[RendererTextures_OITRevealage]->resize( m_width, m_height );
+    m_textures[RendererTextures_Volume]->resize( m_width, m_height );
 
     m_fbo->bind();
     m_fbo->attachTexture( GL_DEPTH_ATTACHMENT, m_textures[RendererTextures_Depth]->texture() );
@@ -471,25 +507,34 @@ void ForwardRenderer::resizeInternal() {
     if ( m_fbo->checkStatus() != GL_FRAMEBUFFER_COMPLETE )
     { LOG( logERROR ) << "FBO Error (ForwardRenderer::m_fbo): " << m_fbo->checkStatus(); }
 
-#ifndef NO_TRANSPARENCY
+    m_volumeFbo->bind();
+    m_volumeFbo->attachTexture( GL_DEPTH_ATTACHMENT,
+                                m_textures[RendererTextures_Depth]->texture() );
+    m_volumeFbo->attachTexture( GL_COLOR_ATTACHMENT0,
+                                m_textures[RendererTextures_Volume]->texture() );
+    if ( m_volumeFbo->checkStatus() != GL_FRAMEBUFFER_COMPLETE )
+    {
+        LOG( logERROR ) << "FBO Error (ForwardRenderer::m_volumeFbo) : "
+                        << m_volumeFbo->checkStatus();
+    }
+
     m_oitFbo->bind();
     m_oitFbo->attachTexture( GL_DEPTH_ATTACHMENT, m_textures[RendererTextures_Depth]->texture() );
     m_oitFbo->attachTexture( GL_COLOR_ATTACHMENT0,
                              m_textures[RendererTextures_OITAccum]->texture() );
     m_oitFbo->attachTexture( GL_COLOR_ATTACHMENT1,
                              m_textures[RendererTextures_OITRevealage]->texture() );
-    if ( m_fbo->checkStatus() != GL_FRAMEBUFFER_COMPLETE )
-    { LOG( logERROR ) << "FBO Error (ForwardRenderer::m_oitFbo) : " << m_fbo->checkStatus(); }
-#endif
+    if ( m_oitFbo->checkStatus() != GL_FRAMEBUFFER_COMPLETE )
+    { LOG( logERROR ) << "FBO Error (ForwardRenderer::m_oitFbo) : " << m_oitFbo->checkStatus(); }
 
     m_postprocessFbo->bind();
     m_postprocessFbo->attachTexture( GL_DEPTH_ATTACHMENT,
                                      m_textures[RendererTextures_Depth]->texture() );
     m_postprocessFbo->attachTexture( GL_COLOR_ATTACHMENT0, m_fancyTexture->texture() );
-    if ( m_fbo->checkStatus() != GL_FRAMEBUFFER_COMPLETE )
+    if ( m_postprocessFbo->checkStatus() != GL_FRAMEBUFFER_COMPLETE )
     {
         LOG( logERROR ) << "FBO Error (ForwardRenderer::m_postprocessFbo) : "
-                        << m_fbo->checkStatus();
+                        << m_postprocessFbo->checkStatus();
     }
 
     // FIXED : when m_postprocessFbo use the RendererTextures_Depth, the depth buffer is erased and
@@ -499,10 +544,49 @@ void ForwardRenderer::resizeInternal() {
     m_uiXrayFbo->bind();
     m_uiXrayFbo->attachTexture( GL_DEPTH_ATTACHMENT, Renderer::m_depthTexture->texture() );
     m_uiXrayFbo->attachTexture( GL_COLOR_ATTACHMENT0, m_fancyTexture->texture() );
-    if ( m_fbo->checkStatus() != GL_FRAMEBUFFER_COMPLETE )
-    { LOG( logERROR ) << "FBO Error (ForwardRenderer::m_uiXrayFbo) : " << m_fbo->checkStatus(); }
+    if ( m_uiXrayFbo->checkStatus() != GL_FRAMEBUFFER_COMPLETE )
+    {
+        LOG( logERROR ) << "FBO Error (ForwardRenderer::m_uiXrayFbo) : "
+                        << m_uiXrayFbo->checkStatus();
+    }
     // finished with fbo, undbind to bind default
     globjects::Framebuffer::unbind();
+}
+
+/*
+ * Build renderTechnique for Forward Renderer : this is the default in Radium, so create Default
+ * Render Technique
+ */
+bool ForwardRenderer::buildRenderTechnique( RenderObject* ro ) const {
+    auto material = ro->getMaterial();
+    auto builder  = EngineRenderTechniques::getDefaultTechnique( material->getMaterialName() );
+    auto rt       = Core::make_shared<RenderTechnique>();
+    // define the technique for rendering this RenderObject (here, using the default from Material
+    // name)
+    builder.second( *rt, material->isTransparent() );
+    // If renderObject is a point cloud,  add geometry shader for splatting
+    auto RenderedGeometry = dynamic_cast<const Mesh*>( ro->getMesh().get() );
+    if ( RenderedGeometry && RenderedGeometry->getNumFaces() == 0 )
+    {
+        auto addGeomShader = [&rt]( Core::Utils::Index pass ) {
+            if ( rt->hasConfiguration( pass ) )
+            {
+                ShaderConfiguration config = rt->getConfiguration( pass );
+                config.addShader( ShaderType_GEOMETRY,
+                                  std::string( Core::Resources::getRadiumResourcesDir() ) +
+                                      "Shaders/Points/PointCloud.geom.glsl" );
+                rt->setConfiguration( config, pass );
+            }
+        };
+
+        addGeomShader( DefaultRenderingPasses::LIGHTING_OPAQUE );
+        addGeomShader( DefaultRenderingPasses::LIGHTING_TRANSPARENT );
+        addGeomShader( DefaultRenderingPasses::Z_PREPASS );
+    }
+    // make the material the parameter provider for the technique
+    rt->setParametersProvider( material );
+    ro->setRenderTechnique( rt );
+    return true;
 }
 
 void ForwardRenderer::updateShadowMaps() {

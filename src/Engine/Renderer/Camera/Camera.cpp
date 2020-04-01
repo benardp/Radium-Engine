@@ -1,7 +1,9 @@
 #include <Engine/Renderer/Camera/Camera.hpp>
 
+#include <Core/Containers/MakeShared.hpp>
 #include <Core/Math/Math.hpp>
 
+#include <Engine/Renderer/Material/PlainMaterial.hpp>
 #include <Engine/Renderer/Mesh/Mesh.hpp>
 #include <Engine/Renderer/RenderObject/RenderObject.hpp>
 #include <Engine/Renderer/RenderTechnique/ShaderConfigFactory.hpp>
@@ -15,10 +17,7 @@ using Core::Math::PiDiv4;
 namespace Engine {
 
 Camera::Camera( Entity* entity, const std::string& name, Scalar height, Scalar width ) :
-    Component( name, entity ),
-    m_width{width},
-    m_height{height},
-    m_aspect{width / height} {}
+    Component( name, entity ), m_width{width}, m_height{height}, m_aspect{width / height} {}
 
 Camera::~Camera() = default;
 
@@ -42,10 +41,16 @@ void Camera::initialize() {
     m->loadGeometry( std::move( triMesh ) );
 
     // Create the RO
-    m_RO = RenderObject::createRenderObject( m_name + "_RO", this, RenderObjectType::Debug, m );
-    m_RO->getRenderTechnique()->setConfiguration(
-        ShaderConfigurationFactory::getConfiguration( "Plain" ) );
+    auto mat              = Core::make_shared<PlainMaterial>( m_name + "_Material" );
+    mat->m_perVertexColor = true;
+    RenderTechnique rt;
+    auto cfg = ShaderConfigurationFactory::getConfiguration( "Plain" );
+    rt.setConfiguration( *cfg );
+    rt.setParametersProvider( mat );
+    m_RO = RenderObject::createRenderObject( m_name + "_RO", this, RenderObjectType::Debug, m, rt );
     m_RO->setLocalTransform( m_frame );
+    m_RO->setMaterial( mat );
+    show( false );
     addRenderObject( m_RO );
 }
 
@@ -70,8 +75,7 @@ void Camera::updateProjMatrix() {
 
     switch ( m_projType )
     {
-    case ProjType::ORTHOGRAPHIC:
-    {
+    case ProjType::ORTHOGRAPHIC: {
         const Scalar dx = m_zoomFactor * .5_ra;
         const Scalar dy = dx / m_aspect;
         // ------------
@@ -94,8 +98,7 @@ void Camera::updateProjMatrix() {
     }
     break;
 
-    case ProjType::PERSPECTIVE:
-    {
+    case ProjType::PERSPECTIVE: {
         // Compute projection matrix as describe in the doc of gluPerspective()
         const Scalar f    = std::tan( ( PiDiv2 ) - ( m_fov * m_zoomFactor * .5_ra ) );
         const Scalar diff = m_zNear - m_zFar;

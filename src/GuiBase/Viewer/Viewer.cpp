@@ -56,12 +56,13 @@ using namespace Core::Utils; // log
 using namespace glbinding;
 
 #define KMA_VALUE( x ) Gui::KeyMappingManager::KeyMappingAction Gui::Viewer::x;
-KeyMappingViewer;
+KeyMappingViewer
 #undef KMA_VALUE
 
-// Register all keymapings related to the viewer and its managed functionalities (Trackball camera,
-// Gizmo, ..)
-void Gui::Viewer::setupKeyMappingCallbacks() {
+    // Register all keymapings related to the viewer and its managed functionalities (Trackball
+    // camera, Gizmo, ..)
+    void
+    Gui::Viewer::setupKeyMappingCallbacks() {
     auto keyMappingManager = Gui::KeyMappingManager::getInstance();
 
     // Add default manipulator listener
@@ -592,6 +593,8 @@ bool Gui::Viewer::changeRenderer( int index ) {
         m_currentRenderer = m_renderers[index].get();
         // renderers in m_renderers are supposed to be locked
         m_currentRenderer->resize( width(), height() );
+        // Configure the renderObjects for this renderer
+        m_currentRenderer->buildAllRenderTechniques();
         m_currentRenderer->unlockRendering();
 
         LOG( logINFO ) << "[Viewer] Set active renderer: " << m_currentRenderer->getRendererName();
@@ -731,6 +734,7 @@ void Gui::Viewer::enableDebugDraw( int enabled ) {
 }
 
 void Gui::Viewer::update( const Scalar dt ) {
+    CORE_UNUSED( dt );
     if ( m_gizmoManager != nullptr ) { m_gizmoManager->updateValues(); }
 }
 

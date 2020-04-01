@@ -1,6 +1,7 @@
 #include <IO/AssimpLoader/AssimpGeometryDataLoader.hpp>
 
 #include <assimp/mesh.h>
+
 #include <assimp/scene.h>
 
 #include <Core/Asset/GeometryData.hpp>
@@ -17,8 +18,7 @@ using namespace Core::Asset; // log
 
 AssimpGeometryDataLoader::AssimpGeometryDataLoader( const std::string& filepath,
                                                     const bool VERBOSE_MODE ) :
-    DataLoader<GeometryData>( VERBOSE_MODE ),
-    m_filepath( filepath ) {}
+    DataLoader<GeometryData>( VERBOSE_MODE ), m_filepath( filepath ) {}
 
 AssimpGeometryDataLoader::~AssimpGeometryDataLoader() = default;
 
@@ -149,40 +149,60 @@ void AssimpGeometryDataLoader::fetchType( const aiMesh& mesh, GeometryData& data
     {
         switch ( face_type )
         {
-        case 0:
-        { data.setType( GeometryData::POINT_CLOUD ); }
+        case 0: {
+            data.setType( GeometryData::POINT_CLOUD );
+        }
         break;
-        case 2:
-        { data.setType( GeometryData::LINE_MESH ); }
+        case 2: {
+            data.setType( GeometryData::LINE_MESH );
+        }
         break;
-        case 3:
-        { data.setType( GeometryData::TRI_MESH ); }
+        case 3: {
+            data.setType( GeometryData::TRI_MESH );
+        }
         break;
-        case 4:
-        { data.setType( GeometryData::QUAD_MESH ); }
+        case 4: {
+            data.setType( GeometryData::QUAD_MESH );
+        }
         break;
-        default:
-        { data.setType( GeometryData::POLY_MESH ); }
+        default: {
+            data.setType( GeometryData::POLY_MESH );
+        }
         break;
         }
     }
 }
+/** \todo have something like
+template <typename I, typename TYPE, int DIM>
+void fetchVectorData( size_t sz,
+                      const I& input,
+                      Core::VectorArray<Eigen::Matrix<TYPE, DIM, 1>>& output ) {
+    const auto size = int( sz );
+    output.resize( sz );
 
+#pragma omp parallel for
+    for ( int i = 0; i < size; ++i )
+    {
+        output[i] = assimpToCore( input[i] );
+    }
+}
+*/
 void AssimpGeometryDataLoader::fetchVertices( const aiMesh& mesh, GeometryData& data ) {
-    const uint size = mesh.mNumVertices;
-    auto& vertex    = data.getVertices();
-    vertex.resize( size );
+    const int size = mesh.mNumVertices;
+    auto& vertex   = data.getVertices();
+    vertex.resize( mesh.mNumVertices );
 #pragma omp parallel for
     for ( int i = 0; i < size; ++i )
     {
         vertex[i] = assimpToCore( mesh.mVertices[i] );
     }
+    //    fetchVectorData( mesh.mNumVertices, mesh.mVertices, vertex );
 }
 
 void AssimpGeometryDataLoader::fetchEdges( const aiMesh& mesh, GeometryData& data ) const {
-    const uint size = mesh.mNumFaces;
-    auto& edge      = data.getEdges();
-    edge.resize( size );
+    const int size = mesh.mNumFaces;
+    auto& edge     = data.getEdges();
+    edge.resize( mesh.mNumFaces );
 #pragma omp parallel for
     for ( int i = 0; i < size; ++i )
     {
@@ -191,9 +211,9 @@ void AssimpGeometryDataLoader::fetchEdges( const aiMesh& mesh, GeometryData& dat
 }
 
 void AssimpGeometryDataLoader::fetchFaces( const aiMesh& mesh, GeometryData& data ) const {
-    const uint size = mesh.mNumFaces;
-    auto& face      = data.getFaces();
-    face.resize( size );
+    const int size = mesh.mNumFaces;
+    auto& face     = data.getFaces();
+    face.resize( mesh.mNumFaces );
 #pragma omp parallel for
     for ( int i = 0; i < size; ++i )
     {
@@ -202,15 +222,17 @@ void AssimpGeometryDataLoader::fetchFaces( const aiMesh& mesh, GeometryData& dat
 }
 
 void AssimpGeometryDataLoader::fetchPolyhedron( const aiMesh& mesh, GeometryData& data ) const {
+    CORE_UNUSED( mesh );
+    CORE_UNUSED( data );
     // TO DO
 }
 
 void AssimpGeometryDataLoader::fetchNormals( const aiMesh& mesh, GeometryData& data ) const {
-    auto& normal = data.getNormals();
-    normal.resize( data.getVerticesSize(), Core::Vector3::Zero() );
-
+    const int size = mesh.mNumVertices;
+    auto& normal   = data.getNormals();
+    normal.resize( mesh.mNumVertices, Core::Vector3::Zero() );
 #pragma omp parallel for
-    for ( int i = 0; i < mesh.mNumVertices; ++i )
+    for ( int i = 0; i < size; ++i )
     {
         normal[i] = assimpToCore( mesh.mNormals[i] );
         normal[i].normalize();
@@ -218,20 +240,20 @@ void AssimpGeometryDataLoader::fetchNormals( const aiMesh& mesh, GeometryData& d
 }
 
 void AssimpGeometryDataLoader::fetchTangents( const aiMesh& mesh, GeometryData& data ) const {
-    const uint size = mesh.mNumVertices;
-    auto& tangent   = data.getTangents();
-    tangent.resize( size, Core::Vector3::Zero() );
+    const int size = mesh.mNumVertices;
+    auto& tangent  = data.getTangents();
+    tangent.resize( mesh.mNumVertices, Core::Vector3::Zero() );
 #pragma omp parallel for
-    for ( int i = 0; i < size; ++i )
+    for ( int i = 0; i < int( size ); ++i )
     {
         tangent[i] = assimpToCore( mesh.mTangents[i] );
     }
 }
 
 void AssimpGeometryDataLoader::fetchBitangents( const aiMesh& mesh, GeometryData& data ) const {
-    const uint size = mesh.mNumVertices;
+    const int size  = mesh.mNumVertices;
     auto& bitangent = data.getBiTangents();
-    bitangent.resize( size );
+    bitangent.resize( mesh.mNumVertices );
 #pragma omp parallel for
     for ( int i = 0; i < size; ++i )
     {
@@ -241,9 +263,9 @@ void AssimpGeometryDataLoader::fetchBitangents( const aiMesh& mesh, GeometryData
 
 void AssimpGeometryDataLoader::fetchTextureCoordinates( const aiMesh& mesh,
                                                         GeometryData& data ) const {
-    const uint size = mesh.mNumVertices;
-    auto& texcoord  = data.getTexCoords();
-    texcoord.resize( data.getVerticesSize() );
+    const int size = mesh.mNumVertices;
+    auto& texcoord = data.getTexCoords();
+    texcoord.resize( mesh.mNumVertices );
 #pragma omp parallel for
     for ( int i = 0; i < size; ++i )
     {
@@ -254,6 +276,8 @@ void AssimpGeometryDataLoader::fetchTextureCoordinates( const aiMesh& mesh,
 
 void AssimpGeometryDataLoader::fetchColors( const aiMesh& mesh, GeometryData& data ) const {
     // TO DO
+    CORE_UNUSED( mesh );
+    CORE_UNUSED( data );
 }
 
 void AssimpGeometryDataLoader::loadMaterial( const aiMaterial& material,
@@ -266,76 +290,80 @@ void AssimpGeometryDataLoader::loadMaterial( const aiMaterial& material,
     // Radium V2 : use AI_MATKEY_SHADING_MODEL to select the apropriate model
     // (http://assimp.sourceforge.net/lib_html/material_8h.html#a93e23e0201d6ed86fb4287e15218e4cf)
     auto blinnPhongMaterial = new BlinnPhongMaterialData( matName );
-    aiColor4D color;
-    float shininess;
-    float opacity;
-    aiString name;
-
-    if ( AI_SUCCESS == material.Get( AI_MATKEY_COLOR_DIFFUSE, color ) )
+    if ( AI_DEFAULT_MATERIAL_NAME != matName )
     {
-        blinnPhongMaterial->m_hasDiffuse = true;
-        blinnPhongMaterial->m_diffuse    = assimpToCore( color );
-    }
+        aiColor4D color;
+        float shininess;
+        float opacity;
+        aiString name;
 
-    if ( AI_SUCCESS == material.Get( AI_MATKEY_COLOR_SPECULAR, color ) )
-    {
-        blinnPhongMaterial->m_hasSpecular = true;
-        blinnPhongMaterial->m_specular    = assimpToCore( color );
-    }
+        if ( AI_SUCCESS == material.Get( AI_MATKEY_COLOR_DIFFUSE, color ) )
+        {
+            blinnPhongMaterial->m_hasDiffuse = true;
+            blinnPhongMaterial->m_diffuse    = assimpToCore( color );
+        }
 
-    if ( AI_SUCCESS == material.Get( AI_MATKEY_SHININESS, shininess ) )
-    {
-        blinnPhongMaterial->m_hasShininess = true;
-        // Assimp gives the Phong exponent, we use the Blinn-Phong exponent
-        blinnPhongMaterial->m_shininess = shininess * 4;
-    }
+        if ( AI_SUCCESS == material.Get( AI_MATKEY_COLOR_SPECULAR, color ) )
+        {
+            blinnPhongMaterial->m_hasSpecular = true;
+            blinnPhongMaterial->m_specular    = assimpToCore( color );
+        }
 
-    if ( AI_SUCCESS == material.Get( AI_MATKEY_OPACITY, opacity ) )
-    {
-        blinnPhongMaterial->m_hasOpacity = true;
-        // NOTE(charly): Due to collada way of handling objects that have an alpha map, we must
-        // ensure
-        //               we do not have zeros in here.
-        blinnPhongMaterial->m_opacity = opacity < 1e-5 ? 1 : opacity;
-    }
+        if ( AI_SUCCESS == material.Get( AI_MATKEY_SHININESS, shininess ) )
+        {
+            blinnPhongMaterial->m_hasShininess = true;
+            // Assimp gives the Phong exponent, we use the Blinn-Phong exponent
+            blinnPhongMaterial->m_shininess = shininess * 4;
+        }
 
-    if ( AI_SUCCESS == material.Get( AI_MATKEY_TEXTURE( aiTextureType_DIFFUSE, 0 ), name ) )
-    {
-        blinnPhongMaterial->m_texDiffuse    = m_filepath + "/" + assimpToCore( name );
-        blinnPhongMaterial->m_hasTexDiffuse = true;
-    }
+        if ( AI_SUCCESS == material.Get( AI_MATKEY_OPACITY, opacity ) )
+        {
+            blinnPhongMaterial->m_hasOpacity = true;
+            // NOTE(charly): Due to collada way of handling objects that have an alpha map, we must
+            // ensure
+            //               we do not have zeros in here.
+            blinnPhongMaterial->m_opacity = opacity < 1e-5 ? 1 : opacity;
+        }
 
-    if ( AI_SUCCESS == material.Get( AI_MATKEY_TEXTURE( aiTextureType_SPECULAR, 0 ), name ) )
-    {
-        blinnPhongMaterial->m_texSpecular    = m_filepath + "/" + assimpToCore( name );
-        blinnPhongMaterial->m_hasTexSpecular = true;
-    }
+        if ( AI_SUCCESS == material.Get( AI_MATKEY_TEXTURE( aiTextureType_DIFFUSE, 0 ), name ) )
+        {
+            blinnPhongMaterial->m_texDiffuse    = m_filepath + "/" + assimpToCore( name );
+            blinnPhongMaterial->m_hasTexDiffuse = true;
+        }
 
-    if ( AI_SUCCESS == material.Get( AI_MATKEY_TEXTURE( aiTextureType_SHININESS, 0 ), name ) )
-    {
-        blinnPhongMaterial->m_texShininess    = m_filepath + "/" + assimpToCore( name );
-        blinnPhongMaterial->m_hasTexShininess = true;
-    }
+        if ( AI_SUCCESS == material.Get( AI_MATKEY_TEXTURE( aiTextureType_SPECULAR, 0 ), name ) )
+        {
+            blinnPhongMaterial->m_texSpecular    = m_filepath + "/" + assimpToCore( name );
+            blinnPhongMaterial->m_hasTexSpecular = true;
+        }
 
-    if ( AI_SUCCESS == material.Get( AI_MATKEY_TEXTURE( aiTextureType_NORMALS, 0 ), name ) )
-    {
-        blinnPhongMaterial->m_texNormal    = m_filepath + "/" + assimpToCore( name );
-        blinnPhongMaterial->m_hasTexNormal = true;
-    }
+        if ( AI_SUCCESS == material.Get( AI_MATKEY_TEXTURE( aiTextureType_SHININESS, 0 ), name ) )
+        {
+            blinnPhongMaterial->m_texShininess    = m_filepath + "/" + assimpToCore( name );
+            blinnPhongMaterial->m_hasTexShininess = true;
+        }
 
-    // Assimp loads objs bump maps as height maps, gj bro
-    if ( AI_SUCCESS == material.Get( AI_MATKEY_TEXTURE( aiTextureType_HEIGHT, 0 ), name ) )
-    {
-        blinnPhongMaterial->m_texNormal    = m_filepath + "/" + assimpToCore( name );
-        blinnPhongMaterial->m_hasTexNormal = true;
-    }
+        if ( AI_SUCCESS == material.Get( AI_MATKEY_TEXTURE( aiTextureType_NORMALS, 0 ), name ) )
+        {
+            blinnPhongMaterial->m_texNormal    = m_filepath + "/" + assimpToCore( name );
+            blinnPhongMaterial->m_hasTexNormal = true;
+        }
 
-    if ( AI_SUCCESS == material.Get( AI_MATKEY_TEXTURE( aiTextureType_OPACITY, 0 ), name ) )
-    {
-        blinnPhongMaterial->m_texOpacity    = m_filepath + "/" + assimpToCore( name );
-        blinnPhongMaterial->m_hasTexOpacity = true;
-    }
+        // Assimp loads objs bump maps as height maps, gj bro
+        if ( AI_SUCCESS == material.Get( AI_MATKEY_TEXTURE( aiTextureType_HEIGHT, 0 ), name ) )
+        {
+            blinnPhongMaterial->m_texNormal    = m_filepath + "/" + assimpToCore( name );
+            blinnPhongMaterial->m_hasTexNormal = true;
+        }
 
+        if ( AI_SUCCESS == material.Get( AI_MATKEY_TEXTURE( aiTextureType_OPACITY, 0 ), name ) )
+        {
+            blinnPhongMaterial->m_texOpacity    = m_filepath + "/" + assimpToCore( name );
+            blinnPhongMaterial->m_hasTexOpacity = true;
+        }
+    }
+    else
+    { LOG( logINFO ) << "Found assimp default material " << matName; }
     data.setMaterial( blinnPhongMaterial );
 }
 
@@ -352,6 +380,7 @@ void AssimpGeometryDataLoader::loadGeometryData(
         {
             auto geometry = new GeometryData();
             loadMeshData( *mesh, *geometry, usedNames );
+            // This returns always true (see assimp documentation)
             if ( scene->HasMaterials() )
             {
                 const uint matID = mesh->mMaterialIndex;

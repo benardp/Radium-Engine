@@ -1,4 +1,3 @@
-
 set( core_sources
     Animation/Animation.cpp
     Animation/BulgeCorrection.cpp
@@ -36,12 +35,13 @@ set( core_sources
     Geometry/TriangleMesh.cpp
     Geometry/TriangleOperation.cpp
     Geometry/VertexDistance.cpp
+    Geometry/Volume.cpp
     Resources/Resources.cpp
     Tasks/TaskQueue.cpp
     Utils/Attribs.cpp
     Utils/CircularIndex.cpp
     Utils/StringUtils.cpp
-    )
+)
 
 set( core_headers
     Animation/Animation.hpp
@@ -79,6 +79,7 @@ set( core_headers
     Asset/HandleToSkeleton.hpp
     Asset/LightData.hpp
     Asset/MaterialData.hpp
+    Asset/VolumeData.hpp
     Containers/AdjacencyList.hpp
     Containers/Algorithm.hpp
     Containers/AlignedAllocator.hpp
@@ -103,7 +104,7 @@ set( core_headers
     Geometry/MeshPrimitives.hpp
     Geometry/Normal.hpp
     Geometry/Obb.hpp
-    Geometry/OpenMesh.h
+    Geometry/OpenMesh.hpp
     Geometry/PolyLine.hpp
     Geometry/RayCast.hpp
     Geometry/Spline.hpp
@@ -111,6 +112,7 @@ set( core_headers
     Geometry/TriangleMesh.hpp
     Geometry/TriangleOperation.hpp
     Geometry/VertexDistance.hpp
+    Geometry/Volume.hpp
     Math/DualQuaternion.hpp
     Math/GlmAdapters.hpp
     Math/LinearAlgebra.hpp
@@ -125,9 +127,9 @@ set( core_headers
     Utils/Chronometer.hpp
     Utils/CircularIndex.hpp
     Utils/Color.hpp
+    Utils/IndexedObject.hpp
     Utils/Index.hpp
     Utils/IndexMap.hpp
-    Utils/IndexedObject.hpp
     Utils/Log.hpp
     Utils/Observable.hpp
     Utils/Singleton.hpp
@@ -136,7 +138,7 @@ set( core_headers
     Utils/StringUtils.hpp
     Utils/Timer.hpp
     Utils/Version.hpp
-    )
+)
 
 set( core_inlines
     Animation/HandleArray.inl
@@ -168,4 +170,4 @@ set( core_inlines
     Utils/CircularIndex.inl
     Utils/Index.inl
     Utils/IndexMap.inl
-    )
+)

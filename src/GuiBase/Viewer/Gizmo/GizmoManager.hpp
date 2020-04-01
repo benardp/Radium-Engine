@@ -1,5 +1,4 @@
-#ifndef RADIUMENGINE_GIZMO_MANAGER_HPP_
-#define RADIUMENGINE_GIZMO_MANAGER_HPP_
+#pragma once
 
 #include <memory>
 
@@ -27,7 +26,7 @@ class RA_GUIBASE_API GizmoManager : public QObject,
     friend class KeyMappingManageable<GizmoManager>;
 
   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW;
+    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     enum GizmoType { NONE, TRANSLATION, ROTATION, SCALE };
 
     explicit GizmoManager( QObject* parent = nullptr );
@@ -92,5 +91,3 @@ class RA_GUIBASE_API GizmoManager : public QObject,
 };
 } // namespace Gui
 } // namespace Ra
-
-#endif // RADIUMENGINE_GIZMO_MANAGER_HPP_

@@ -1,5 +1,4 @@
-#ifndef RADIUMENGINE_RESOURCES_HPP
-#define RADIUMENGINE_RESOURCES_HPP
+#pragma once
 #include <Core/RaCore.hpp>
 
 namespace Ra {
@@ -39,9 +38,12 @@ RA_CORE_API std::string getBaseDir();
 class RA_CORE_API ResourcesLocator
 {
   public:
-    /// Construct a resource locator tha will offset the path to the dynamic library that contains
+    /// Construct a resource locator that will offset the path to the dynamic library that contains
     /// the given symbol by the given offset.
     explicit ResourcesLocator( void* symbol, const std::string& offset = "../" );
+    /// Construct a resource locator that will search for the given pattern starting from the offset
+    /// the path to the dynamic library or executable that contains the given symbol.
+    explicit ResourcesLocator( void* symbol, std::string pattern, const std::string& offset );
     const std::string& getBasePath();
 
   private:
@@ -50,4 +52,3 @@ class RA_CORE_API ResourcesLocator
 } // namespace Resources
 } // namespace Core
 } // namespace Ra
-#endif // RADIUMENGINE_RESOURCES_HPP

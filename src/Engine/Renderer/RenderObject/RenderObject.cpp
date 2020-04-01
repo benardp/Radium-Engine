@@ -5,6 +5,7 @@
 #include <Engine/Component/Component.hpp>
 #include <Engine/Renderer/Displayable/DisplayableObject.hpp>
 #include <Engine/Renderer/Material/Material.hpp>
+#include <Engine/Renderer/OpenGL/OpenGL.hpp>
 #include <Engine/Renderer/RenderObject/RenderObjectManager.hpp>
 #include <Engine/Renderer/RenderTechnique/RenderParameters.hpp>
 
@@ -12,8 +13,8 @@
 // component to give this directly ?
 #include <Engine/Entity/Entity.hpp>
 
-// Only needed to access the ViewingParameters struct
-#include <Engine/Renderer/Camera/Camera.hpp>
+#include <Core/Containers/MakeShared.hpp>
+#include <Engine/Renderer/Camera/ViewingParameters.hpp>
 
 namespace Ra {
 namespace Engine {
@@ -35,18 +36,12 @@ RenderObject* RenderObject::createRenderObject( const std::string& name,
                                                 Component* comp,
                                                 const RenderObjectType& type,
                                                 const std::shared_ptr<Displayable>& mesh,
-                                                const RenderTechnique& techniqueConfig,
-                                                const std::shared_ptr<Material>& material ) {
+                                                const RenderTechnique& techniqueConfig ) {
     auto obj = new RenderObject( name, comp, type );
     obj->setMesh( mesh );
     obj->setVisible( true );
-
-    auto rt = std::make_shared<RenderTechnique>( techniqueConfig );
-
-    if ( material != nullptr ) { rt->setMaterial( material ); }
-
+    auto rt = Core::make_shared<RenderTechnique>( techniqueConfig );
     obj->setRenderTechnique( rt );
-
     return obj;
 }
 
@@ -146,6 +141,18 @@ std::shared_ptr<RenderTechnique> RenderObject::getRenderTechnique() {
     return m_renderTechnique;
 }
 
+void RenderObject::setMaterial( const std::shared_ptr<Material>& material ) {
+    m_material = material;
+}
+
+std::shared_ptr<const Material> RenderObject::getMaterial() const {
+    return m_material;
+}
+
+std::shared_ptr<Material> RenderObject::getMaterial() {
+    return m_material;
+}
+
 void RenderObject::setMesh( const std::shared_ptr<Displayable>& mesh ) {
     m_mesh = mesh;
 }
@@ -209,36 +216,43 @@ void RenderObject::hasExpired() {
 
 void RenderObject::render( const RenderParameters& lightParams,
                            const ViewingParameters& viewParams,
-                           const ShaderProgram* shader ) {
-    if ( m_visible )
-    {
-        if ( !shader ) { return; }
-
-        // Radium V2 : avoid this temporary
-        Core::Matrix4 modelMatrix  = getTransformAsMatrix();
-        Core::Matrix4 normalMatrix = modelMatrix.inverse().transpose();
-        // bind data
-        shader->bind();
-        shader->setUniform( "transform.proj", viewParams.projMatrix );
-        shader->setUniform( "transform.view", viewParams.viewMatrix );
-        shader->setUniform( "transform.model", modelMatrix );
-        shader->setUniform( "transform.worldNormal", normalMatrix );
-        lightParams.bind( shader );
-
-        GL_CHECK_ERROR;
-        auto material = m_renderTechnique->getMaterial();
-        if ( material != nullptr ) material->bind( shader );
-        GL_CHECK_ERROR;
-        // render
-
-        getMesh()->render( shader );
-    }
+                           const ShaderProgram* shader,
+                           const RenderParameters& shaderParams ) {
+    if ( !m_visible || !shader ) { return; }
+    // Radium V2 : avoid this temporary
+    Core::Matrix4 modelMatrix  = getTransformAsMatrix();
+    Core::Matrix4 normalMatrix = modelMatrix.inverse().transpose();
+    // bind data
+    shader->bind();
+    shader->setUniform( "transform.proj", viewParams.projMatrix );
+    shader->setUniform( "transform.view", viewParams.viewMatrix );
+    shader->setUniform( "transform.model", modelMatrix );
+    shader->setUniform( "transform.worldNormal", normalMatrix );
+    lightParams.bind( shader );
+    shaderParams.bind( shader );
+    // FIXME : find another solution for FrontFacing polygons (depends on the camera matrix)
+    // This is a hack to allow correct face culling
+    // Note that this hack implies the inclusion of OpenGL.h in this file
+    if ( viewParams.viewMatrix.determinant() < 0 ) { glFrontFace( GL_CW ); }
+    else
+    { glFrontFace( GL_CCW ); }
+    m_mesh->render( shader );
 }
 
 void RenderObject::render( const RenderParameters& lightParams,
                            const ViewingParameters& viewParams,
-                           RenderTechnique::PassName passname ) {
-    render( lightParams, viewParams, getRenderTechnique()->getShader( passname ) );
+                           Core::Utils::Index passId ) {
+    if ( m_visible )
+    {
+        auto shader = getRenderTechnique()->getShader( passId );
+        if ( !shader ) { return; }
+
+        auto paramsProvider = getRenderTechnique()->getParametersProvider( passId );
+        render( lightParams,
+                viewParams,
+                shader,
+                paramsProvider ? paramsProvider->getParameters() : RenderParameters() );
+    }
 }
 
 } // namespace Engine
