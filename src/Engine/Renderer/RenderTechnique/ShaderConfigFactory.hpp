@@ -1,6 +1,7 @@
 #ifndef RADIUMENGINE_SHADERCONFIGFACTORY_HPP
 #define RADIUMENGINE_SHADERCONFIGFACTORY_HPP
 
+#include <Core/Utils/StdOptional.hpp>
 #include <string>
 
 #include <Engine/Renderer/RenderTechnique/ShaderConfiguration.hpp>
@@ -22,11 +23,10 @@ RA_ENGINE_API void addConfiguration( const ShaderConfiguration& config );
 /**
  * Get a configuration from the factory
  * @param name The configuration to get
- * @return The configuration or Default
- * @note If the requested configuration is not in the factory, return a default shader
- * configuration.
+ * @return The configuration if it exists, std::nullopt otherwise
  */
-RA_ENGINE_API ShaderConfiguration getConfiguration( const std::string& name );
+RA_ENGINE_API Core::Utils::optional<ShaderConfiguration>
+getConfiguration( const std::string& name );
 } // namespace ShaderConfigurationFactory
 
 } // namespace Engine

@@ -49,7 +49,7 @@ void LightManager::handleAssetLoading( Entity* entity, const FileData* filedata 
     // belong to the system entity (e.g. the headlight) from the list of managed lights. Beware to
     // not destroy the headlight component, that do not belong to this system, so that it could be
     // added again
-    for ( int i = 0; i < m_data->size(); )
+    for ( size_t i = 0; i < m_data->size(); )
     {
         auto l = ( *m_data )[i];
         if ( l->getEntity() == Ra::Engine::SystemEntity::getInstance() ) { m_data->remove( l ); }
@@ -65,8 +65,7 @@ void LightManager::handleAssetLoading( Entity* entity, const FileData* filedata 
 
         switch ( data->getType() )
         {
-        case LightData::DIRECTIONAL_LIGHT:
-        {
+        case LightData::DIRECTIONAL_LIGHT: {
 
             auto thelight = new Engine::DirectionalLight( entity, componentName );
             thelight->setColor( data->m_color );
@@ -74,8 +73,7 @@ void LightManager::handleAssetLoading( Entity* entity, const FileData* filedata 
             comp = thelight;
             break;
         }
-        case LightData::POINT_LIGHT:
-        {
+        case LightData::POINT_LIGHT: {
             auto thelight = new Engine::PointLight( entity, componentName );
             thelight->setColor( data->m_color );
             thelight->setPosition( data->m_pointlight.position );
@@ -85,8 +83,7 @@ void LightManager::handleAssetLoading( Entity* entity, const FileData* filedata 
             comp = thelight;
             break;
         }
-        case LightData::SPOT_LIGHT:
-        {
+        case LightData::SPOT_LIGHT: {
             auto thelight = new Engine::SpotLight( entity, componentName );
             thelight->setColor( data->m_color );
             thelight->setPosition( data->m_spotlight.position );
@@ -99,8 +96,7 @@ void LightManager::handleAssetLoading( Entity* entity, const FileData* filedata 
             comp = thelight;
             break;
         }
-        case LightData::AREA_LIGHT:
-        {
+        case LightData::AREA_LIGHT: {
             // Radium-V2 : manage real area light. For the moment, transform them in point light
             // using given position
             auto thelight = new Engine::PointLight( entity, componentName );

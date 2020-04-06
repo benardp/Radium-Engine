@@ -19,10 +19,11 @@ using Core::Math::Pi;
 
 #define KMA_VALUE( XX ) \
     Gui::KeyMappingManager::KeyMappingAction Gui::TrackballCameraManipulator::XX;
-KeyMappingCamera;
+KeyMappingCamera
 #undef KMA_VALUE
 
-void Gui::TrackballCameraManipulator::configureKeyMapping_impl() {
+    void
+    Gui::TrackballCameraManipulator::configureKeyMapping_impl() {
 
     m_keyMappingContext = Gui::KeyMappingManager::getInstance()->getContext( "CameraContext" );
     if ( m_keyMappingContext.isInvalid() )
@@ -127,10 +128,11 @@ bool Gui::TrackballCameraManipulator::handleMousePressEvent( QMouseEvent* event,
     return handled;
 }
 
-bool Gui::TrackballCameraManipulator::handleMouseMoveEvent( QMouseEvent* event,
-                                                            const Qt::MouseButtons& buttons,
-                                                            const Qt::KeyboardModifiers& modifiers,
-                                                            int /*key*/ ) {
+bool Gui::TrackballCameraManipulator::handleMouseMoveEvent(
+    QMouseEvent* event,
+    const Qt::MouseButtons& /*buttons*/,
+    const Qt::KeyboardModifiers& /* modifiers*/,
+    int /*key*/ ) {
 
     // auto action = KeyMappingManager::getInstance()->getAction( context, buttons, modifiers, key
     // );

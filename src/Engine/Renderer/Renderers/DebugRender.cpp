@@ -28,54 +28,48 @@ DebugRender::~DebugRender() = default;
 void DebugRender::initialize() {
     /// FIXME : this was not ported to globject ...
     /// \todo FIXED but not tested
-
-    auto createProgram = []( const char* vertStr, const char* fragStr ) -> ShaderProgram* {
-        ShaderProgram* prog = new ShaderProgram();
-        // return prog;
-        prog->addShaderFromSource( ShaderType_VERTEX,
-                                   globjects::Shader::sourceFromString( vertStr ) );
-        prog->addShaderFromSource( ShaderType_FRAGMENT,
-                                   globjects::Shader::sourceFromString( fragStr ) );
-        prog->link();
-
-        return prog;
+    auto setShader = []( ShaderProgramManager* manager,
+                         const std::string& configName,
+                         const char* vertexShader,
+                         const char* fragmentShader ) -> const ShaderProgram* {
+        Ra::Engine::ShaderConfiguration config{configName};
+        config.addShaderSource( Ra::Engine::ShaderType::ShaderType_VERTEX, vertexShader );
+        config.addShaderSource( Ra::Engine::ShaderType::ShaderType_FRAGMENT, fragmentShader );
+        auto added = manager->addShaderProgram( config );
+        if ( added ) { return *added; }
+        else
+        { return nullptr; }
     };
 
+    auto shaderMgr = ShaderProgramManager::getInstance();
+
     const char* lineVertStr = R"(
-#version 330
+                layout (location = 0) in vec3 in_pos;
+                layout (location = 5) in vec3 in_col;
 
-            layout (location = 0) in vec3 in_pos;
-            layout (location = 5) in vec3 in_col;
+                uniform mat4 model;
+                uniform mat4 view;
+                uniform mat4 proj;
 
-            uniform mat4 model;
-            uniform mat4 view;
-            uniform mat4 proj;
-
-            out vec3 v_color;
-            void main()
-            {
-                gl_Position = proj * view * model * vec4(in_pos, 1.0);
-                v_color = in_col;
-            }
-            )";
+                out vec3 v_color;
+                void main()
+                {
+                    gl_Position = proj * view * model * vec4(in_pos, 1.0);
+                    v_color = in_col;
+                }
+                )";
 
     const char* lineFragStr = R"(
-#version 330
+                in vec3 v_color;
+                out vec4 f_color;
 
-            in vec3 v_color;
-            out vec4 f_color;
-
-            void main()
-            {
-                f_color = vec4(v_color, 1.0);
-            }
-            )";
-
-    m_lineProg.reset( createProgram( lineVertStr, lineFragStr ) );
+                void main()
+                {
+                    f_color = vec4(v_color, 1.0);
+                }
+                )";
 
     static const char* pointVertStr = R"(
-#version 330
-
             layout (location = 0) in vec3 in_pos;
             layout (location = 1) in vec3 in_col;
 
@@ -93,51 +87,44 @@ void DebugRender::initialize() {
             )";
 
     static const char* pointFragStr = R"(
-#version 330
+                in vec3 v_color;
+                out vec4 f_color;
 
-            in vec3 v_color;
-            out vec4 f_color;
+                void main()
+                {
+                    f_color = vec4(v_color, 1.0);
+                }
+                )";
+    static const char* meshVertStr  = R"(
+                layout (location = 0) in vec3 in_pos;
+                layout (location = 5) in vec3 in_col;
 
-            void main()
-            {
-                f_color = vec4(v_color, 1.0);
-            }
-            )";
+                uniform mat4 model;
+                uniform mat4 view;
+                uniform mat4 proj;
 
-    m_pointProg.reset( createProgram( pointVertStr, pointFragStr ) );
+                out vec3 v_color;
 
-    static const char* meshVertStr = R"(
-#version 330
-
-            layout (location = 0) in vec3 in_pos;
-            layout (location = 5) in vec3 in_col;
-
-            uniform mat4 model;
-            uniform mat4 view;
-            uniform mat4 proj;
-
-            out vec3 v_color;
-
-            void main()
-            {
-                gl_Position = proj * view * model * vec4(in_pos, 1.0);
-                v_color = in_col;
-            }
-            )";
+                void main()
+                {
+                    gl_Position = proj * view * model * vec4(in_pos, 1.0);
+                    v_color = in_col;
+                }
+                )";
 
     static const char* meshFragStr = R"(
-#version 330
+                in vec3 v_color;
+                out vec4 f_color;
 
-            in vec3 v_color;
-            out vec4 f_color;
+                void main()
+                {
+                    f_color = vec4(v_color, 1.0);
+                }
+                )";
 
-            void main()
-            {
-                f_color = vec4(v_color, 1.0);
-            }
-            )";
-
-    m_meshProg.reset( createProgram( meshVertStr, meshFragStr ) );
+    m_lineProg  = setShader( shaderMgr, "dbgLineShader", lineVertStr, lineFragStr );
+    m_pointProg = setShader( shaderMgr, "dbgPointShader", pointVertStr, pointFragStr );
+    m_meshProg  = setShader( shaderMgr, "dbgMeshShader", meshVertStr, meshFragStr );
 
     GL_CHECK_ERROR;
 }
@@ -180,7 +167,7 @@ void DebugRender::renderLines( const Core::Matrix4f& viewMatrix,
         mesh.getCoreGeometry().addAttrib( Mesh::getAttribName( Mesh::VERTEX_COLOR ), colors );
         mesh.updateGL();
         ///\todo
-        mesh.render( m_lineProg.get() );
+        mesh.render( m_lineProg );
     }
 
     m_lines.clear();

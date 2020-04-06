@@ -23,6 +23,56 @@ BlinnPhongMaterial::~BlinnPhongMaterial() {
     m_textures.clear();
 }
 
+void BlinnPhongMaterial::updateRenderingParameters() {
+    // update the rendering parameters
+    m_renderParameters.addParameter( "material.kd", m_kd );
+    m_renderParameters.addParameter( "material.hasPerVertexKd", m_perVertexColor );
+    m_renderParameters.addParameter( "material.renderAsSplat", m_renderAsSplat );
+    m_renderParameters.addParameter( "material.ks", m_ks );
+    m_renderParameters.addParameter( "material.ns", m_ns );
+    m_renderParameters.addParameter( "material.alpha", std::min( m_alpha, m_kd[3] ) );
+    Texture* tex = getTexture( BlinnPhongMaterial::TextureSemantic::TEX_DIFFUSE );
+    if ( tex != nullptr )
+    {
+        m_renderParameters.addParameter( "material.tex.kd", tex );
+        m_renderParameters.addParameter( "material.tex.hasKd", 1 );
+    }
+    else
+    { m_renderParameters.addParameter( "material.tex.hasKd", 0 ); }
+    tex = getTexture( BlinnPhongMaterial::TextureSemantic::TEX_SPECULAR );
+    if ( tex != nullptr )
+    {
+        m_renderParameters.addParameter( "material.tex.ks", tex );
+        m_renderParameters.addParameter( "material.tex.hasKs", 1 );
+    }
+    else
+    { m_renderParameters.addParameter( "material.tex.hasKs", 0 ); }
+    tex = getTexture( BlinnPhongMaterial::TextureSemantic::TEX_NORMAL );
+    if ( tex != nullptr )
+    {
+        m_renderParameters.addParameter( "material.tex.normal", tex );
+        m_renderParameters.addParameter( "material.tex.hasNormal", 1 );
+    }
+    else
+    { m_renderParameters.addParameter( "material.tex.hasNormal", 0 ); }
+    tex = getTexture( BlinnPhongMaterial::TextureSemantic::TEX_SHININESS );
+    if ( tex != nullptr )
+    {
+        m_renderParameters.addParameter( "material.tex.ns", tex );
+        m_renderParameters.addParameter( "material.tex.hasNs", 1 );
+    }
+    else
+    { m_renderParameters.addParameter( "material.tex.hasNs", 0 ); }
+    tex = getTexture( BlinnPhongMaterial::TextureSemantic::TEX_ALPHA );
+    if ( tex != nullptr )
+    {
+        m_renderParameters.addParameter( "material.tex.alpha", tex );
+        m_renderParameters.addParameter( "material.tex.hasAlpha", 1 );
+    }
+    else
+    { m_renderParameters.addParameter( "material.tex.hasAlpha", 0 ); }
+}
+
 void BlinnPhongMaterial::updateGL() {
     if ( !m_isDirty ) { return; }
 
@@ -41,60 +91,8 @@ void BlinnPhongMaterial::updateGL() {
 
     m_pendingTextures.clear();
     m_isDirty = false;
-}
 
-void BlinnPhongMaterial::bind( const ShaderProgram* shader ) {
-    shader->setUniform( "material.kd", m_kd );
-    shader->setUniform( "material.hasPerVertexKd", m_hasPerVertexKd );
-    shader->setUniform( "material.renderAsSplat", m_renderAsSplat );
-    shader->setUniform( "material.ks", m_ks );
-    shader->setUniform( "material.ns", m_ns );
-    shader->setUniform( "material.alpha", std::min( m_alpha, m_kd[3] ) );
-
-    Texture* tex = getTexture( BlinnPhongMaterial::TextureSemantic::TEX_DIFFUSE );
-    if ( tex != nullptr )
-    {
-        shader->setUniformTexture( "material.tex.kd", tex );
-        shader->setUniform( "material.tex.hasKd", 1 );
-    }
-    else
-    { shader->setUniform( "material.tex.hasKd", 0 ); }
-
-    tex = getTexture( BlinnPhongMaterial::TextureSemantic::TEX_SPECULAR );
-    if ( tex != nullptr )
-    {
-        shader->setUniformTexture( "material.tex.ks", tex );
-        shader->setUniform( "material.tex.hasKs", 1 );
-    }
-    else
-    { shader->setUniform( "material.tex.hasKs", 0 ); }
-
-    tex = getTexture( BlinnPhongMaterial::TextureSemantic::TEX_NORMAL );
-    if ( tex != nullptr )
-    {
-        shader->setUniformTexture( "material.tex.normal", tex );
-        shader->setUniform( "material.tex.hasNormal", 1 );
-    }
-    else
-    { shader->setUniform( "material.tex.hasNormal", 0 ); }
-
-    tex = getTexture( BlinnPhongMaterial::TextureSemantic::TEX_SHININESS );
-    if ( tex != nullptr )
-    {
-        shader->setUniformTexture( "material.tex.ns", tex );
-        shader->setUniform( "material.tex.hasNs", 1 );
-    }
-    else
-    { shader->setUniform( "material.tex.hasNs", 0 ); }
-
-    tex = getTexture( BlinnPhongMaterial::TextureSemantic::TEX_ALPHA );
-    if ( tex != nullptr )
-    {
-        shader->setUniformTexture( "material.tex.alpha", tex );
-        shader->setUniform( "material.tex.hasAlpha", 1 );
-    }
-    else
-    { shader->setUniform( "material.tex.hasAlpha", 0 ); }
+    updateRenderingParameters();
 }
 
 bool BlinnPhongMaterial::isTransparent() const {
@@ -102,21 +100,21 @@ bool BlinnPhongMaterial::isTransparent() const {
 }
 
 void BlinnPhongMaterial::registerMaterial() {
-    /// For internal resources management in a filesystem
+    // For resources access (glsl files) in a filesystem
     std::string resourcesRootDir = {Core::Resources::getRadiumResourcesDir()};
-    // Defining Converter
+
+    // Defining the material converter
     EngineMaterialConverters::registerMaterialConverter( materialName,
                                                          BlinnPhongMaterialConverter() );
 
+    // adding the material glsl implementation file
     ShaderProgramManager::getInstance()->addNamedString(
-        "/BlinnPhongMaterial.glsl",
-        resourcesRootDir + "Shaders/Materials/BlinnPhong/BlinnPhongMaterial.glsl" );
+        "/BlinnPhong.glsl", resourcesRootDir + "Shaders/Materials/BlinnPhong/BlinnPhong.glsl" );
     // registering re-usable shaders
     Ra::Engine::ShaderConfiguration lpconfig(
         "BlinnPhong",
         resourcesRootDir + "Shaders/Materials/BlinnPhong/BlinnPhong.vert.glsl",
         resourcesRootDir + "Shaders/Materials/BlinnPhong/BlinnPhong.frag.glsl" );
-
     Ra::Engine::ShaderConfigurationFactory::addConfiguration( lpconfig );
 
     Ra::Engine::ShaderConfiguration zprepassconfig(
@@ -138,21 +136,21 @@ void BlinnPhongMaterial::registerMaterial() {
         []( Ra::Engine::RenderTechnique& rt, bool isTransparent ) {
             // Configure the technique to render this object using forward Renderer or any
             // compatible one Main pass (Mandatory) : BlinnPhong
-            auto lightpassconfig =
+            auto lightpass =
                 Ra::Engine::ShaderConfigurationFactory::getConfiguration( "BlinnPhong" );
-            rt.setConfiguration( lightpassconfig, Ra::Engine::RenderTechnique::LIGHTING_OPAQUE );
+            rt.setConfiguration( *lightpass, DefaultRenderingPasses::LIGHTING_OPAQUE );
 
             // Z prepass (Recommended) : DepthAmbiantPass
-            auto zprepassconfig =
+            auto zprepass =
                 Ra::Engine::ShaderConfigurationFactory::getConfiguration( "ZprepassBlinnPhong" );
-            rt.setConfiguration( zprepassconfig, Ra::Engine::RenderTechnique::Z_PREPASS );
+            rt.setConfiguration( *zprepass, DefaultRenderingPasses::Z_PREPASS );
             // Transparent pass (0ptional) : If Transparent ... add LitOIT
             if ( isTransparent )
             {
-                auto transparentpassconfig =
+                auto transparentpass =
                     Ra::Engine::ShaderConfigurationFactory::getConfiguration( "LitOITBlinnPhong" );
-                rt.setConfiguration( transparentpassconfig,
-                                     Ra::Engine::RenderTechnique::LIGHTING_TRANSPARENT );
+                rt.setConfiguration( *transparentpass,
+                                     DefaultRenderingPasses::LIGHTING_TRANSPARENT );
             }
         } );
 }
@@ -162,8 +160,8 @@ void BlinnPhongMaterial::unregisterMaterial() {
     EngineRenderTechniques::removeDefaultTechnique( materialName );
 }
 
-Material* BlinnPhongMaterialConverter::
-operator()( const Ra::Core::Asset::MaterialData* toconvert ) {
+Material*
+BlinnPhongMaterialConverter::operator()( const Ra::Core::Asset::MaterialData* toconvert ) {
     auto result = new Ra::Engine::BlinnPhongMaterial( toconvert->getName() );
     // we are sure here that the concrete type of "toconvert" is BlinnPhongMaterialData
     // static cst is safe here

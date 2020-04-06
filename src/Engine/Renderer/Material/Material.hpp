@@ -1,5 +1,4 @@
-#ifndef RADIUMENGINE_MATERIAL_HPP
-#define RADIUMENGINE_MATERIAL_HPP
+#pragma once
 
 #include <Engine/RaEngine.hpp>
 
@@ -10,11 +9,7 @@
 // Need to be separated to reduce compilation time
 #include <Core/Types.hpp>
 
-namespace Ra {
-namespace Engine {
-class ShaderProgram;
-}
-} // namespace Ra
+#include <Engine/Renderer/RenderTechnique/RenderParameters.hpp>
 
 namespace Ra {
 namespace Engine {
@@ -25,10 +20,19 @@ namespace Engine {
  * transparent materials.
  *
  */
-class RA_ENGINE_API Material
+class RA_ENGINE_API Material : public ShaderParameterProvider
 {
   public:
-    enum class MaterialAspect { MAT_OPAQUE, MAT_TRANSPARENT };
+    /**
+     * Identifies the type of the material.
+     *  MAT_OPAQUE and MAT_TRANSPARENT implements the GLSL "surfacic" BSDF interface
+     *  MAT_DENSITY implements the GLSL "volumetric" interface
+     */
+    enum class MaterialAspect {
+        MAT_OPAQUE,      /// <- The material is either OPAQUE or TRANSPARENT
+        MAT_TRANSPARENT, /// <- The material is TRANSPARENT
+        MAT_DENSITY      /// <- The material implements the VOLUME interface
+    };
 
   public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -45,19 +49,6 @@ class RA_ENGINE_API Material
 
   public:
     virtual ~Material() = default;
-
-    /** Update the OpenGL states used by the material.
-     * These state could be textures, precomputed tables or whater data associated to the material
-     * and given to OpenGL as a buffer object.
-     */
-    virtual void updateGL() = 0;
-
-    /** Bind the material to the given shader.
-     * This method must set the uniforms and textures of the shader to reflect the state of the
-     * material.
-     * @param shader
-     */
-    virtual void bind( const ShaderProgram* shader ) = 0;
 
     /**
      * @return the name of the material instance
@@ -77,7 +68,7 @@ class RA_ENGINE_API Material
 
     /** Get the aspect (MAT_OPAQUE or MAT_TRANSPARENT) of the material.
      *
-     * @return
+     * @return the current aspect of the Material
      */
     inline const MaterialAspect& getMaterialAspect() const;
 
@@ -86,18 +77,26 @@ class RA_ENGINE_API Material
      */
     virtual bool isTransparent() const;
 
+    /** Mark the Material as needing update before the next OpenGL call
+     *
+     */
+    inline void needUpdate();
+
   protected:
+    /// Material instance name
     std::string m_instanceName{};
-    bool m_isDirty{true};
+    /// Material aspect
     MaterialAspect m_aspect{MaterialAspect::MAT_OPAQUE};
+    /// Dirty mark : true if the openGL state of the material need to be updated before next draw call
+    bool m_isDirty{true};
 
   private:
     /// Unique material name that can be used to identify the material
     const std::string m_materialName;
+
 };
 
 } // namespace Engine
 } // namespace Ra
 
 #include <Engine/Renderer/Material/Material.inl>
-#endif

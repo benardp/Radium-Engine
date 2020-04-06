@@ -53,36 +53,31 @@ void TextureManager::loadTexture( TextureParameters& texParameters ) {
 
     switch ( n )
     {
-    case 1:
-    {
+    case 1: {
         texParameters.format         = GL_RED;
         texParameters.internalFormat = GL_R8;
     }
     break;
 
-    case 2:
-    {
+    case 2: {
         // suppose it is GL_LUMINANCE_ALPHA
         texParameters.format         = GL_RG;
         texParameters.internalFormat = GL_RG8;
     }
     break;
 
-    case 3:
-    {
+    case 3: {
         texParameters.format         = GL_RGB;
         texParameters.internalFormat = GL_RGB8;
     }
     break;
 
-    case 4:
-    {
+    case 4: {
         texParameters.format         = GL_RGBA;
         texParameters.internalFormat = GL_RGBA8;
     }
     break;
-    default:
-    {
+    default: {
         texParameters.format         = GL_RGBA;
         texParameters.internalFormat = GL_RGBA8;
     }
@@ -106,9 +101,9 @@ Texture* TextureManager::getOrLoadTexture( const TextureParameters& texParameter
                                            bool linearize ) {
     auto it = m_textures.find( texParameters.name );
     if ( it != m_textures.end() ) { return it->second; }
-    auto makeTexture = []( TextureParameters& data, bool linearize ) -> Texture* {
-        auto tex = new Texture( data );
-        tex->initializeGL( linearize );
+    auto makeTexture = []( TextureParameters& d, bool l ) -> Texture* {
+        auto tex = new Texture( d );
+        tex->initializeGL( l );
         return tex;
     };
     TextureParameters texparams = texParameters;

@@ -21,6 +21,10 @@
 #include <Engine/Managers/SignalManager/SignalManager.hpp>
 #include <Engine/Managers/SystemDisplay/SystemDisplay.hpp>
 #include <Engine/Renderer/Material/BlinnPhongMaterial.hpp>
+#include <Engine/Renderer/Material/LambertianMaterial.hpp>
+#include <Engine/Renderer/Material/MaterialConverters.hpp>
+#include <Engine/Renderer/Material/PlainMaterial.hpp>
+#include <Engine/Renderer/Material/VolumetricMaterial.hpp>
 #include <Engine/Renderer/RenderObject/RenderObject.hpp>
 #include <Engine/Renderer/RenderObject/RenderObjectManager.hpp>
 #include <Engine/Renderer/RenderTechnique/ShaderConfigFactory.hpp>
@@ -58,36 +62,36 @@ void RadiumEngine::registerDefaultPrograms() {
     // SURE that the name (first parameter) begin with a "/", otherwise it won't work !
     // Radium V2 : are these initialization required here ? They will be better in
     // Engine::Initialize .... Define a better ressources management and initialization
-    shaderProgramManager->addNamedString( "/Helpers.glsl",
-                                          m_resourcesRootDir + "Shaders/Helpers.glsl" );
-    shaderProgramManager->addNamedString( "/Structs.glsl",
-                                          m_resourcesRootDir + "Shaders/Structs.glsl" );
-    shaderProgramManager->addNamedString( "/Tonemap.glsl",
-                                          m_resourcesRootDir + "Shaders/Tonemap.glsl" );
-    shaderProgramManager->addNamedString( "/LightingFunctions.glsl",
-                                          m_resourcesRootDir + "Shaders/LightingFunctions.glsl" );
+    /* Default definiton of a transformation matrices struct */
     shaderProgramManager->addNamedString(
         "/TransformStructs.glsl", m_resourcesRootDir + "Shaders/Transform/TransformStructs.glsl" );
     shaderProgramManager->addNamedString( "/DefaultLight.glsl",
                                           m_resourcesRootDir + "Shaders/Lights/DefaultLight.glsl" );
 
-    // Engine support some built-in materials. Register here
-    Ra::Engine::ShaderConfiguration pConfig( "Plain" );
-    pConfig.addShader( ShaderType_VERTEX, m_resourcesRootDir + "Shaders/Plain.vert.glsl" );
-    pConfig.addShader( ShaderType_FRAGMENT, m_resourcesRootDir + "Shaders/Plain.frag.glsl" );
-    Ra::Engine::ShaderConfigurationFactory::addConfiguration( pConfig );
+    // VertexAttribInterface :add this name string so that each material could include the same code
+    ShaderProgramManager::getInstance()->addNamedString(
+        "/VertexAttribInterface.frag.glsl",
+        m_resourcesRootDir + "Shaders/Materials/VertexAttribInterface.frag.glsl" );
 
+    // Engine support some built-in materials. Register here
+    /// @todo find a way to integrate "Line" material into Radium Material System
     ShaderConfiguration lConfig( "Lines" );
-    lConfig.addShader( ShaderType_VERTEX, m_resourcesRootDir + "Shaders/Lines.vert.glsl" );
-    lConfig.addShader( ShaderType_FRAGMENT, m_resourcesRootDir + "Shaders/Lines.frag.glsl" );
+    lConfig.addShader( ShaderType_VERTEX, m_resourcesRootDir + "Shaders/Lines/Lines.vert.glsl" );
+    lConfig.addShader( ShaderType_FRAGMENT, m_resourcesRootDir + "Shaders/Lines/Lines.frag.glsl" );
     ShaderConfigurationFactory::addConfiguration( lConfig );
 
+    // Plain is flat or diffuse
+    PlainMaterial::registerMaterial();
     BlinnPhongMaterial::registerMaterial();
+    LambertianMaterial::registerMaterial();
+    VolumetricMaterial::registerMaterial();
 }
 
 void RadiumEngine::cleanup() {
+    PlainMaterial::unregisterMaterial();
     BlinnPhongMaterial::unregisterMaterial();
-
+    LambertianMaterial::unregisterMaterial();
+    VolumetricMaterial::unregisterMaterial();
     m_signalManager->setOn( false );
     m_entityManager.reset();
     m_renderObjectManager.reset();
@@ -120,7 +124,8 @@ void RadiumEngine::getTasks( Core::TaskQueue* taskQueue, Scalar dt ) {
 bool RadiumEngine::registerSystem( const std::string& name, System* system, int priority ) {
     if ( findSystem( name ) != m_systems.end() )
     {
-        LOG( logWARNING ) << "System " << name.c_str() << " added multiple times.";
+        LOG( logWARNING ) << "Try to add system " << name.c_str()
+                          << " multiple time. Keep the already registered one.";
         return false;
     }
 
@@ -223,7 +228,7 @@ bool RadiumEngine::loadFile( const std::string& filename ) {
     return true;
 }
 
-void RadiumEngine::releaseFile( const std::string& filename ) {
+void RadiumEngine::releaseFile() {
     m_loadedFile.reset( nullptr );
     m_loadingState = false;
 }
@@ -250,7 +255,7 @@ const std::vector<std::shared_ptr<FileLoaderInterface>>& RadiumEngine::getFileLo
 
 RA_SINGLETON_IMPLEMENTATION( RadiumEngine );
 
-const FileData& RadiumEngine::getFileData( const std::string& file ) const {
+const FileData& RadiumEngine::getFileData() const {
     CORE_ASSERT( m_loadingState, "Access to file content is only available at loading time." );
     return *( m_loadedFile.get() );
 }

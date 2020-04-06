@@ -22,6 +22,8 @@ class ShaderProgram;
 
 /**
  * Implementation of the Blinn-Phong Material BSDF.
+ * @todo due to "Material.glsl" interface modification, must test this version with all plugins,
+ * apps, ... that uses Radium Renderer
  */
 class RA_ENGINE_API BlinnPhongMaterial final : public Material
 {
@@ -35,7 +37,7 @@ class RA_ENGINE_API BlinnPhongMaterial final : public Material
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
     /**
      * Construct a named Blinn-Phongmaterial
-     * @param name The name of the material
+     * @param instanceName The name of this instance of the material
      */
     explicit BlinnPhongMaterial( const std::string& instanceName );
     /**
@@ -46,7 +48,6 @@ class RA_ENGINE_API BlinnPhongMaterial final : public Material
     ~BlinnPhongMaterial() override;
 
     void updateGL() override;
-    void bind( const ShaderProgram* shader ) override;
     bool isTransparent() const override;
 
     /**
@@ -77,11 +78,11 @@ class RA_ENGINE_API BlinnPhongMaterial final : public Material
     static void unregisterMaterial();
 
   public:
-    Core::Utils::Color m_kd{0.9, 0.9, 0.9, 1.0};
-    Core::Utils::Color m_ks{0.0, 0.0, 0.0, 1.0};
-    Scalar m_ns{1.0};
+    Core::Utils::Color m_kd{0.7, 0.7, 0.7, 1.0};
+    Core::Utils::Color m_ks{0.3, 0.3, 0.3, 1.0};
+    Scalar m_ns{64.0};
     Scalar m_alpha{1.0};
-    bool m_hasPerVertexKd{false};
+    bool m_perVertexColor{false};
     bool m_renderAsSplat{false};
 
     /**
@@ -105,6 +106,11 @@ class RA_ENGINE_API BlinnPhongMaterial final : public Material
      */
     inline TextureParameters& addTexture( const TextureSemantic& semantic,
                                           const std::string& texture );
+
+    /**
+     * Update the rendering parameters for the Material
+     */
+    void updateRenderingParameters();
 };
 
 /**

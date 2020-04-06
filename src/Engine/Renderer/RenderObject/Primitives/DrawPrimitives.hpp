@@ -1,5 +1,4 @@
-#ifndef RADIUMENGINE_DRAW_PRIMITIVES_HPP_
-#define RADIUMENGINE_DRAW_PRIMITIVES_HPP_
+#pragma once
 
 #include <Engine/RaEngine.hpp>
 
@@ -135,8 +134,11 @@ RA_ENGINE_API MeshPtr Spline( const Core::Geometry::Spline<3, 3>& spline,
                               uint pointCount,
                               const Core::Utils::Color& color,
                               Scalar scale = 1.0f );
+
+/// Display a line strip.
+RA_ENGINE_API MeshPtr LineStrip( const Core::Vector3Array& vertices,
+                                 const Core::Vector4Array& colors );
+
 } // namespace DrawPrimitives
 } // namespace Engine
 } // namespace Ra
-
-#endif // RADIUMENGINE_DRAW_PRIMITIVES_HPP_

@@ -1,9 +1,10 @@
-#include <Engine/Renderer/Material/BlinnPhongMaterial.hpp>
 #include <Engine/Renderer/RenderTechnique/RenderTechnique.hpp>
+
+#include <Engine/Renderer/Material/BlinnPhongMaterial.hpp>
+#include <Engine/Renderer/RenderTechnique/RenderParameters.hpp>
 #include <Engine/Renderer/RenderTechnique/ShaderConfigFactory.hpp>
 #include <Engine/Renderer/RenderTechnique/ShaderProgramManager.hpp>
 
-#include "RenderTechnique.hpp"
 #include <Core/Utils/Log.hpp>
 
 namespace Ra {
@@ -11,104 +12,112 @@ namespace Engine {
 
 using namespace Core::Utils; // log
 
-// For iterating on the enum easily
-const std::array<RenderTechnique::PassName, 4> allPasses = {RenderTechnique::Z_PREPASS,
-                                                            RenderTechnique::LIGHTING_OPAQUE,
-                                                            RenderTechnique::LIGHTING_TRANSPARENT,
-                                                            RenderTechnique::WIREFRAME };
+std::shared_ptr<Ra::Engine::RenderTechnique> RadiumDefaultRenderTechnique{nullptr};
 
-
-std::shared_ptr<Ra::Engine::RenderTechnique> RadiumDefaultRenderTechnique( nullptr );
-
-RenderTechnique::RenderTechnique() {
-    for ( auto p : allPasses )
+RenderTechnique::RenderTechnique() : m_numActivePass{0} {
+    for ( auto p = Index( 0 ); p < s_maxNbPasses; ++p )
     {
-        shaders[p] = nullptr;
+        m_activePasses[p]     = std::move( PassConfiguration( ShaderConfiguration(), nullptr ) );
+        m_passesParameters[p] = nullptr;
     }
 }
 
 RenderTechnique::RenderTechnique( const RenderTechnique& o ) :
-    material{o.material},
-    dirtyBits{o.dirtyBits},
-    setPasses{o.setPasses} {
-    for ( auto p : allPasses )
+    m_numActivePass{o.m_numActivePass}, m_dirtyBits{o.m_dirtyBits}, m_setPasses{o.m_setPasses} {
+    for ( auto p = Index( 0 ); p < m_numActivePass; ++p )
     {
-        if ( setPasses & p )
+        if ( m_setPasses & ( 1 << p ) )
         {
-            shaderConfig[p] = o.shaderConfig.at( p );
-            shaders[p]      = o.shaders.at( p );
+            m_activePasses[p]     = o.m_activePasses[p];
+            m_passesParameters[p] = o.m_passesParameters[p];
         }
     }
 }
 
 RenderTechnique::~RenderTechnique() = default;
 
-void RenderTechnique::setConfiguration( const ShaderConfiguration& newConfig, PassName pass ) {
-    shaderConfig[pass] = newConfig;
-    dirtyBits |= pass;
-    setPasses |= pass;
+void RenderTechnique::setConfiguration( const ShaderConfiguration& newConfig,
+                                        Core::Utils::Index pass ) {
+    m_numActivePass      = std::max( m_numActivePass, pass + 1 );
+    m_activePasses[pass] = std::move( PassConfiguration( newConfig, nullptr ) );
+    m_dirtyBits |= ( 1 << pass );
+    m_setPasses |= ( 1 << pass );
 }
 
-const ShaderProgram* RenderTechnique::getShader( PassName pass ) const {
-    if ( setPasses & pass ) { return shaders.at( pass ); }
+const ShaderProgram* RenderTechnique::getShader( Core::Utils::Index pass ) const {
+    if ( m_setPasses & ( 1 << pass ) ) { return m_activePasses[pass].second; }
+    return nullptr;
+}
+
+void RenderTechnique::setParametersProvider(
+    const std::shared_ptr<ShaderParameterProvider>& provider,
+    Core::Utils::Index pass ) {
+    if ( m_numActivePass == 0 )
+    {
+        LOG( logERROR )
+            << "Unable to set pass parameters : is passes configured using setConfiguration ? ";
+        return;
+    }
+    if ( pass.isValid() ) { m_passesParameters[pass] = provider; }
+    else
+    {
+        for ( int i = 0; i < m_numActivePass; ++i )
+        {
+            m_passesParameters[i] = provider;
+        }
+    }
+}
+
+const ShaderParameterProvider*
+RenderTechnique::getParametersProvider( Core::Utils::Index pass ) const {
+    if ( m_setPasses & ( 1 << pass ) ) { return m_passesParameters[pass].get(); }
     return nullptr;
 }
 
 void RenderTechnique::updateGL() {
-    for ( auto p : allPasses )
+    for ( auto p = Index( 0 ); p < m_numActivePass; ++p )
     {
-        if ( ( setPasses & p ) && ( ( nullptr == shaders[p] ) || ( dirtyBits & p ) ) )
+        if ( ( m_setPasses & ( 1 << p ) ) &&
+             ( ( nullptr == m_activePasses[p].second ) || ( m_dirtyBits & ( 1 << p ) ) ) )
         {
-            shaders[p] = ShaderProgramManager::getInstance()->getShaderProgram( shaderConfig[p] );
-            dirtyBits |= p;
+            m_activePasses[p].second =
+                ShaderProgramManager::getInstance()->getShaderProgram( m_activePasses[p].first );
+            m_dirtyBits |= ( 1 << p );
         }
     }
-
-    if ( material ) { material->updateGL(); }
+    for ( auto p = Index( 0 ); p < m_numActivePass; ++p )
+    {
+        if ( m_passesParameters[p] ) { m_passesParameters[p]->updateGL(); }
+    }
 }
 
-const std::shared_ptr<Material>& RenderTechnique::getMaterial() const {
-    return material;
+bool RenderTechnique::hasConfiguration( Core::Utils::Index pass ) const {
+    return m_setPasses & ( 1 << pass );
 }
 
-void RenderTechnique::resetMaterial( Material* mat ) {
-    material.reset( mat );
+const ShaderConfiguration& RenderTechnique::getConfiguration( Core::Utils::Index pass ) const {
+    return m_activePasses[pass].first;
 }
 
-void RenderTechnique::setMaterial( const std::shared_ptr<Material>& material ) {
-    RenderTechnique::material = material;
+bool RenderTechnique::shaderIsDirty( Core::Utils::Index pass ) const {
+    return m_dirtyBits & ( 1 << pass );
 }
 
-bool RenderTechnique::hasConfiguration( PassName pass ) const {
-    return shaderConfig.find( pass ) != shaderConfig.end();
-}
-
-const ShaderConfiguration& RenderTechnique::getConfiguration( PassName pass ) const {
-    return shaderConfig.at( pass );
-}
-
-// creates a Radium default rendertechnique :
-//      Z_PREPASS = Nothing
-//      LIGHTING_OPAQUE = BlinnPhong
-//      LIGHTING_TRANSPARENT = Nothing
+///////////////////////////////////////////////
 Ra::Engine::RenderTechnique RenderTechnique::createDefaultRenderTechnique() {
     if ( RadiumDefaultRenderTechnique != nullptr )
     { return *( RadiumDefaultRenderTechnique.get() ); }
     std::shared_ptr<Material> mat( new BlinnPhongMaterial( "DefaultGray" ) );
-    auto rt = new Ra::Engine::RenderTechnique;
-    rt->setMaterial( mat );
+    auto rt      = new Ra::Engine::RenderTechnique;
     auto builder = EngineRenderTechniques::getDefaultTechnique( "BlinnPhong" );
     if ( !builder.first )
     {
         LOG( logERROR ) << "Unable to create the default technique : is the Engine initialized ? ";
     }
     builder.second( *rt, false );
+    rt->setParametersProvider( mat );
     RadiumDefaultRenderTechnique.reset( rt );
     return *( RadiumDefaultRenderTechnique.get() );
-}
-
-bool RenderTechnique::shaderIsDirty( RenderTechnique::PassName pass ) const {
-    return dirtyBits & pass;
 }
 
 ///////////////////////////////////////////////
@@ -147,6 +156,11 @@ std::pair<bool, DefaultTechniqueBuilder> getDefaultTechnique( const std::string&
         LOG( logERROR ) << "Undefined default technique for " << name << " !";
     } );
     return result;
+}
+
+bool cleanup() {
+    EngineTechniqueRegistry.clear();
+    return true;
 }
 
 } // namespace EngineRenderTechniques
