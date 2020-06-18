@@ -3,6 +3,7 @@ cmake_minimum_required (VERSION 3.6)
 project (radiumio-external VERSION 1.0.0)
 
 include(ExternalProject)
+include(ExternalInclude)
 
 #------------------------------------------------------------------------------
 # Eigen - Linear Algebra library
@@ -19,14 +20,12 @@ if (RADIUM_IO_ASSIMP)
     # For now, only configure in Debug mode to work with xcode
     ExternalProject_Add(assimp
             GIT_REPOSITORY https://github.com/assimp/assimp.git
-            GIT_TAG origin/master
+            GIT_TAG tags/v5.0.1
             GIT_SHALLOW TRUE
             GIT_PROGRESS TRUE
             INSTALL_DIR "${CMAKE_INSTALL_PREFIX}"
             CMAKE_ARGS
-            -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
-            -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-            -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
+            ${RADIUM_EXTERNAL_CMAKE_OPTIONS}
             -DASSIMP_BUILD_ASSIMP_TOOLS=False
             -DASSIMP_BUILD_SAMPLES=False
             -DASSIMP_BUILD_TESTS=False
@@ -39,15 +38,12 @@ endif()
 if(RADIUM_IO_TINYPLY)
     ExternalProject_Add( tinyply
         GIT_REPOSITORY https://github.com/ddiakopoulos/tinyply.git
-        GIT_TAG origin/master
+        GIT_TAG tags/2.3.2
         GIT_SHALLOW TRUE
         GIT_PROGRESS TRUE
         INSTALL_DIR "${CMAKE_INSTALL_PREFIX}"
         CMAKE_ARGS
-        -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
-        -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-        -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
-            -DCMAKE_MACOSX_RPATH=TRUE
+        ${RADIUM_EXTERNAL_CMAKE_OPTIONS}
         -DSHARED_LIB=TRUE
         )
 endif()

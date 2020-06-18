@@ -1,14 +1,20 @@
 \page develbuildchain Radium Build Chain
 [TOC]
 
-### Installation directory
+# Installation directory
 By default, `${CMAKE_INSTALL_PREFIX}` is set as follow:
-~~~{.cmake}
-set(RADIUM_BUNDLE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bundle-${CMAKE_CXX_COMPILER_ID})
-~~~
 
-### Radium Libraries
-#### Overview
+- For release build :
+    ~~~{.cmake}
+    set(RADIUM_BUNDLE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bundle-${CMAKE_CXX_COMPILER_ID})
+    ~~~
+- For Debug orRelWithDebInfo build
+    ~~~{.cmake}
+    set(RADIUM_BUNDLE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/Bundle-${CMAKE_CXX_COMPILER_ID}-${CMAKE_BUILD_TYPE})
+    ~~~
+
+# Radium Libraries
+## Overview
 Radium is split in 5 libraries: Core, Engine, GuiBase, UI and PluginBase.
    The compilation of each library is controlled by the following cmake options
 ~~~{.cmake}
@@ -18,7 +24,7 @@ option(RADIUM_GENERATE_LIB_ENGINE     "Include Radium::Engine in CMake project" 
 option(RADIUM_GENERATE_LIB_GUIBASE    "Include Radium::GuiBase in CMake project" ON)
 option(RADIUM_GENERATE_LIB_PLUGINBASE "Include Radium::PluginBase in CMake project" ON)
 ~~~
-#### Dependencies between libraries
+## Dependencies between libraries
 ~~~{.cmake}
 add_dependencies (${ra_engine_target} PUBLIC Radium::Core)
 add_dependencies (${ra_io_target} PUBLIC Radium::Core)
@@ -30,7 +36,7 @@ add_dependencies (${ra_guibase_target} PUBLIC Radium::Core Radium::Engine Radium
  - When enabled using `RADIUM_GENERATE_LIB_***`, each library has a compilation target: `Core`,
  `Engine`, ...
 
-#### External dependencies
+## External dependencies
 Each library comes with its own dependencies, which are fetched and built at **configure** time:
 ~~~{.sh}
 $ cmake .. -DRADIUM_GENERATE_LIB_IO=OFF -DRADIUM_GENERATE_LIB_ENGINE=OFF -DRADIUM_GENERATE_LIB_GUIBASE=OFF -DRADIUM_GENERATE_LIB_PLUGINBASE=OFF -DRADIUM_ENABLE_TESTING=OFF
@@ -45,7 +51,7 @@ Sanitizers:
   + ADDRESS_SANITIZER                     OFF
   + UB_SANITIZER                          OFF
   + THREAD_SANITIZER                      OFF
-INFO[addExternalFolder] process Core /*****/Radium-Engine/src/Core/external
+[addExternalFolder] process Core /*****/Radium-Engine/src/Core/external
 [addExternalFolder] Create temporary directory
 [addExternalFolder] Configure cmake project
 [addExternalFolder] Start build

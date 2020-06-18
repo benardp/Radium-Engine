@@ -2,11 +2,9 @@
 
 #include <iostream>
 
-#include <Core/Asset/FileData.hpp>
 #include <Core/Asset/GeometryData.hpp>
 #include <Core/Containers/MakeShared.hpp>
 #include <Core/Geometry/Normal.hpp>
-#include <Core/Resources/Resources.hpp>
 #include <Core/Utils/Color.hpp>
 #include <Core/Utils/Log.hpp>
 
@@ -17,14 +15,10 @@
 #include <Engine/Renderer/Material/MaterialConverters.hpp>
 #include <Engine/Renderer/Material/VolumetricMaterial.hpp>
 #include <Engine/Renderer/Mesh/Mesh.hpp>
-#include <Engine/Renderer/RenderObject/Primitives/DrawPrimitives.hpp>
 #include <Engine/Renderer/RenderObject/RenderObject.hpp>
 #include <Engine/Renderer/RenderObject/RenderObjectManager.hpp>
 #include <Engine/Renderer/RenderObject/RenderObjectTypes.hpp>
 #include <Engine/Renderer/RenderTechnique/RenderTechnique.hpp>
-#include <Engine/Renderer/RenderTechnique/ShaderConfigFactory.hpp>
-#include <Engine/Renderer/RenderTechnique/ShaderProgram.hpp>
-#include <Engine/Renderer/RenderTechnique/ShaderProgramManager.hpp>
 
 #define CHECK_MESH_NOT_NULL \
     CORE_ASSERT( m_displayMesh != nullptr, "DisplayMesh should exist while component is alive" );
@@ -59,7 +53,7 @@ TriangleMeshComponent::TriangleMeshComponent( const std::string& name,
     GeometryComponent( name, entity ), m_displayMesh( new Engine::Mesh( name ) ) {
     setContentName( name );
     m_displayMesh->loadGeometry( std::move( mesh ) );
-    finalizeROFromGeometry( mat );
+    finalizeROFromGeometry( mat, Core::Transform::Identity() );
 }
 
 //////////// STORE Mesh/TriangleMesh here instead of an index, so don't need to request the ROMgr
@@ -69,48 +63,29 @@ TriangleMeshComponent::~TriangleMeshComponent() = default;
 
 void TriangleMeshComponent::generateTriangleMesh( const Ra::Core::Asset::GeometryData* data ) {
     m_contentName = data->getName();
-
-    std::string name( m_name );
-    name.append( "_" + m_contentName );
-
-    std::string meshName = name;
-    meshName.append( "_Mesh" );
-
-    m_displayMesh = Ra::Core::make_shared<Mesh>( meshName );
+    m_displayMesh = Ra::Core::make_shared<Mesh>( m_contentName );
 
     Ra::Core::Geometry::TriangleMesh mesh;
     Ra::Core::Geometry::TriangleMesh::PointAttribHandle::Container vertices;
     Ra::Core::Geometry::TriangleMesh::NormalAttribHandle::Container normals;
 
-    const auto T = data->getFrame();
-    const Ra::Core::Transform N( ( T.matrix() ).inverse().transpose() );
-
-    vertices.resize( data->getVerticesSize(), Ra::Core::Vector3::Zero() );
-
-#pragma omp parallel for
-    for ( int i = 0; i < int( data->getVerticesSize() ); ++i )
-    {
-        vertices[i] = T * data->getVertices()[i];
-    }
+    vertices.reserve( data->getVerticesSize() );
+    std::copy(
+        data->getVertices().begin(), data->getVertices().end(), std::back_inserter( vertices ) );
 
     if ( data->hasNormals() )
     {
-        normals.resize( data->getVerticesSize(), Ra::Core::Vector3::Zero() );
-#pragma omp parallel for
-        for ( int i = 0; i < int( data->getVerticesSize() ); ++i )
-        {
-            normals[i] = ( N * data->getNormals()[i] ).normalized();
-        }
+        normals.reserve( data->getVerticesSize() );
+        std::copy(
+            data->getNormals().begin(), data->getNormals().end(), std::back_inserter( normals ) );
     }
 
     const auto& faces = data->getFaces();
-    mesh.m_indices.resize( faces.size(), Ra::Core::Vector3ui::Zero() );
-#pragma omp parallel for
-    for ( int i = 0; i < int( faces.size() ); ++i )
-    {
-        mesh.m_indices[i] = faces[i].head<3>();
-    }
-
+    mesh.m_indices.reserve( faces.size() );
+    std::transform( faces.begin(),
+                    faces.end(),
+                    std::back_inserter( mesh.m_indices ),
+                    []( const Core::VectorNui& f ) { return f.head<3>(); } );
     mesh.setVertices( std::move( vertices ) );
     mesh.setNormals( std::move( normals ) );
 
@@ -131,10 +106,12 @@ void TriangleMeshComponent::generateTriangleMesh( const Ra::Core::Asset::Geometr
 
     m_displayMesh->loadGeometry( std::move( mesh ) );
 
-    finalizeROFromGeometry( data->hasMaterial() ? &( data->getMaterial() ) : nullptr );
+    finalizeROFromGeometry( data->hasMaterial() ? &( data->getMaterial() ) : nullptr,
+                            data->getFrame() );
 }
 
-void TriangleMeshComponent::finalizeROFromGeometry( const Core::Asset::MaterialData* data ) {
+void TriangleMeshComponent::finalizeROFromGeometry( const Core::Asset::MaterialData* data,
+                                                    Core::Transform transform ) {
     // The technique for rendering this component
     std::shared_ptr<Material> roMaterial;
     // First extract the material from asset or create a default one
@@ -159,6 +136,7 @@ void TriangleMeshComponent::finalizeROFromGeometry( const Core::Asset::MaterialD
     ro->setTransparent( roMaterial->isTransparent() );
     ro->setMaterial( roMaterial );
     setupIO( m_contentName );
+    ro->setLocalTransform( transform );
     m_roIndex = addRenderObject( ro );
 }
 
@@ -212,7 +190,7 @@ PointCloudComponent::PointCloudComponent( const std::string& name,
                                           Core::Asset::MaterialData* mat ) :
     GeometryComponent( name, entity ), m_displayMesh( new Engine::PointCloud( name ) ) {
     m_displayMesh->loadGeometry( std::move( mesh ) );
-    finalizeROFromGeometry( mat );
+    finalizeROFromGeometry( mat, Core::Transform::Identity() );
 }
 
 //////////// STORE Mesh/PointCloud here instead of an index, so don't need to request the ROMgr
@@ -224,39 +202,22 @@ void PointCloudComponent::initialize() {}
 
 void PointCloudComponent::generatePointCloud( const Ra::Core::Asset::GeometryData* data ) {
     m_contentName = data->getName();
-
-    std::string name( m_name );
-    name.append( "_" + m_contentName );
-
-    std::string meshName = name;
-    meshName.append( "_PointCloud" );
-
-    m_displayMesh = Ra::Core::make_shared<PointCloud>( meshName );
+    m_displayMesh = Ra::Core::make_shared<PointCloud>( m_contentName );
     m_displayMesh->setRenderMode( AttribArrayDisplayable::RM_POINTS );
 
     Ra::Core::Geometry::PointCloud mesh;
     Ra::Core::Geometry::PointCloud::PointAttribHandle::Container vertices;
     Ra::Core::Geometry::PointCloud::NormalAttribHandle::Container normals;
 
-    const auto T = data->getFrame();
-    const Ra::Core::Transform N( ( T.matrix() ).inverse().transpose() );
-
-    vertices.resize( data->getVerticesSize(), Ra::Core::Vector3::Zero() );
-
-#pragma omp parallel for
-    for ( int i = 0; i < int( data->getVerticesSize() ); ++i )
-    {
-        vertices[i] = T * data->getVertices()[i];
-    }
+    vertices.reserve( data->getVerticesSize() );
+    std::copy(
+        data->getVertices().begin(), data->getVertices().end(), std::back_inserter( vertices ) );
 
     if ( data->hasNormals() )
     {
-        normals.resize( data->getVerticesSize(), Ra::Core::Vector3::Zero() );
-#pragma omp parallel for
-        for ( int i = 0; i < int( data->getVerticesSize() ); ++i )
-        {
-            normals[i] = ( N * data->getNormals()[i] ).normalized();
-        }
+        normals.reserve( data->getVerticesSize() );
+        std::copy(
+            data->getNormals().begin(), data->getNormals().end(), std::back_inserter( normals ) );
     }
 
     mesh.setVertices( std::move( vertices ) );
@@ -279,10 +240,12 @@ void PointCloudComponent::generatePointCloud( const Ra::Core::Asset::GeometryDat
 
     m_displayMesh->loadGeometry( std::move( mesh ) );
 
-    finalizeROFromGeometry( data->hasMaterial() ? &( data->getMaterial() ) : nullptr );
+    finalizeROFromGeometry( data->hasMaterial() ? &( data->getMaterial() ) : nullptr,
+                            data->getFrame() );
 }
 
-void PointCloudComponent::finalizeROFromGeometry( const Core::Asset::MaterialData* data ) {
+void PointCloudComponent::finalizeROFromGeometry( const Core::Asset::MaterialData* data,
+                                                  Core::Transform transform ) {
     // The technique for rendering this component
     std::shared_ptr<Material> roMaterial;
     // First extract the material from asset or create a default one
@@ -307,6 +270,7 @@ void PointCloudComponent::finalizeROFromGeometry( const Core::Asset::MaterialDat
     ro->setTransparent( roMaterial->isTransparent() );
     ro->setMaterial( roMaterial );
     setupIO( m_contentName );
+    ro->setLocalTransform( transform );
     m_roIndex = addRenderObject( ro );
 }
 
@@ -357,21 +321,8 @@ VolumeComponent::~VolumeComponent() = default;
 void VolumeComponent::initialize() {}
 
 void VolumeComponent::generateVolumeRender( const Ra::Core::Asset::VolumeData* data ) {
-    std::string name( m_name );
-    name.append( "_" + data->getName() );
-
-    std::string roName = name;
-
-    roName.append( "_RO" );
-    std::string meshName = name;
-    meshName.append( "_Mesh" );
-
-    std::string matName = name;
-    matName.append( "_Mat" );
-
-    m_contentName = name + "_DAT_" + data->getName();
-
-    m_displayVolume = Ra::Core::make_shared<VolumeObject>( meshName );
+    m_contentName   = data->getName();
+    m_displayVolume = Ra::Core::make_shared<VolumeObject>( m_contentName );
     m_displayVolume->loadGeometry( data->volume, data->boundingBox );
 
     auto roMaterial = Ra::Core::make_shared<VolumetricMaterial>( data->getName() + "_VolMat" );
@@ -380,6 +331,7 @@ void VolumeComponent::generateVolumeRender( const Ra::Core::Asset::VolumeData* d
     roMaterial->m_sigma_s       = data->sigma_s;
     roMaterial->m_modelToMedium = data->densityToModel.inverse();
 
+    std::string roName( m_name + "_" + m_contentName + "_RO" );
     auto ro = RenderObject::createRenderObject(
         roName, this, RenderObjectType::Geometry, m_displayVolume, RenderTechnique{} );
     ro->setTransparent( roMaterial->isTransparent() );

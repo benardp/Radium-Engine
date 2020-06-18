@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.6)
+﻿cmake_minimum_required(VERSION 3.13)
 
 #------------------------------------------------------------------------------
 # Policies and global parameters for CMake
@@ -8,6 +8,10 @@ endif()
 
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
+
+# Enable helpfull warnings and C++17 for all files
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Project setup, versioning stuff here, change when changing the version
 # Note: keep the project name lower case only for easy linux packaging support
@@ -27,6 +31,8 @@ option(RADIUM_GENERATE_LIB_GUIBASE    "Include Radium::GuiBase in CMake project"
 option(RADIUM_GENERATE_LIB_PLUGINBASE "Include Radium::PluginBase in CMake project" ON)
 option(RADIUM_UPDATE_VERSION          "Update version file each time the project is compiled (update compilation time in version.cpp)" ON)
 option(RADIUM_INSTALL_DOC             "Install documentation. If RadiumDoc is compiled, install documentation to bundle directory for install target" ON)
+
+set(RADIUM_EXTERNAL_CMAKE_INSTALL_MESSAGE NEVER)
 
 set(RADIUM_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.${PROJECT_VERSION_PATCH})
 set(RADIUM_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
@@ -97,9 +103,9 @@ set(RADIUM_SHADERS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/Shaders")
 # Set default install location to RADIUM_BUNDLE_DIRECTORY
 # we do not want to install to /usr by default
 if (CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-    set (CMAKE_INSTALL_PREFIX "${RADIUM_BUNDLE_DIRECTORY}" CACHE PATH
-        "Install path prefix, prepended onto install directories." FORCE )
-    message( "Set install prefix to ${CMAKE_INSTALL_PREFIX}" )
+    set(CMAKE_INSTALL_PREFIX "${RADIUM_BUNDLE_DIRECTORY}" CACHE PATH
+        "Install path prefix, prepended onto install directories." FORCE)
+    message(STATUS "Set install prefix to ${CMAKE_INSTALL_PREFIX}")
 endif()
 
 
@@ -145,7 +151,7 @@ message("Git Changeset: ${GIT_CHANGESET}")
 # Dependency management utilities
 include(externalFunc)
 # Installation utilities
-include(installFunc)
+include(radium_setup_functions)
 
 # Documentation build
 add_subdirectory(doc)
@@ -156,18 +162,30 @@ add_subdirectory(doc)
 # Source code
 add_subdirectory(src)
 
+# Add this target so that some IDE could propose to build all radium libs and examples at once
+add_custom_target(RadiumLibs DEPENDS Core Engine GuiBase IO PluginBase)
+
+# add a target allowing to force the installation of the library
+
+set(RadiumForceInstallCommutators "")
+if (MSVC)
+        set(RadiumForceInstallCommutators "/p:Configuration=${CMAKE_BUILD_TYPE}")
+endif(MSVC)
+add_custom_target(ForceRadiumInstallation
+    COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target install -- ${RadiumForceInstallCommutators}
+    COMMENT "Forcing Radium installation")
+
 # Testing
 if( RADIUM_ENABLE_TESTING )
     enable_testing()
     add_subdirectory(tests)
+    add_dependencies(RadiumLibs CoreExampleApp RadiumExampleApps)
 endif()
 
 # Packaging stuff (deb, rpm, windows installer)
 #add_subdirectory(packaging)
 
 
-# Add this target so that some IDE could propose to build all radium libs and examples at once
-add_custom_target(RadiumLibs DEPENDS Core Engine GuiBase IO PluginBase CoreExampleApp RadiumExampleApps)
 
 
 #-------------------------------------------------------------------------------

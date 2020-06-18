@@ -1,8 +1,8 @@
-set( CMAKE_EXECUTE_PROCESS_COMMAND_ECHO STDOUT)
+include(ExternalInclude)
 
 macro(addExternalFolder NAME FOLDER )
     # External resources/repositories are downloaded and built at configuration stage
-    message(INFO "[addExternalFolder] process ${NAME} ${FOLDER}")
+    message(STATUS "[addExternalFolder] process ${NAME} ${FOLDER}")
 
     message(STATUS "[addExternalFolder] Create temporary directory")
     execute_process(
@@ -25,19 +25,7 @@ macro(addExternalFolder NAME FOLDER )
     if ( UPDATE_EXTERNAL )
         execute_process(
             COMMAND ${CMAKE_COMMAND} ${FOLDER}
-                -DCMAKE_GENERATOR=${CMAKE_GENERATOR}
-                -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
-                -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-                -DCMAKE_C_COMPILER=${CMAKE_C_COMPILER}
-                -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-                -DCMAKE_CXX_FLAGS=${CMAKE_CXX_FLAGS}
-                -DCMAKE_CXX_FLAGS_DEBUG=${CMAKE_CXX_FLAGS_DEBUG}
-                -DCMAKE_CXX_FLAGS_RELEASE=${CMAKE_CXX_FLAGS_RELEASE}
-                -DCMAKE_CXX_FLAGS_RELWITHDEBINFO=${CMAKE_CXX_FLAGS_RELWITHDEBINFO}
-                -DCMAKE_SHARED_LINKER_FLAGS=${CMAKE_SHARED_LINKER_FLAGS}
-                -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
-                -DCMAKE_MODULE_PATH=${CMAKE_MODULE_PATH}
-                -DCMAKE_MACOSX_RPATH=TRUE
+                ${RADIUM_EXTERNAL_CMAKE_OPTIONS}
                 ${ARGN}
             WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/external
             RESULT_VARIABLE ret
@@ -51,12 +39,12 @@ macro(addExternalFolder NAME FOLDER )
         string(TOLOWER ${CMAKE_GENERATOR} generator_lower)
         if (MSVC AND NOT ${generator_lower} STREQUAL "ninja")
             set(RadiumExternalMakeTarget ALL_BUILD)
-            message(INFO "[addExternalFolder] Enable compatibility mode for VS Generator")
+            message(STATUS "[addExternalFolder] Enable compatibility mode for VS Generator")
         endif ()
 
         if (APPLE AND ${generator_lower} STREQUAL "xcode")
             set(RadiumExternalMakeTarget ALL_BUILD)
-            message(INFO "[addExternalFolder] Enable compatibility mode for Xcode Generator")
+            message(STATUS "[addExternalFolder] Enable compatibility mode for Xcode Generator")
         endif ()
 
         if (${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.12)

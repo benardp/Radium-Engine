@@ -118,6 +118,8 @@ set( engine_inlines
     Renderer/Material/VolumetricMaterial.inl
     Renderer/Mesh/Mesh.inl
     Renderer/RenderTechnique/RenderParameters.inl
+    Renderer/RenderTechnique/RenderTechnique.inl
+    Renderer/RenderTechnique/ShaderProgram.inl
 )
 
 set(engine_shaders
