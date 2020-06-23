@@ -492,7 +492,6 @@ void Renderer::doPicking( const ViewingParameters& renderData ) {
             result.m_centerFrag.second = pick[1];
         }
         result.m_mode = query.m_mode;
-        result.m_brushRadius = m_brushRadius;
         m_pickingResults.push_back( result );
     }
 
