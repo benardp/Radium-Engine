@@ -450,6 +450,8 @@ void Renderer::doPicking( const ViewingParameters& renderData ) {
             result.m_vertexIdx.emplace_back( pick[1] );  // vertex idx in the element
             result.m_elementIdx.emplace_back( pick[2] ); // element idx
             result.m_edgeIdx.emplace_back( pick[3] );    // edge opposite idx for triangles
+            result.m_centerFrag.first = pick[2];         // trivial for this use case
+            result.m_centerFrag.second = pick[1];         // trivial for this use case
         }
         else
         {
@@ -471,7 +473,7 @@ void Renderer::doPicking( const ViewingParameters& renderData ) {
                     resultPerRO[pick[0]].m_vertexIdx.emplace_back( pick[1] );
                     resultPerRO[pick[0]].m_elementIdx.emplace_back( pick[2] );
                     resultPerRO[pick[0]].m_edgeIdx.emplace_back( pick[3] );
-                }
+                 }
             }
 
             auto itr = std::max_element(
@@ -482,8 +484,15 @@ void Renderer::doPicking( const ViewingParameters& renderData ) {
                     return a.second.m_vertexIdx.size() < b.second.m_vertexIdx.size();
                 } );
             result = itr->second;
+            GL_ASSERT( glReadPixels( query.m_screenCoords.x(),
+                                     query.m_screenCoords.y(),
+                                     1, 1, GL_RGBA_INTEGER,
+                                     GL_INT, pick ) );
+            result.m_centerFrag.first = pick[2];
+            result.m_centerFrag.second = pick[1];
         }
         result.m_mode = query.m_mode;
+        result.m_brushRadius = m_brushRadius;
         m_pickingResults.push_back( result );
     }
 

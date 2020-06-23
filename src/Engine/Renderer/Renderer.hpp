@@ -102,6 +102,8 @@ class RA_ENGINE_API Renderer
         std::vector<int> m_elementIdx; // Idx of the element, i.e. triangle for mesh, edge for lines
                                        // and -1 for points
         std::vector<int> m_edgeIdx;    // Idx of the opposite vertex in the triangle if mesh
+        std::pair<int, int> m_centerFrag; // Element, vertex idx of the center fragment (at the mouse cursor position)  
+        float m_brushRadius;           // Brush radius of the query
         // Note: There is exactly one triplet for each querried pixel (thus there can be doublons
         // coming from pixels). Note: Beware that the same mesh vertex would also be picked for each
         // of its adjacent triangles.
