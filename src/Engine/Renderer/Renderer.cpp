@@ -458,23 +458,40 @@ void Renderer::doPicking( const ViewingParameters& renderData ) {
             // select the results for the RO with the most representatives
             // (or first to come if same amount)
             std::map<int, PickingResult> resultPerRO;
-            for ( auto i = -m_brushRadius; i <= m_brushRadius; i += 3 )
+            const size_t length = 2 * m_brushRadius;
+            const size_t data_size = 4 * length * length; // 4 * (2 * m_brushSize)^2
+
+            if ( query.m_screenCoords.x() < 0 || query.m_screenCoords.x() > m_width - 1 ||
+                 query.m_screenCoords.y() < 0 || query.m_screenCoords.y() > m_height - 1 )
             {
-                auto h = std::round( std::sqrt( m_brushRadius * m_brushRadius - i * i ) );
-                for ( auto j = -h; j <= +h; j += 3 )
-                {
-                    const int x = query.m_screenCoords.x() + i;
-                    const int y = query.m_screenCoords.y() - j;
-                    // skip query if out of window (can occur when picking while moving outside)
-                    if ( x < 0 || x > int( m_width ) - 1 || y < 0 || y > int( m_height ) - 1 )
-                    { continue; }
-                    GL_ASSERT( glReadPixels( x, y, 1, 1, GL_RGBA_INTEGER, GL_INT, pick ) );
-                    resultPerRO[pick[0]].m_roIdx = pick[0];
-                    resultPerRO[pick[0]].m_vertexIdx.emplace_back( pick[1] );
-                    resultPerRO[pick[0]].m_elementIdx.emplace_back( pick[2] );
-                    resultPerRO[pick[0]].m_edgeIdx.emplace_back( pick[3] );
-                 }
+                result.m_roIdx = -1;
+                m_pickingResults.push_back( result );
+                continue;
             }
+
+            int x  = std::clamp( query.m_screenCoords.x() - m_brushRadius, 0.0f, m_width - 1.0f );
+            int x2 = std::clamp( query.m_screenCoords.x() + m_brushRadius, 0.0f, m_width - 1.0f );
+            int y  = std::clamp( query.m_screenCoords.y() - m_brushRadius, 0.0f, m_height - 1.0f );
+            int y2 = std::clamp( query.m_screenCoords.y() + m_brushRadius, 0.0f, m_height - 1.0f );
+            int w  = x2 - x, h = y2 - y;       
+            GLint* pixels = new GLint[data_size]; 
+            GL_ASSERT( glReadPixels( x, y, w, h, GL_RGBA_INTEGER, GL_INT, pixels ) );
+            size_t idx;
+            int brushRad = std::floor( std::min( w, h ) / 2 );
+            int offsetX = (w - 2 * brushRad) / 2, offsetY = (h - 2 * brushRad) / 2; 
+            for ( auto i = -brushRad; i <= brushRad; i += 3 )
+            {
+                auto circ_height = std::round( std::sqrt( brushRad * brushRad - i * i ) );
+                for ( auto j = -circ_height; j <= +circ_height; j += 3 )
+                {
+                    idx = 4 * (j + brushRad + offsetY) * length + 4 * (i + brushRad + offsetX);
+                    resultPerRO[pixels[idx]].m_roIdx = pixels[idx];
+                    resultPerRO[pixels[idx]].m_vertexIdx.emplace_back( pixels[idx + 1] );
+                    resultPerRO[pixels[idx]].m_elementIdx.emplace_back( pixels[idx + 2] );
+                    resultPerRO[pixels[idx]].m_edgeIdx.emplace_back( pixels[idx + 3] );
+                }
+            }
+            delete[] pixels;
 
             auto itr = std::max_element(
                 resultPerRO.begin(),
@@ -484,12 +501,8 @@ void Renderer::doPicking( const ViewingParameters& renderData ) {
                     return a.second.m_vertexIdx.size() < b.second.m_vertexIdx.size();
                 } );
             result = itr->second;
-            GL_ASSERT( glReadPixels( query.m_screenCoords.x(),
-                                     query.m_screenCoords.y(),
-                                     1, 1, GL_RGBA_INTEGER,
-                                     GL_INT, pick ) );
-            result.m_centerFrag.first = pick[2];
-            result.m_centerFrag.second = pick[1];
+            result.m_centerFrag.first = pixels[int(4 * (h / 2) * length + 4 * (w / 2)) + 2];
+            result.m_centerFrag.second = pixels[int(4 * (h / 2) * length + 4 * (w / 2)) + 1];
         }
         result.m_mode = query.m_mode;
         m_pickingResults.push_back( result );
