@@ -458,8 +458,6 @@ void Renderer::doPicking( const ViewingParameters& renderData ) {
             // select the results for the RO with the most representatives
             // (or first to come if same amount)
             std::map<int, PickingResult> resultPerRO;
-            const size_t length = 2 * m_brushRadius;
-            const size_t data_size = 4 * length * length; // 4 * (2 * m_brushSize)^2
 
             if ( query.m_screenCoords.x() < 0 || query.m_screenCoords.x() > m_width - 1 ||
                  query.m_screenCoords.y() < 0 || query.m_screenCoords.y() > m_height - 1 )
@@ -469,22 +467,21 @@ void Renderer::doPicking( const ViewingParameters& renderData ) {
                 continue;
             }
 
-            int x  = std::clamp( query.m_screenCoords.x() - m_brushRadius, 0.0f, m_width - 1.0f );
-            int x2 = std::clamp( query.m_screenCoords.x() + m_brushRadius, 0.0f, m_width - 1.0f );
-            int y  = std::clamp( query.m_screenCoords.y() - m_brushRadius, 0.0f, m_height - 1.0f );
-            int y2 = std::clamp( query.m_screenCoords.y() + m_brushRadius, 0.0f, m_height - 1.0f );
+            float dx = query.m_screenCoords.x() - m_brushRadius, dx2 = query.m_screenCoords.x() + m_brushRadius;
+            float dy = query.m_screenCoords.y() - m_brushRadius, dy2 = query.m_screenCoords.y() + m_brushRadius;
+            int x  = std::max( dx, 0.0f ), x2 = std::min( dx2, m_width - 1.0f );
+            int y  = std::max( dy, 0.0f ), y2 = std::min( dy2, m_height - 1.0f );
             int w  = x2 - x, h = y2 - y;       
+            size_t data_size = 4 * w * h;
             GLint* pixels = new GLint[data_size]; 
             GL_ASSERT( glReadPixels( x, y, w, h, GL_RGBA_INTEGER, GL_INT, pixels ) );
-            size_t idx;
-            int brushRad = std::floor( std::min( w, h ) / 2 );
-            int offsetX = (w - 2 * brushRad) / 2, offsetY = (h - 2 * brushRad) / 2; 
-            for ( auto i = -brushRad; i <= brushRad; i += 3 )
+            for ( auto i = -m_brushRadius; i <= m_brushRadius; i += 3 )
             {
-                auto circ_height = std::round( std::sqrt( brushRad * brushRad - i * i ) );
-                for ( auto j = -circ_height; j <= +circ_height; j += 3 )
+                auto circ_h = std::round( std::sqrt( m_brushRadius * m_brushRadius - i * i ) );
+                for ( auto j = -circ_h; j <= +circ_h; j += 3 )
                 {
-                    idx = 4 * (j + brushRad + offsetY) * length + 4 * (i + brushRad + offsetX);
+                    size_t idx = 4 * ( j + m_brushRadius + std::min( dy, 0.0f ) ) * w + 4 * (i + m_brushRadius + std::min( dx, 0.0f ));
+                    if ( idx < 0 || idx >= data_size - 1 ) continue;
                     resultPerRO[pixels[idx]].m_roIdx = pixels[idx];
                     resultPerRO[pixels[idx]].m_vertexIdx.emplace_back( pixels[idx + 1] );
                     resultPerRO[pixels[idx]].m_elementIdx.emplace_back( pixels[idx + 2] );
@@ -501,8 +498,10 @@ void Renderer::doPicking( const ViewingParameters& renderData ) {
                     return a.second.m_vertexIdx.size() < b.second.m_vertexIdx.size();
                 } );
             result = itr->second;
-            result.m_centerFrag.first = pixels[int(4 * (h / 2) * length + 4 * (w / 2)) + 2];
-            result.m_centerFrag.second = pixels[int(4 * (h / 2) * length + 4 * (w / 2)) + 1];
+            GL_ASSERT( glReadPixels( query.m_screenCoords.x(), query.m_screenCoords.y(),
+                                     1, 1, GL_RGBA_INTEGER, GL_INT, pick ) );
+            result.m_centerFrag.first = pick[2];
+            result.m_centerFrag.second = pick[1];
         }
         result.m_mode = query.m_mode;
         m_pickingResults.push_back( result );
