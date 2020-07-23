@@ -23,6 +23,12 @@ vec3 getWorldSpaceNormal();
 //----------------------------------------------------------------
 const float Pi = 3.141592653589793;
 
+// Implementation of the emissivity interface.
+// For now, Lambertian Material is not emissive
+vec3 getEmissiveColor( Material material, vec3 textCoord ) {
+    return vec3( 0 );
+}
+
 vec4 getBaseColor( Material material, vec3 texCoord ) {
     vec4 dc = vec4( material.color.rgb, 1 );
 

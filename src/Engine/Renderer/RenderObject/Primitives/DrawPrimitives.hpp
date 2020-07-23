@@ -24,8 +24,13 @@ namespace DrawPrimitives {
 using MeshPtr                   = std::shared_ptr<Mesh>;
 using LineMeshPtr               = std::shared_ptr<LineMesh>;
 using AttribArrayDisplayablePtr = std::shared_ptr<AttribArrayDisplayable>;
+
+///@{
+/// Renturn a render object to display the given geometry
 RA_ENGINE_API RenderObject* Primitive( Component* comp, const MeshPtr& mesh );
 RA_ENGINE_API RenderObject* Primitive( Component* comp, const LineMeshPtr& mesh );
+RA_ENGINE_API RenderObject* Primitive( Component* comp, const AttribArrayDisplayablePtr& mesh );
+///@}
 
 /// Displays given point shown as the crossing of 3 lines of length 'scale'
 RA_ENGINE_API LineMeshPtr Point( const Core::Vector3& point,
@@ -103,10 +108,10 @@ RA_ENGINE_API MeshPtr Disk( const Core::Vector3& center,
 
 /// Displays a normal vector emanating from the given point as a vector arrow
 /// and a normal plane of size 'scale'.
-RA_ENGINE_API MeshPtr Normal( const Core::Vector3& point,
-                              const Core::Vector3& normal,
-                              const Core::Utils::Color& color,
-                              Scalar scale = 0.1f );
+RA_ENGINE_API LineMeshPtr Normal( const Core::Vector3& point,
+                                  const Core::Vector3& normal,
+                                  const Core::Utils::Color& color,
+                                  Scalar scale = 0.1f );
 
 /// Displays a 3D frame representing the given transform.
 /// Each axis has length 'scale' and are in usual colors

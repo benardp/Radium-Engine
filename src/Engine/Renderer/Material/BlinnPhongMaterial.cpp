@@ -14,7 +14,7 @@
 namespace Ra {
 namespace Engine {
 
-static const std::string materialName{"BlinnPhong"};
+static const std::string materialName {"BlinnPhong"};
 
 BlinnPhongMaterial::BlinnPhongMaterial( const std::string& instanceName ) :
     Material( instanceName, materialName, Material::MaterialAspect::MAT_OPAQUE ) {}
@@ -120,7 +120,7 @@ void BlinnPhongMaterial::registerMaterial() {
     Ra::Engine::ShaderConfiguration zprepassconfig(
         "ZprepassBlinnPhong",
         resourcesRootDir + "Shaders/Materials/BlinnPhong/BlinnPhong.vert.glsl",
-        resourcesRootDir + "Shaders/Materials/BlinnPhong/DepthAmbientBlinnPhong.frag.glsl" );
+        resourcesRootDir + "Shaders/Materials/BlinnPhong/BlinnPhongZPrepass.frag.glsl" );
     Ra::Engine::ShaderConfigurationFactory::addConfiguration( zprepassconfig );
 
     Ra::Engine::ShaderConfiguration transparentpassconfig(

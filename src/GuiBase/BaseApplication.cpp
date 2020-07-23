@@ -50,6 +50,8 @@ static const bool expectPluginsDebug = true;
 #else
 static const bool expectPluginsDebug = false;
 #endif
+// the default priority for systems created here.
+constexpr int defaultSystemPriority = 1000;
 
 BaseApplication::BaseApplication( int& argc,
                                   char** argv,
@@ -79,7 +81,7 @@ BaseApplication::BaseApplication( int& argc,
 
     m_targetFPS = 60; // Default
     // TODO at startup, only load "standard plugins". This must be extended.
-    std::string pluginsPath = std::string{Core::Resources::getRadiumPluginsDir()};
+    std::string pluginsPath = std::string {Core::Resources::getRadiumPluginsDir()};
 
     QCommandLineParser parser;
     parser.setApplicationDescription( "Radium Engine RPZ, TMTC" );
@@ -87,40 +89,40 @@ BaseApplication::BaseApplication( int& argc,
     parser.addVersionOption();
 
     QCommandLineOption fpsOpt(
-        QStringList{"r", "framerate", "fps"},
+        QStringList {"r", "framerate", "fps"},
         "Control the application framerate, 0 to disable it (and run as fast as possible).",
         "number",
         "60" );
     QCommandLineOption maxThreadsOpt(
-        QStringList{"m", "maxthreads", "max-threads"},
+        QStringList {"m", "maxthreads", "max-threads"},
         "Control the maximum number of threads. 0 will set to the number of cores available",
         "number",
         "0" );
     QCommandLineOption numFramesOpt(
-        QStringList{"n", "numframes"}, "Run for a fixed number of frames.", "number", "0" );
-    QCommandLineOption pluginOpt( QStringList{"p", "plugins", "pluginsPath"},
+        QStringList {"n", "numframes"}, "Run for a fixed number of frames.", "number", "0" );
+    QCommandLineOption pluginOpt( QStringList {"p", "plugins", "pluginsPath"},
                                   "Set the path to the plugin dlls.",
                                   "folder",
                                   "Plugins" );
     QCommandLineOption pluginLoadOpt(
-        QStringList{"l", "load", "loadPlugin"},
+        QStringList {"l", "load", "loadPlugin"},
         "Only load plugin with the given name (filename without the extension). If this option is "
         "not used, all plugins in the plugins folder will be loaded. ",
         "name" );
-    QCommandLineOption pluginIgnoreOpt( QStringList{"i", "ignore", "ignorePlugin"},
+    QCommandLineOption pluginIgnoreOpt( QStringList {"i", "ignore", "ignorePlugin"},
                                         "Ignore plugins with the given name. If the name appears "
                                         "within both load and ignore options, it will be ignored.",
                                         "name" );
-    QCommandLineOption fileOpt( QStringList{"f", "file", "scene"},
+    QCommandLineOption fileOpt( QStringList {"f", "file", "scene"},
                                 "Open a scene file at startup.",
                                 "file name",
                                 "foo.bar" );
 
-    QCommandLineOption camOpt( QStringList{"c", "camera", "cam"},
+    QCommandLineOption camOpt( QStringList {"c", "camera", "cam"},
                                "Open a camera file at startup",
                                "file name",
                                "foo.bar" );
-    QCommandLineOption recordOpt( QStringList{"s", "recordFrames"}, "Enable snapshot recording." );
+    QCommandLineOption recordOpt( QStringList {"s", "recordFrames"}, "Enable snapshot recording." );
 
     parser.addOptions( {fpsOpt,
                         pluginOpt,
@@ -215,6 +217,13 @@ BaseApplication::BaseApplication( int& argc,
     m_engine->initialize();
     addBasicShaders();
 
+    // Register the GeometrySystem converting loaded assets to meshes
+    m_engine->registerSystem(
+        "GeometrySystem", new Ra::Engine::GeometrySystem, defaultSystemPriority );
+    // Register the TimeSystem managing time dependant systems
+    Scalar dt = ( m_targetFPS == 0 ? 1_ra / 60_ra : 1_ra / m_targetFPS );
+    m_engine->setConstantTimeStep( dt );
+
     // Create main window.
     m_mainWindow.reset( factory.createMainWindow() );
     m_mainWindow->show();
@@ -231,12 +240,10 @@ BaseApplication::BaseApplication( int& argc,
     createConnections();
     processEvents();
 
-    // Register the GeometrySystem converting loaded assets to meshes
-    m_engine->registerSystem( "GeometrySystem", new Ra::Engine::GeometrySystem, 1000 );
-
     // Initialize plugin context
     m_pluginContext.m_engine           = m_engine.get();
     m_pluginContext.m_selectionManager = m_mainWindow->getSelectionManager();
+    m_pluginContext.m_timeline         = m_mainWindow->getTimeline();
     m_pluginContext.m_pickingManager   = m_viewer->getPickingManager();
     m_pluginContext.m_viewer           = m_viewer;
     m_pluginContext.m_exportDir        = m_exportFoldername;
@@ -251,7 +258,7 @@ BaseApplication::BaseApplication( int& argc,
     // Load installed plugins plugins
     if ( !loadPlugins(
              pluginsPath, parser.values( pluginLoadOpt ), parser.values( pluginIgnoreOpt ) ) )
-    { LOG( logERROR ) << "An error occurred while trying to load plugins."; }
+    { LOG( logDEBUG ) << "No plugin found in default path " << pluginsPath; }
     // load supplemental plugins
     {
         QSettings settings;
@@ -506,16 +513,19 @@ bool BaseApplication::loadPlugins( const std::string& pluginsPath,
                                    const QStringList& loadList,
                                    const QStringList& ignoreList ) {
     QDir pluginsDir( qApp->applicationDirPath() );
-    LOG( logINFO ) << " *** Loading Plugins from " << pluginsPath << " ***";
     bool result = pluginsDir.cd( pluginsPath.c_str() );
 
-    if ( !result )
+    if ( result )
     {
-        LOG( logERROR ) << "Cannot open specified plugins directory " << pluginsPath;
+        LOG( logINFO ) << " *** Loading Plugins from " << pluginsDir.absolutePath().toStdString()
+                       << " ***";
+    }
+    else
+    {
+        LOG( logDEBUG ) << "Cannot open specified plugins directory "
+                        << pluginsDir.absolutePath().toStdString();
         return false;
     }
-
-    LOG( logDEBUG ) << "Plugin directory :" << pluginsDir.absolutePath().toStdString();
     bool res       = true;
     uint pluginCpt = 0;
 

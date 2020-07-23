@@ -23,6 +23,11 @@ vec3 getWorldSpaceNormal();
 #define DONT_USE_INPUT_TANGENT
 
 //----------------------------------------------------------------
+// Implementation of the emissivity interface.
+// Plain Material is not emissive
+vec3 getEmissiveColor( Material material, vec3 textCoord ) {
+    return vec3( 0 );
+}
 
 vec4 getBaseColor( Material material, vec3 texCoord ) {
     vec4 dc = vec4( material.color.rgb, 1 );

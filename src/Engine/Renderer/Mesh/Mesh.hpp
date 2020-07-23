@@ -2,35 +2,24 @@
 #define RADIUMENGINE_MESH_HPP
 
 #include <Engine/RaEngine.hpp>
+
 #include <Engine/Renderer/Displayable/DisplayableObject.hpp>
+
+#include <Core/Containers/VectorArray.hpp>
+#include <Core/Geometry/TriangleMesh.hpp>
+#include <Core/Utils/Color.hpp>
+#include <Core/Utils/Log.hpp>
+
+#include <globjects/Buffer.h>
+#include <globjects/VertexArray.h>
 
 #include <array>
 #include <map>
 #include <vector>
 
-#include <Core/Containers/VectorArray.hpp>
-#include <Core/Geometry/TriangleMesh.hpp>
-#include <Core/Utils/Color.hpp>
-
-#include <Core/Utils/Log.hpp>
-
-// from .inl, temporary include, remove when compiles
-#include <Engine/Renderer/OpenGL/OpenGL.hpp>
-#include <Engine/Renderer/RenderTechnique/ShaderProgram.hpp>
-#include <globjects/Buffer.h>
-#include <globjects/Program.h>
-#include <globjects/VertexArray.h>
-#include <globjects/VertexAttributeBinding.h>
-
-namespace globjects {
-
-class VertexArray;
-class Buffer;
-
-} // namespace globjects
-
 namespace Ra {
 namespace Engine {
+
 class ShaderProgram;
 using namespace Ra::Core::Utils;
 
@@ -99,7 +88,7 @@ class RA_ENGINE_API AttribArrayDisplayable : public Displayable
     void operator=( const AttribArrayDisplayable& rhs ) = delete;
 
     // no need to detach listener since TriangleMesh is owned by Mesh.
-    ~AttribArrayDisplayable(){};
+    ~AttribArrayDisplayable() {}
 
     using Displayable::getName;
 
@@ -128,10 +117,16 @@ class RA_ENGINE_API AttribArrayDisplayable : public Displayable
     /// It will update the necessary openGL buffers.
     void updateGL() override = 0;
 
-    //@{
+    ///@{
     /// Get the name expected for a given attrib.
     static inline std::string getAttribName( MeshData type );
-    //@}
+    ///@}
+
+    ///@{
+    /**  Returns the underlying CoreGeometry as an Core::Geometry::AttribArrayGeometry */
+    virtual const Core::Geometry::AttribArrayGeometry& getAttribArrayGeometry() const = 0;
+    virtual Core::Geometry::AttribArrayGeometry& getAttribArrayGeometry()             = 0;
+    ///@}
 
   protected:
     /// Update the picking render mode according to the object render mode
@@ -143,8 +138,13 @@ class RA_ENGINE_API AttribArrayDisplayable : public Displayable
         explicit AttribObserver( AttribArrayDisplayable* displayable, int idx ) :
             m_displayable( displayable ), m_idx( idx ) {}
         void operator()() {
-            m_displayable->m_dataDirty[m_idx] = true;
-            m_displayable->m_isDirty          = true;
+            if ( m_idx < m_displayable->m_dataDirty.size() )
+            {
+                m_displayable->m_dataDirty[m_idx] = true;
+                m_displayable->m_isDirty          = true;
+            }
+            else
+                LOG( logDEBUG ) << "Invalid dirty bit notified"; /// \fixme Should never be here
         }
 
       private:
@@ -155,7 +155,7 @@ class RA_ENGINE_API AttribArrayDisplayable : public Displayable
   protected:
     std::unique_ptr<globjects::VertexArray> m_vao;
 
-    MeshRenderMode m_renderMode{MeshRenderMode::RM_TRIANGLES};
+    MeshRenderMode m_renderMode {MeshRenderMode::RM_TRIANGLES};
 
     // m_vbos and m_dataDirty have the same size and are indexed thru m_handleToBuffer[attribName]
     std::vector<std::unique_ptr<globjects::Buffer>> m_vbos;
@@ -167,7 +167,7 @@ class RA_ENGINE_API AttribArrayDisplayable : public Displayable
 
     /// General dirty bit of the mesh. Must be equivalent of the "or" of the other dirty flags.
     /// an empty mesh is not dirty
-    bool m_isDirty{false};
+    bool m_isDirty {false};
 };
 
 /// Concept class to ensure consistent naming of VaoIndices accross derived classes.
@@ -178,10 +178,11 @@ class RA_ENGINE_API VaoIndices
     inline void setIndicesDirty();
 
   protected:
-    std::unique_ptr<globjects::Buffer> m_indices{nullptr};
-    bool m_indicesDirty{true};
+    std::unique_ptr<globjects::Buffer> m_indices {nullptr};
+    bool m_indicesDirty {true};
     /// number of elements to draw (i.e number of indices to use)
-    size_t m_numElements{0};
+    /// automatically set by updateGL(), not meaningfull if m_indicesDirty.
+    size_t m_numElements {0};
 };
 
 /// This class handles an attrib array displayable on gpu only, without core
@@ -211,16 +212,20 @@ template <typename T>
 class CoreGeometryDisplayable : public AttribArrayDisplayable
 {
   public:
+    using base         = AttribArrayDisplayable;
     using CoreGeometry = T;
-    using AttribArrayDisplayable::AttribArrayDisplayable;
+
     explicit CoreGeometryDisplayable( const std::string& name,
-                                      CoreGeometry&& geom,
                                       MeshRenderMode renderMode = RM_TRIANGLES );
+
     ///@{
     /**  Returns the underlying CoreGeometry as an Core::Geometry::AbstractGeometry */
     inline const Core::Geometry::AbstractGeometry& getAbstractGeometry() const override;
     inline Core::Geometry::AbstractGeometry& getAbstractGeometry() override;
     ///@}
+
+    inline const Core::Geometry::AttribArrayGeometry& getAttribArrayGeometry() const override;
+    inline Core::Geometry::AttribArrayGeometry& getAttribArrayGeometry() override;
 
     ///@{
     /// Returns the underlying CoreGeometry
@@ -262,15 +267,18 @@ class CoreGeometryDisplayable : public AttribArrayDisplayable
                                       const std::string& shaderAttribName );
 
   protected:
-    virtual void updateGL_specific_impl(){};
+    virtual void updateGL_specific_impl() {}
 
     void loadGeometry_common( CoreGeometry&& mesh );
+    void setupCoreMeshObservers();
     void autoVertexAttribPointer( const ShaderProgram* prog );
 
     /// m_mesh Observer method, called whenever an attrib is added or removed from
     /// m_mesh.
     /// it adds an observer to the new attrib.
     void addAttribObserver( const std::string& name );
+
+    void addToTranslationTable( const std::string& name );
 
     /// Core::Mesh attrib name to Render::Mesh attrib name
     using TranslationTable = std::map<std::string, std::string>;

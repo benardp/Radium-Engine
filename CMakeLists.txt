@@ -176,17 +176,18 @@ add_custom_target(ForceRadiumInstallation
     COMMENT "Forcing Radium installation")
 
 # Testing
-if( RADIUM_ENABLE_TESTING )
+if (RADIUM_ENABLE_TESTING)
     enable_testing()
     add_subdirectory(tests)
     add_dependencies(RadiumLibs CoreExampleApp RadiumExampleApps)
-endif()
+endif ()
 
 # Packaging stuff (deb, rpm, windows installer)
 #add_subdirectory(packaging)
 
 
-
+install(FILES LICENSE DESTINATION ${CMAKE_INSTALL_PREFIX} COMPONENT meta)
+install(FILES README.md DESTINATION ${CMAKE_INSTALL_PREFIX} COMPONENT meta)
 
 #-------------------------------------------------------------------------------
 # Wrap up of settings printed on build
@@ -202,3 +203,6 @@ message(STATUS "RADIUM_INSTALL_DOC:    ${RADIUM_INSTALL_DOC}")
 message(STATUS "  possible options: Debug Release RelWithDebInfo MinSizeRel")
 message(STATUS "  set with ` cmake -DCMAKE_BUILD_TYPE=Debug .. `")
 message(STATUS "")
+
+
+set( CACHED_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}" CACHE INTERNAL "Previous value of CMAKE_INSTALL_PREFIX")

@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.12)
+
 include(ExternalInclude)
 
 macro(addExternalFolder NAME FOLDER )
@@ -21,6 +23,19 @@ macro(addExternalFolder NAME FOLDER )
         set( UPDATE_EXTERNAL OFF)
     endif()
 
+    # Check if install prefix has changed. If yes, force installing the externals again
+    if( DEFINED CACHED_INSTALL_PREFIX )
+        if( NOT "${CACHED_INSTALL_PREFIX}" STREQUAL "${CMAKE_INSTALL_PREFIX}" )
+            message(STATUS "[addExternalFolder] CMAKE_INSTALL_PREFIX has changed (from ${CACHED_INSTALL_PREFIX} to ${CMAKE_INSTALL_PREFIX}), reinstalling dependencies")
+            set( UPDATE_EXTERNAL ON)
+        endif()
+    endif()
+
+    # Check if the external ${NAME} is installed. If not, force installing the externals again
+    if( NOT EXISTS "${CMAKE_INSTALL_PREFIX}/share/Radium-${NAME}.touch" )
+        message(STATUS "[addExternalFolder] CMAKE_INSTALL_PREFIX is empty (${CMAKE_INSTALL_PREFIX}), reinstalling dependencies")
+        set( UPDATE_EXTERNAL ON)
+    endif()
 
     if ( UPDATE_EXTERNAL )
         execute_process(
@@ -47,27 +62,11 @@ macro(addExternalFolder NAME FOLDER )
             message(STATUS "[addExternalFolder] Enable compatibility mode for Xcode Generator")
         endif ()
 
-        if (${CMAKE_VERSION} VERSION_GREATER_EQUAL 3.12)
-            execute_process(
-                    COMMAND ${CMAKE_COMMAND} --build . -j ${RADIUM_BUILD_EXTERNAL_PARALLEL_LEVEL} --config ${CMAKE_BUILD_TYPE} --target ${RadiumExternalMakeTarget}
-                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/external
-                    RESULT_VARIABLE ret
-            )
-        else ()
-            set(TOOL_OPTIONS "")
-            if( ${generator_lower} MATCHES "|makefile|" OR ${generator_lower} MATCHES "|ninja|" )
-              set( TOOL_OPTIONS -- -j${RADIUM_BUILD_EXTERNAL_PARALLEL_LEVEL} )
-            elseif( ${generator_lower} MATCHES "|visual|" )
-              set( TOOL_OPTIONS -- /m )
-            else()
-              message(WARNING "[addExternalFolder] Parallel build are not supported with your generator ${CMAKE_GENERATOR}")
-            endif()
-            execute_process(
-              COMMAND ${CMAKE_COMMAND} --build . --config ${CMAKE_BUILD_TYPE} --target ${RadiumExternalMakeTarget} ${TOOL_OPTIONS}
-              WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/external
-              RESULT_VARIABLE ret
-              )
-        endif()
+        execute_process(
+                COMMAND ${CMAKE_COMMAND} --build . -j ${RADIUM_BUILD_EXTERNAL_PARALLEL_LEVEL} --config ${CMAKE_BUILD_TYPE} --target ${RadiumExternalMakeTarget}
+                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/external
+                RESULT_VARIABLE ret
+        )
 
         if(NOT ret EQUAL "0")
             message( FATAL_ERROR "[addExternalFolder] Cmake build step failed. ")
@@ -79,8 +78,8 @@ macro(addExternalFolder NAME FOLDER )
             set(EXTERNAL_TARGET_PACKAGE_FILE "${CMAKE_CURRENT_BINARY_DIR}/external/cmake/package-${NAME}.cmake")
             message(STATUS "[addExternalFolder] Configure package file ${EXTERNAL_TARGET_PACKAGE_FILE}")
             configure_file(${FOLDER}/package.cmake "${EXTERNAL_TARGET_PACKAGE_FILE}" COPYONLY)
+            include("${EXTERNAL_TARGET_PACKAGE_FILE}")
             unset(EXTERNAL_TARGET_PACKAGE_FILE)
-            include("${CMAKE_CURRENT_BINARY_DIR}/external/cmake/package-${NAME}.cmake")
         endif()
         OPTION( RADIUM_SKIP_${NAME_UPPER}_EXTERNAL "[addExternalFolder] Skip updating ${NAME}::external (disable for rebuild)" ON)
 
@@ -95,5 +94,14 @@ macro(addExternalFolder NAME FOLDER )
     endif()
     add_custom_target(External${NAME} ALL SOURCES ${external_sources})
     include("${CMAKE_CURRENT_BINARY_DIR}/external/cmake/package-${NAME}.cmake")
+
+    # Create touch file
+    file( TOUCH "${CMAKE_CURRENT_BINARY_DIR}/Radium-${NAME}.touch" )
+    install(
+      FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/Radium-${NAME}.touch"
+      DESTINATION
+        share/
+    )
 
 endmacro()

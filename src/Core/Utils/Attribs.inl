@@ -2,7 +2,7 @@ namespace Ra {
 namespace Core {
 namespace Utils {
 
-AttribBase::AttribBase( const std::string& name ) : m_name{name} {}
+AttribBase::AttribBase( const std::string& name ) : m_name {name} {}
 
 std::string AttribBase::getName() const {
     return m_name;
@@ -105,17 +105,17 @@ bool Attrib<T>::isFloat() const {
 }
 
 template <typename T>
-bool Attrib<T>::isVec2() const {
+bool Attrib<T>::isVector2() const {
     return std::is_same<Eigen::Matrix<Scalar, 2, 1>, T>::value;
 }
 
 template <typename T>
-bool Attrib<T>::isVec3() const {
+bool Attrib<T>::isVector3() const {
     return std::is_same<Eigen::Matrix<Scalar, 3, 1>, T>::value;
 }
 
 template <typename T>
-bool Attrib<T>::isVec4() const {
+bool Attrib<T>::isVector4() const {
     return std::is_same<Eigen::Matrix<Scalar, 4, 1>, T>::value;
 }
 

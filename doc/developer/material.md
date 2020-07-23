@@ -210,7 +210,7 @@ vec3 getPerVertexSpecularColor();
 Note also that if a function is not needed by a shader, there is no need to implement its interface.
 
 
-#### Microgeometry interface {#microgeometry-interface}
+### Microgeometry interface {#microgeometry-interface}
 Defining the micro-geometry procedurally or by using textures allows to de-correlates the geometric sampling from the
 appearance parameters sampling.
 The best example of procedural micro-geometry is normal mapping.
@@ -237,7 +237,7 @@ bool toDiscard(Material material, vec4 color);
 ~~~
 
 
-#### BSDF interface {#bsdf-interface}
+### BSDF interface {#bsdf-interface}
 Implementing or using the GLSL BSDF interface is based on the fact that the method Ra::Engine::Material::getMaterialName()
  must return a string that contains the `name_of_the_BSDF` implemented in a file named `name_of_the_BSDF.glsl`.
 This file is preloaded at [material registration](#registration-mtl-lib) into a `glNamedString` to allow inclusion by others.
@@ -284,6 +284,15 @@ vec3 getSpecularColor(Material material, vec3 texCoord);
 // The local Frame is the Frame wher the Geometric normal is the Z axis,
 // and the tangent defined the X axis.
 vec3 evaluateBSDF(Material material, vec3 texCoord, vec3 wi, vec3 wo);
+~~~
+
+### Emissivity interface {#emissivity-interface}
+Some materials are not only reflective, hence implementing the BSDF interface, but also can be emissive. 
+To allow a renderer to access the emissivity of a material the following GLSL function  must 
+defined in the same GLSL file than the BSDF and microgeometry interface :
+~~~
+// Return the emissivity of the material
+vec3 getEmissiveColor(GLTFCommon material, vec3 textCoord);
 ~~~
 
 ## Material registration into the Engine {#registration-mtl-lib}
@@ -407,23 +416,43 @@ builder.second( rt, isMaterialTransparent );
 
 
 ## Rendering without using Materials {#non-bsdf-rendering}
-The _Radium Material Library_ and related components are mainly designed to manage Materials as a representation of a 
-_Bidirectional Scattering Distribution function (BSDF)_.
+The _Radium Material Library_ and related components are mainly designed to manage Materials as a representation of a _Bidirectional Scattering Distribution function (BSDF)_.
 
-When rendering, it is sometime useful to compute the final color of an object that do not rely on a bsdf but just 
-on a specific color for each geometry fragment.
+When rendering, it is sometime useful to compute the final color of an object that do not rely on a bsdf but just on a specific color for each geometry fragment.
 
-Even if the Ra::Engine::PlainMaterial could be used for this and assuming that such a way to define material is object 
-specific, the following steps are required :
+To define a custom fragment's color computation shader and use it with application provided parameters, the following steps are required :
 
 1. Develop specific vertex and fragment shaders to compute the fragment color
 2. Build a Ra::Engine::ShaderConfiguration that uses these shaders
 3. Build a render technique that use this configuration
-4. Associate the render technique with a geometry in a Ra::Engine::RenderObject
+4. If the shaders have uniform parameters, implement a specific Ra::Engine::ShaderParameterProvider and associate an instance of the parameter provider to the render technique.
+5. Associate the render technique with a geometry in a Ra::Engine::RenderObject
 
-This could result in the following C++ code to configure a RenderObject.
+Here is an example snippet.
 ~~~{.cpp}
-// 1. Develop specific vertex and fragment shaders to compute the fragment color
+// 1. Implement a parameter provider to provide the uniforms for the shader
+class MyParameterProvider : public Ra:Engine::ShaderParameterProvider {
+public:
+  MyParameterProvider() {}
+  ~MyParameterProvider() {}
+  void updateGL() override {
+    // Method called before drawing each frame in Renderer::updateRenderObjectsInternal.
+    // The name of the parameter corresponds to the shader's uniform name.
+    m_renderParameters.addParameter( "aColorUniform", m_colorParameter );
+    m_renderParameters.addParameter( "aScalarUniform", m_scalarParameter );
+  }
+
+  void setOrComputeTheParameterValues() {
+	// client side computation of the parameters, e.g.
+	m_colorParameter = Ra::Core::Color::Red();
+	m_scalarParameter = .5_ra;
+  }
+private:
+  Ra::Core::Color m_colorParameter;
+  Scalar m_scalarParameter;
+}
+
+// 2. Implement a specific vertex and fragment shaders to compute the fragment color based on uniform values
 // Vertex shader source code
 const std::string vertexShaderSource{
     "#include \"TransformStructs.glsl\"\n"
@@ -437,31 +466,38 @@ const std::string vertexShaderSource{
 // Fragment shader source code
 const std::string fragmentShaderSource{
     "layout (location = 0) out vec4 out_color;\n"
-    "vec4 some_color_computation()\n"
-    "{\n"
-    "    vec result = vec4(vec3(1), 1);\n"
-    "}\n"};
+     "uniform vec4 aColorUniform;\n"
+     "uniform float aScalarUniform;\n"
     "void main(void)\n"
     "{\n"
-    "    out_color = some_color_computation();\n"
+    "    out_color =  aColorUniform*aScalarUniform;\n"
     "}\n"};
-// 2. Build a Ra::Engine::ShaderConfiguration that uses these shaders
+
+// 3. Setup a Ra::Engine::ShaderConfiguration that uses these shaders
 Ra::Engine::ShaderConfiguration myConfig{"MyColorComputation"};
 config.addShaderSource( Ra::Engine::ShaderType::ShaderType_VERTEX, vertexShaderSource );
 config.addShaderSource( Ra::Engine::ShaderType::ShaderType_FRAGMENT, fragmentShaderSource );
 Ra::Engine::ShaderConfigurationFactory::addConfiguration( myConfig );
-// 3. Build a render technique that use this configuration
-Ra::Engine::RenderTechnique theRenderTechnique;
-theRenderTechnique.setConfiguration( myConfig, DefaultRenderingPasses::LIGHTING_OPAQUE );
-// 4. Associate the render technique with a geometry in a Ra::Engine::RenderObject
-std::shared_ptr<Ra::Engine::Mesh> theMesh( new Ra::Engine::Mesh( "theMesh" ) );
-theMesh->loadGeometry( Ra::Core::Geometry::makeSharpBox( {0.1f, 0.1f, 0.1f} ) );
-auto theRenderObject = Ra::Engine::RenderObject::createRenderObject(
-    "myRenderObject", theRadiumComponent, 
-    Ra::Engine::RenderObjectType::Geometry, theMesh, 
-    theRenderTechnique );
-addRenderObject( theRenderObject );
+
+// 4. Build a render technique that use this configuration
+Ra::Engine::RenderTechnique renderTechnique;
+renderTechnique.setConfiguration( myConfig, DefaultRenderingPasses::LIGHTING_OPAQUE );
+
+// 5. Create and associate the parameter provider with the RenderTechnique
+auto parameterProvider = std::make_shared<MyParameterProvider>();
+parameterProvider->setOrComputeTheParameterValues();
+renderTechnique.setParametersProvider(parameterProvider);
+
+// 6. Associate the render technique with a geometry in a Ra::Engine::RenderObject
+std::shared_ptr<Ra::Engine::Mesh> mesh( new Ra::Engine::Mesh( "my mesh" ) );
+mesh->loadGeometry( Ra::Core::Geometry::makeSharpBox( {0.1f, 0.1f, 0.1f} ) );
+auto renderObject = Ra::Engine::RenderObject::createRenderObject(
+    "myRenderObject", radiumComponent,
+    Ra::Engine::RenderObjectType::Geometry, mesh, renderTechnique );
+addRenderObject( renderObject );
+// where radiumComponent is a component of the scene.
 ~~~
 
-After this, when ``theRenderObject`` will be drawn by the Ra::Engine::ForwardRenderer, all the resulting fragments 
-will have the color computed by the GLSL function ``some_color_computation()``
+Then the draw call of ``renderObject`` uses the ``myConfig`` as shader configuration.
+Before rendering, the method ``updateGL`` on the ``parameterProvider`` instance is called so that the shader's uniforms values are updated according the one stored in ``parameterProvider``.
+

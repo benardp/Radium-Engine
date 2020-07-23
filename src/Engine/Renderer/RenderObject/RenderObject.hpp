@@ -83,7 +83,7 @@ class RA_ENGINE_API RenderObject final : public Core::Utils::IndexedObject
         const std::string& name,
         Component* comp,
         const RenderObjectType& type,
-        const std::shared_ptr<Displayable>& mesh,
+        std::shared_ptr<Displayable> mesh,
         const RenderTechnique& techniqueConfig = RenderTechnique::createDefaultRenderTechnique() );
 
     /**
@@ -118,15 +118,15 @@ class RA_ENGINE_API RenderObject final : public Core::Utils::IndexedObject
 
     bool isDirty() const;
 
-    void setRenderTechnique( const std::shared_ptr<RenderTechnique>& technique );
+    void setRenderTechnique( std::shared_ptr<RenderTechnique> technique );
     std::shared_ptr<const RenderTechnique> getRenderTechnique() const;
     std::shared_ptr<RenderTechnique> getRenderTechnique();
 
-    void setMaterial( const std::shared_ptr<Material>& material );
+    void setMaterial( std::shared_ptr<Material> material );
     std::shared_ptr<const Material> getMaterial() const;
     std::shared_ptr<Material> getMaterial();
 
-    void setMesh( const std::shared_ptr<Displayable>& mesh );
+    void setMesh( std::shared_ptr<Displayable> mesh );
     std::shared_ptr<const Displayable> getMesh() const;
     const std::shared_ptr<Displayable>& getMesh();
 
@@ -173,25 +173,25 @@ class RA_ENGINE_API RenderObject final : public Core::Utils::IndexedObject
                  Core::Utils::Index passId = DefaultRenderingPasses::LIGHTING_OPAQUE );
 
   private:
-    Core::Transform m_localTransform{Core::Transform::Identity()};
+    Core::Transform m_localTransform {Core::Transform::Identity()};
 
-    Component* m_component{nullptr};
-    std::string m_name{};
+    Component* m_component {nullptr};
+    std::string m_name {};
 
-    RenderObjectType m_type{RenderObjectType::Geometry};
-    std::shared_ptr<RenderTechnique> m_renderTechnique{nullptr};
-    std::shared_ptr<Displayable> m_mesh{nullptr};
-    std::shared_ptr<Material> m_material{nullptr};
+    RenderObjectType m_type {RenderObjectType::Geometry};
+    std::shared_ptr<RenderTechnique> m_renderTechnique {nullptr};
+    std::shared_ptr<Displayable> m_mesh {nullptr};
+    std::shared_ptr<Material> m_material {nullptr};
 
     mutable std::mutex m_updateMutex;
 
-    int m_lifetime{-1};
-    bool m_visible{true};
-    bool m_pickable{true};
-    bool m_xray{false};
-    bool m_transparent{false};
-    bool m_dirty{true};
-    bool m_hasLifetime{false};
+    int m_lifetime {-1};
+    bool m_visible {true};
+    bool m_pickable {true};
+    bool m_xray {false};
+    bool m_transparent {false};
+    bool m_dirty {true};
+    bool m_hasLifetime {false};
 };
 
 } // namespace Engine

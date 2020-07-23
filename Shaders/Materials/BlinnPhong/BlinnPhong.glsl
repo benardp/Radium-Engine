@@ -40,6 +40,12 @@ struct Material {
     BlinnPhongTextures tex;
 };
 
+// Implementation of the emissivity interface.
+// For now, BlinnPhong Material is not emissive
+vec3 getEmissiveColor( Material material, vec3 textCoord ) {
+    return vec3( 0 );
+}
+
 // Du to access to in_vertexColor this does not respect the "Material.glsl" interface as it access
 // data outside the material
 vec4 getDiffuseColor( Material material, vec3 texCoord ) {

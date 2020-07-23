@@ -128,7 +128,7 @@ class RA_ENGINE_API RenderTechnique final
      * @param pass The index of the pass to set. If this -1, all active passes will share the same
      * provider.
      */
-    void setParametersProvider( const std::shared_ptr<ShaderParameterProvider>& provider,
+    void setParametersProvider( std::shared_ptr<ShaderParameterProvider> provider,
                                 Core::Utils::Index pass = Core::Utils::Index( -1 ) );
 
     /**
@@ -181,7 +181,7 @@ class RA_ENGINE_API RenderTechnique final
 
   private:
     /// Maximum number of passses in the technique
-    static constexpr int s_maxNbPasses{32};
+    static constexpr int s_maxNbPasses {32};
 
     /// A pass configuration is a pair of ShaderConfiguration and a ShaderProgram
     using PassConfiguration = std::pair<ShaderConfiguration, const ShaderProgram*>;
@@ -200,9 +200,9 @@ class RA_ENGINE_API RenderTechnique final
 
     // Change this if there is more than 32 configurations
     /// Dirty bits representing the compiled state of passes. bit i is 1 if pass i is dirty
-    unsigned int m_dirtyBits{0xFFFFFFFF};
+    unsigned int m_dirtyBits {0xFFFFFFFF};
     /// Bit arrays indicating which pass is active. Bit i is 1 if pass i is active
-    unsigned int m_setPasses{0x00000000};
+    unsigned int m_setPasses {0x00000000};
 };
 
 ///////////////////////////////////////////////

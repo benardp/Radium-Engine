@@ -1,16 +1,9 @@
-#include <globjects/Buffer.h>
+#include <Engine/Renderer/Mesh/Mesh.hpp>
 
-// #include <numeric>
-
-// #include <Core/Utils/Attribs.hpp>
-// #include <Core/Utils/Log.hpp>
-#include <Engine/Renderer/OpenGL/OpenGL.hpp>
 #include <Engine/Renderer/RenderTechnique/ShaderProgram.hpp>
 
-#include <globjects/Program.h>
-
 #include <globjects/Buffer.h>
-#include <globjects/VertexArray.h>
+#include <globjects/Program.h>
 #include <globjects/VertexAttributeBinding.h>
 
 namespace Ra {
@@ -169,12 +162,12 @@ void IndexedAttribArrayDisplayable<I>::render( const ShaderProgram* prog ) {
 }
 
 ////////////////  CoreGeometryDisplayable ///////////////////////////////
+
 template <typename CoreGeometry>
 CoreGeometryDisplayable<CoreGeometry>::CoreGeometryDisplayable( const std::string& name,
-                                                                CoreGeometry&& geom,
                                                                 MeshRenderMode renderMode ) :
-    AttribArrayDisplayable( name, renderMode ) {
-    loadGeometry( std::move( geom ) );
+    base( name, renderMode ) {
+    setupCoreMeshObservers();
 }
 
 template <typename CoreGeometry>
@@ -189,6 +182,18 @@ Ra::Core::Geometry::AbstractGeometry& CoreGeometryDisplayable<CoreGeometry>::get
 }
 
 template <typename CoreGeometry>
+const Ra::Core::Geometry::AttribArrayGeometry&
+CoreGeometryDisplayable<CoreGeometry>::getAttribArrayGeometry() const {
+    return m_mesh;
+}
+
+template <typename CoreGeometry>
+Ra::Core::Geometry::AttribArrayGeometry&
+CoreGeometryDisplayable<CoreGeometry>::getAttribArrayGeometry() {
+    return m_mesh;
+}
+
+template <typename CoreGeometry>
 const CoreGeometry& CoreGeometryDisplayable<CoreGeometry>::getCoreGeometry() const {
     return m_mesh;
 }
@@ -199,10 +204,21 @@ CoreGeometry& CoreGeometryDisplayable<CoreGeometry>::getCoreGeometry() {
 }
 
 template <typename CoreGeometry>
+void CoreGeometryDisplayable<CoreGeometry>::addToTranslationTable( const std::string& name ) {
+    auto it = m_translationTableMeshToShader.find( name );
+    if ( it == m_translationTableMeshToShader.end() )
+    {
+        m_translationTableMeshToShader[name] = name;
+        m_translationTableShaderToMesh[name] = name;
+    }
+}
+
+template <typename CoreGeometry>
 void CoreGeometryDisplayable<CoreGeometry>::addAttribObserver( const std::string& name ) {
     // this observer is called each time an attrib is added or removed from m_mesh
     auto attrib = m_mesh.getAttribBase( name );
     // if attrib not nullptr, then it's an attrib add, so attach an observer to it
+
     if ( attrib )
     {
         auto itr = m_handleToBuffer.find( name );
@@ -210,12 +226,7 @@ void CoreGeometryDisplayable<CoreGeometry>::addAttribObserver( const std::string
         {
             m_handleToBuffer[name] = m_dataDirty.size();
 
-            auto it = m_translationTableMeshToShader.find( name );
-            if ( it == m_translationTableMeshToShader.end() )
-            {
-                m_translationTableMeshToShader[name] = name;
-                m_translationTableShaderToMesh[name] = name;
-            }
+            addToTranslationTable( name );
 
             m_dataDirty.push_back( true );
             m_vbos.emplace_back( nullptr );
@@ -267,7 +278,13 @@ void CoreGeometryDisplayable<CoreGeometry>::autoVertexAttribPointer( const Shade
 
 template <typename T>
 void CoreGeometryDisplayable<T>::loadGeometry_common( T&& mesh ) {
-    m_mesh  = std::move( mesh );
+    m_mesh = std::move( mesh );
+    setupCoreMeshObservers();
+}
+
+template <typename T>
+
+void CoreGeometryDisplayable<T>::setupCoreMeshObservers() {
     int idx = 0;
     m_dataDirty.resize( m_mesh.vertexAttribs().getNumAttribs() );
     m_vbos.resize( m_mesh.vertexAttribs().getNumAttribs() );
@@ -278,16 +295,13 @@ void CoreGeometryDisplayable<T>::loadGeometry_common( T&& mesh ) {
         m_dataDirty[idx]       = true;
 
         // create a identity translation if name is not already translated.
-        auto it = m_translationTableMeshToShader.find( name );
-        if ( it == m_translationTableMeshToShader.end() )
-        {
-            m_translationTableMeshToShader[name] = name;
-            m_translationTableShaderToMesh[name] = name;
-        }
+        addToTranslationTable( name );
 
         b->attach( AttribObserver( this, idx ) );
         ++idx;
     } );
+
+    // add an observer on attrib manipulation.
     m_mesh.vertexAttribs().attachMember(
         this, &CoreGeometryDisplayable<CoreGeometry>::addAttribObserver );
     m_isDirty = true;
@@ -393,7 +407,6 @@ IndexedGeometry<T>::IndexedGeometry( const std::string& name,
 template <typename T>
 void IndexedGeometry<T>::loadGeometry( T&& mesh ) {
     setIndicesDirty();
-    m_numElements = mesh.m_indices.size() * base::CoreGeometry::IndexType::RowsAtCompileTime;
     base::loadGeometry_common( std::move( mesh ) );
 }
 
@@ -408,6 +421,8 @@ void IndexedGeometry<T>::updateGL_specific_impl() {
     {
         /// this one do not work since m_indices is not a std::vector
         // m_indices->setData( m_mesh.m_indices, GL_DYNAMIC_DRAW );
+        m_numElements =
+            base::m_mesh.m_indices.size() * base::CoreGeometry::IndexType::RowsAtCompileTime;
 
         m_indices->setData(
             static_cast<gl::GLsizeiptr>( base::m_mesh.m_indices.size() *
@@ -444,7 +459,9 @@ void IndexedGeometry<T>::render( const ShaderProgram* prog ) {
 PointCloud::PointCloud( const std::string& name,
                         typename base::CoreGeometry&& geom,
                         typename base::MeshRenderMode renderMode ) :
-    base( name, std::move( geom ), renderMode ) {}
+    base( name, renderMode ) {
+    loadGeometry( std::move( geom ) );
+}
 
 /////////  LineMesh ///////////
 LineMesh::LineMesh( const std::string& name,

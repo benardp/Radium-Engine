@@ -50,9 +50,9 @@ TriangleMeshComponent::TriangleMeshComponent( const std::string& name,
                                               Entity* entity,
                                               Core::Geometry::TriangleMesh&& mesh,
                                               Core::Asset::MaterialData* mat ) :
-    GeometryComponent( name, entity ), m_displayMesh( new Engine::Mesh( name ) ) {
+    GeometryComponent( name, entity ),
+    m_displayMesh( new Engine::Mesh( name, std::move( mesh ) ) ) {
     setContentName( name );
-    m_displayMesh->loadGeometry( std::move( mesh ) );
     finalizeROFromGeometry( mat, Core::Transform::Identity() );
 }
 
@@ -132,7 +132,7 @@ void TriangleMeshComponent::finalizeROFromGeometry( const Core::Asset::MaterialD
     // initialize with a default rendertechique that draws nothing
     std::string roName( m_name + "_" + m_contentName + "_RO" );
     auto ro = RenderObject::createRenderObject(
-        roName, this, RenderObjectType::Geometry, m_displayMesh, RenderTechnique{} );
+        roName, this, RenderObjectType::Geometry, m_displayMesh, RenderTechnique {} );
     ro->setTransparent( roMaterial->isTransparent() );
     ro->setMaterial( roMaterial );
     setupIO( m_contentName );
@@ -188,8 +188,8 @@ PointCloudComponent::PointCloudComponent( const std::string& name,
                                           Entity* entity,
                                           Core::Geometry::PointCloud&& mesh,
                                           Core::Asset::MaterialData* mat ) :
-    GeometryComponent( name, entity ), m_displayMesh( new Engine::PointCloud( name ) ) {
-    m_displayMesh->loadGeometry( std::move( mesh ) );
+    GeometryComponent( name, entity ),
+    m_displayMesh( new Engine::PointCloud( name, std::move( mesh ) ) ) {
     finalizeROFromGeometry( mat, Core::Transform::Identity() );
 }
 
@@ -266,7 +266,7 @@ void PointCloudComponent::finalizeROFromGeometry( const Core::Asset::MaterialDat
     // initialize with a default rendertechique that draws nothing
     std::string roName( m_name + "_" + m_contentName + "_RO" );
     auto ro = RenderObject::createRenderObject(
-        roName, this, RenderObjectType::Geometry, m_displayMesh, RenderTechnique{} );
+        roName, this, RenderObjectType::Geometry, m_displayMesh, RenderTechnique {} );
     ro->setTransparent( roMaterial->isTransparent() );
     ro->setMaterial( roMaterial );
     setupIO( m_contentName );
@@ -312,7 +312,7 @@ Ra::Core::Geometry::PointCloud* PointCloudComponent::getPointCloudRw() {
 VolumeComponent::VolumeComponent( const std::string& name,
                                   Entity* entity,
                                   const Ra::Core::Asset::VolumeData* data ) :
-    Component( name, entity ), m_displayVolume{nullptr} {
+    Component( name, entity ), m_displayVolume {nullptr} {
     generateVolumeRender( data );
 }
 
@@ -333,7 +333,7 @@ void VolumeComponent::generateVolumeRender( const Ra::Core::Asset::VolumeData* d
 
     std::string roName( m_name + "_" + m_contentName + "_RO" );
     auto ro = RenderObject::createRenderObject(
-        roName, this, RenderObjectType::Geometry, m_displayVolume, RenderTechnique{} );
+        roName, this, RenderObjectType::Geometry, m_displayVolume, RenderTechnique {} );
     ro->setTransparent( roMaterial->isTransparent() );
     ro->setMaterial( roMaterial );
     ro->setLocalTransform( data->modelToWorld );

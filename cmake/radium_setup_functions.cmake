@@ -9,6 +9,10 @@
 #       see https://github.com/STORM-IRIT/Radium-Engine/pull/550#issuecomment-637415860
 cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
+if (MSVC OR MSVC_IDE OR MINGW)
+    include( Windeployqt )
+endif()
+
 include(CMakeParseArguments)
 # Introduction of two customs properties in the buildchain
 # these properties allow identify dependency resources when configuring/installing a target.
@@ -72,16 +76,11 @@ function(configure_cmdline_Radium_app)
                         fixup_bundle( ${CMAKE_INSTALL_PREFIX}/bin/${ARGS_NAME}.exe \"\" \"${FIX_LIBRARY_DIR}\")
             "
             )
+        if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+            install(FILES $<TARGET_PDB_FILE:${ARGS_NAME}> DESTINATION bin)
+        endif()
     endif ()
-    # install Radium Resources if there is a dependency on Engine or Guibase
-    get_target_property(deps ${ARGS_NAME} INTERFACE_LINK_LIBRARIES)
-    list(FIND deps "Radium::Engine" depEngine)
-    list(FIND deps "Radium::GuiBase" depGuibase)
-    if (depEngine GREATER_EQUAL "0" OR depGuibase GREATER_EQUAL "0")
-        install(DIRECTORY ${RADIUM_RESOURCES_DIR} DESTINATION ${CMAKE_INSTALL_PREFIX})
-    else ()
-        message(STATUS " No Radium resource needed for ${ARGS_NAME}")
-    endif ()
+
     # Configure the application own resources installation
     if (ARGS_RESOURCES)
         foreach (resLocation ${ARGS_RESOURCES})
@@ -134,27 +133,27 @@ function(configure_bundled_Radium_app)
     # Configure the executable installation
     install(
         TARGETS ${ARGS_NAME}
-        BUNDLE DESTINATION "."
+        BUNDLE DESTINATION "bin/"
     )
     if (ARGS_USE_PLUGINS)
         install(CODE "
         include(BundleUtilities)
         set(BU_CHMOD_BUNDLE_ITEMS TRUE)
-        file(REMOVE_RECURSE ${CMAKE_INSTALL_PREFIX}/${ARGS_NAME}.app/Contents/Resources)
-        file(COPY ${RADIUM_RESOURCES_DIR} DESTINATION ${CMAKE_INSTALL_PREFIX}/${ARGS_NAME}.app/Contents)
+        file(REMOVE_RECURSE ${CMAKE_INSTALL_PREFIX}/bin/${ARGS_NAME}.app/Contents/Resources)
+        file(COPY ${RADIUM_RESOURCES_DIR} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/${ARGS_NAME}.app/Contents)
         if (EXISTS ${RADIUM_PLUGINS_DIR})
-            file(COPY ${RADIUM_PLUGINS_DIR} DESTINATION ${CMAKE_INSTALL_PREFIX}/${ARGS_NAME}.app/Contents/)
+            file(COPY ${RADIUM_PLUGINS_DIR} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/${ARGS_NAME}.app/Contents/)
         else()
-            file(MAKE_DIRECTORY \"${CMAKE_INSTALL_PREFIX}/${ARGS_NAME}.app/Contents/Plugins/lib\")
+            file(MAKE_DIRECTORY \"${CMAKE_INSTALL_PREFIX}/bin/${ARGS_NAME}.app/Contents/Plugins/lib\")
         endif()
         file(GLOB RadiumAvailablePlugins
                 RELATIVE ${RADIUM_PLUGINS_DIR}/lib/
                 ${RADIUM_PLUGINS_DIR}/lib/*.dylib )
         set(InstalledPlugins)
         foreach (plugin \${RadiumAvailablePlugins})
-            list( APPEND InstalledPlugins ${CMAKE_INSTALL_PREFIX}/${ARGS_NAME}.app/Contents/Plugins/lib/\${plugin} )
+            list( APPEND InstalledPlugins ${CMAKE_INSTALL_PREFIX}/bin/${ARGS_NAME}.app/Contents/Plugins/lib/\${plugin} )
         endforeach ()
-        fixup_bundle(${CMAKE_INSTALL_PREFIX}/${ARGS_NAME}.app \"\${InstalledPlugins}\" \"${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}\")
+        fixup_bundle(${CMAKE_INSTALL_PREFIX}/bin/${ARGS_NAME}.app \"\${InstalledPlugins}\" \"${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}\")
         "
             )
     else ()
@@ -162,9 +161,9 @@ function(configure_bundled_Radium_app)
             message(STATUS \"Installing ${ARGS_NAME} without plugins\")
             include(BundleUtilities)
             set(BU_CHMOD_BUNDLE_ITEMS TRUE)
-            file(REMOVE_RECURSE ${CMAKE_INSTALL_PREFIX}/${ARGS_NAME}.app/Contents/Resources)
-            file(COPY ${RADIUM_RESOURCES_DIR} DESTINATION ${CMAKE_INSTALL_PREFIX}/${ARGS_NAME}.app/Contents)
-            fixup_bundle(${CMAKE_INSTALL_PREFIX}/${ARGS_NAME}.app \"\" \"${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}\")
+            file(REMOVE_RECURSE ${CMAKE_INSTALL_PREFIX}/bin/${ARGS_NAME}.app/Contents/Resources)
+            file(COPY ${RADIUM_RESOURCES_DIR} DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/${ARGS_NAME}.app/Contents)
+            fixup_bundle(${CMAKE_INSTALL_PREFIX}/bin/${ARGS_NAME}.app \"\" \"${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}\")
             "
             )
     endif ()
@@ -176,7 +175,7 @@ function(configure_bundled_Radium_app)
             installTargetResources(
                 TARGET ${ARGS_NAME}
                 DIRECTORY ${resLocation}
-                BUILDLOCATION ${CMAKE_CURRENT_BINARY_DIR}/${ARGS_NAME}.app/Contents/Resources
+                BUILDLOCATION ${CMAKE_CURRENT_BINARY_DIR}/bin/${ARGS_NAME}.app/Contents/Resources
             )
         endforeach ()
     endif ()
@@ -387,6 +386,15 @@ function(configure_radium_app)
         message(STATUS " Configuring application ${ARGS_NAME} as a command line application")
         configure_cmdline_Radium_app(${ARGN})
     endif ()
+
+    get_target_property(IsUsingQt ${ARGS_NAME} LINK_LIBRARIES)
+    list(FIND IsUsingQt "Qt5::Core" QTCOREIDX)
+    if(NOT QTCOREIDX EQUAL -1)
+        if (MSVC OR MSVC_IDE OR MINGW)
+            message(STATUS " Preparing call to WinDeployQT for application ${ARGS_NAME}")
+            windeployqt( ${ARGS_NAME} bin )
+        endif ()
+    endif ()
 endfunction()
 
 # ---------------------------------------------------------------------------------------------
@@ -456,10 +464,10 @@ function(configure_radium_plugin)
                     )
                 endforeach ()
             endif ()
-            get_target_property(OriginalLib "${ARGS_HELPER_LIBS}" ALIASED_TARGET)
+            get_target_property(OriginalLib "${helperLib}" ALIASED_TARGET)
             if (${OriginalLib} STREQUAL "OriginalLib-NOTFOUND")
                 #                message(STATUS "The name ${ARGS_HELPER_LIBS} is a REAL target.")
-                set(OriginalLib ${ARGS_HELPER_LIBS})
+                set(OriginalLib ${helperLib})
             endif ()
             message(STATUS "Installing ${OriginalLib}")
             get_target_property(IsImported "${OriginalLib}" IMPORTED)
@@ -524,6 +532,9 @@ function(configure_radium_library)
             PUBLIC
             _DEBUG
             )
+        if (MSVC OR MSVC_IDE)
+            install(FILES $<TARGET_PDB_FILE:${ARGS_TARGET}> DESTINATION bin)
+        endif()
     endif ()
     target_compile_features(${ARGS_TARGET} PUBLIC cxx_std_17)
     if (OPENMP_FOUND)
