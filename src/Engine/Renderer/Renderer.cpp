@@ -446,29 +446,45 @@ void Renderer::doPicking( const ViewingParameters& renderData ) {
             result.m_vertexIdx.emplace_back( pick[1] );  // vertex idx in the element
             result.m_elementIdx.emplace_back( pick[2] ); // element idx
             result.m_edgeIdx.emplace_back( pick[3] );    // edge opposite idx for triangles
+            result.m_centerFrag.first = pick[2];         // trivial for this use case
+            result.m_centerFrag.second = pick[1];         // trivial for this use case
         }
         else
         {
             // select the results for the RO with the most representatives
             // (or first to come if same amount)
             std::map<int, PickingResult> resultPerRO;
+
+            if ( query.m_screenCoords.x() < 0 || query.m_screenCoords.x() > m_width - 1 ||
+                 query.m_screenCoords.y() < 0 || query.m_screenCoords.y() > m_height - 1 )
+            {
+                result.m_roIdx = -1;
+                m_pickingResults.push_back( result );
+                continue;
+            }
+
+            float dx = query.m_screenCoords.x() - m_brushRadius, dx2 = query.m_screenCoords.x() + m_brushRadius;
+            float dy = query.m_screenCoords.y() - m_brushRadius, dy2 = query.m_screenCoords.y() + m_brushRadius;
+            int x  = std::max( dx, 0.0f ), x2 = std::min( dx2, m_width - 1.0f );
+            int y  = std::max( dy, 0.0f ), y2 = std::min( dy2, m_height - 1.0f );
+            int w  = x2 - x, h = y2 - y;       
+            size_t data_size = 4 * w * h;
+            GLint* pixels = new GLint[data_size]; 
+            GL_ASSERT( glReadPixels( x, y, w, h, GL_RGBA_INTEGER, GL_INT, pixels ) );
             for ( auto i = -m_brushRadius; i <= m_brushRadius; i += 3 )
             {
-                auto h = std::round( std::sqrt( m_brushRadius * m_brushRadius - i * i ) );
-                for ( auto j = -h; j <= +h; j += 3 )
+                auto circ_h = std::round( std::sqrt( m_brushRadius * m_brushRadius - i * i ) );
+                for ( auto j = -circ_h; j <= +circ_h; j += 3 )
                 {
-                    const int x = query.m_screenCoords.x() + i;
-                    const int y = query.m_screenCoords.y() - j;
-                    // skip query if out of window (can occur when picking while moving outside)
-                    if ( x < 0 || x > int( m_width ) - 1 || y < 0 || y > int( m_height ) - 1 )
-                    { continue; }
-                    GL_ASSERT( glReadPixels( x, y, 1, 1, GL_RGBA_INTEGER, GL_INT, pick ) );
-                    resultPerRO[pick[0]].m_roIdx = pick[0];
-                    resultPerRO[pick[0]].m_vertexIdx.emplace_back( pick[1] );
-                    resultPerRO[pick[0]].m_elementIdx.emplace_back( pick[2] );
-                    resultPerRO[pick[0]].m_edgeIdx.emplace_back( pick[3] );
+                    size_t idx = 4 * ( j + m_brushRadius + std::min( dy, 0.0f ) ) * w + 4 * (i + m_brushRadius + std::min( dx, 0.0f ));
+                    if ( idx < 0 || idx >= data_size - 1 ) continue;
+                    resultPerRO[pixels[idx]].m_roIdx = pixels[idx];
+                    resultPerRO[pixels[idx]].m_vertexIdx.emplace_back( pixels[idx + 1] );
+                    resultPerRO[pixels[idx]].m_elementIdx.emplace_back( pixels[idx + 2] );
+                    resultPerRO[pixels[idx]].m_edgeIdx.emplace_back( pixels[idx + 3] );
                 }
             }
+            delete[] pixels;
 
             auto itr = std::max_element(
                 resultPerRO.begin(),
@@ -478,6 +494,10 @@ void Renderer::doPicking( const ViewingParameters& renderData ) {
                     return a.second.m_vertexIdx.size() < b.second.m_vertexIdx.size();
                 } );
             result = itr->second;
+            GL_ASSERT( glReadPixels( query.m_screenCoords.x(), query.m_screenCoords.y(),
+                                     1, 1, GL_RGBA_INTEGER, GL_INT, pick ) );
+            result.m_centerFrag.first = pick[2];
+            result.m_centerFrag.second = pick[1];
         }
         result.m_mode = query.m_mode;
         m_pickingResults.push_back( result );
