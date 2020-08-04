@@ -48,6 +48,8 @@ FileData* AssimpFileLoader::loadFile( const std::string& filename ) {
 
     if ( !fileData->isInitialized() ) { return nullptr; }
 
+    m_importer.SetPropertyBool(AI_CONFIG_IMPORT_REMOVE_EMPTY_BONES, false);
+
     const aiScene* scene = m_importer.ReadFile(
         fileData->getFileName(),
         aiProcess_GenSmoothNormals | aiProcess_SortByPType | aiProcess_FixInfacingNormals |
